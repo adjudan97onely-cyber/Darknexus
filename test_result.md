@@ -181,27 +181,101 @@ backend:
         comment: "PASS: DELETE /api/projects/{project_id} successfully deletes projects and returns success message"
 
 frontend:
-  - task: "Frontend UI (not testing)"
+  - task: "Homepage UI and sections"
     implemented: true
-    working: "NA"
-    file: "/app/frontend/src/App.js"
+    working: true
+    file: "/app/frontend/src/pages/HomePage.jsx"
     stuck_count: 0
-    priority: "low"
+    priority: "high"
     needs_retesting: false
     status_history:
-      - working: "NA"
+      - working: true
         agent: "testing"
-        comment: "Frontend testing not performed per system requirements"
+        comment: "PASS: Homepage loads correctly with hero section 'Créez N'importe Quel Projet avec l'IA', stats section (6+ Types, 10+ Langages, 50+ Templates, 3 Models), features section, 6 project types, 4 templates. Navigation buttons work. Dark theme with purple/pink gradients rendering properly."
+
+  - task: "Create Project Page with form"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/CreateProjectPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASS: Create project page loads with all form fields (name, type dropdown, tech stack, description). Form validation works correctly for empty fields and short descriptions. Submit triggers AI generation with loading state. Dropdown selection works via keyboard navigation. Minor: Dropdown uses Radix UI which requires specific selectors."
+
+  - task: "Projects List Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/ProjectsPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASS: Projects list page loads correctly with title 'Mes Projets', search box, and 'Nouveau Projet' button. Project cards display with type badges, status indicators, names, descriptions, tech stack badges, dates, and 'Voir' buttons. Search functionality works correctly. Card click navigation to detail page works."
+
+  - task: "Project Detail Page"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/ProjectDetailPage.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASS: Project detail page displays project name, description, type badge, status, tech stack badges. Stats cards show files generated, lines of code, and creation date. Code section with file tabs works. Tab switching functional. Copy button works with 'Copié!' feedback. Download and back buttons present. Handles projects with no code files gracefully (shows generation message)."
+
+  - task: "Navigation flows"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASS: All navigation flows work correctly. Homepage to /create works. Header 'Mes Projets' button navigates to /projects. Logo click returns to homepage. Project card click navigates to detail page. Back button from detail returns to projects list. Browser history navigation works."
+
+  - task: "UI/UX and styling"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/index.css"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "PASS: Dark theme (slate-950/900 backgrounds) applied correctly throughout. Purple/pink gradient buttons visible and styled correctly. Hover effects on cards work (translate-y). Text contrast is good. Shadcn/ui components render properly. Loading states show Loader2 spinning icon. Icons from lucide-react display correctly."
+
+  - task: "AI code generation integration"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/CreateProjectPage.jsx"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "FAIL: AI code generation experiencing OpenAI API 502 Bad Gateway errors. Frontend correctly triggers POST /api/projects, shows loading state 'Génération en cours...', but backend times out after 60-90 seconds due to OpenAI API failures. Three test projects created all resulted in 'error' or 'in-progress' status with 0 code files. Frontend/backend integration is working - issue is external OpenAI API reliability. Backend logs show: 'BadGatewayError: OpenAIException - Error code: 502' and multiple retry attempts."
 
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 1
-  run_ui: false
+  test_sequence: 2
+  run_ui: true
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "AI code generation integration"
+  stuck_tasks:
+    - "AI code generation integration"
   test_all: false
   test_priority: "high_first"
 
@@ -210,3 +284,5 @@ agent_communication:
     message: "Starting comprehensive backend API testing for CodeForge AI. All endpoints identified and ready for testing. Focus on AI code generation functionality."
   - agent: "testing"
     message: "TESTING COMPLETE: All 5 backend API endpoints tested successfully. Fixed pydantic regex->pattern issue during testing. AI code generation with Emergent LLM is working correctly, generating 6 code files per project. MongoDB integration working. All CRUD operations functional."
+  - agent: "testing"
+    message: "FRONTEND TESTING COMPLETE: Tested all 7 scenarios from review request. Homepage (hero, stats, features, project types, templates) ✅. Create page with form validation ✅. Projects list with search ✅. Project detail with code tabs and copy button ✅. Navigation flows ✅. UI/UX with dark theme ✅. CRITICAL ISSUE: AI generation failing due to OpenAI API 502 errors - external issue, not application bug. Frontend/backend integration working correctly, but OpenAI provider is unreliable. All 3 test project creations timed out with BadGatewayError. Backend correctly handles errors and retries."
