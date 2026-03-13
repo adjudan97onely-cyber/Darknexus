@@ -84,9 +84,8 @@ const HomePage = () => {
               size="lg"
               onClick={() => navigate('/create')}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 transition-all duration-300 shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105">
-
               <Rocket className="w-5 h-5 mr-2" />
-              je veux creer une application pour telephone qui trie les photos similaire, les vielles photos et tout, histoire de faire de la place sur mon telephone
+              Commencer Maintenant
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
             <Button
