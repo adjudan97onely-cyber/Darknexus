@@ -7,7 +7,7 @@ import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Badge } from '../components/ui/badge';
-import { Sparkles, ArrowLeft, Wand2, Loader2 } from 'lucide-react';
+import { Sparkles, ArrowLeft, Wand2, Loader2, Cpu } from 'lucide-react';
 import { projectTypes } from '../mock/mockData';
 import { useToast } from '../hooks/use-toast';
 import { projectsAPI } from '../services/api';
@@ -22,8 +22,18 @@ const CreateProjectPage = () => {
     name: '',
     description: '',
     type: location.state?.selectedType || '',
-    tech_stack: ''
+    tech_stack: '',
+    ai_model: 'gpt-5.1'  // Modèle par défaut
   });
+
+  const aiModels = [
+    { id: 'gpt-5.1', name: 'GPT-5.1 (Recommandé)', description: 'Le plus équilibré - Rapide et performant' },
+    { id: 'gpt-5.2', name: 'GPT-5.2', description: 'Le plus puissant - Meilleur pour projets complexes' },
+    { id: 'claude-4-sonnet', name: 'Claude 4 Sonnet', description: 'Expert - Excellent pour code structuré' },
+    { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6', description: 'Nouvelle génération Claude' },
+    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', description: 'Google - Très performant' },
+    { id: 'gemini-3-flash', name: 'Gemini 3 Flash', description: 'Ultra rapide - Génération en secondes' }
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -155,6 +165,32 @@ const CreateProjectPage = () => {
                     className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-purple-500 transition-colors"
                   />
                   <p className="text-sm text-slate-500">Laissez vide pour laisser l'IA choisir</p>
+                </div>
+
+                {/* Modèle IA */}
+                <div className="space-y-2">
+                  <Label htmlFor="ai_model" className="text-slate-200 flex items-center">
+                    <Cpu className="w-4 h-4 mr-2 text-purple-400" />
+                    Modèle IA Expert *
+                  </Label>
+                  <Select value={formData.ai_model} onValueChange={(value) => setFormData({ ...formData, ai_model: value })}>
+                    <SelectTrigger className="bg-slate-800 border-slate-700 text-white focus:border-purple-500">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700">
+                      {aiModels.map((model) => (
+                        <SelectItem key={model.id} value={model.id} className="text-white hover:bg-slate-700">
+                          <div className="flex flex-col">
+                            <span className="font-semibold">{model.name}</span>
+                            <span className="text-xs text-slate-400">{model.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-slate-500">
+                    <span className="text-purple-400 font-semibold">Nouveau !</span> Système multi-IA avec fallback automatique
+                  </p>
                 </div>
 
                 {/* Description */}

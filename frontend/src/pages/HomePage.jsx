@@ -12,8 +12,8 @@ const HomePage = () => {
   const features = [
     {
       icon: Sparkles,
-      title: 'Génération IA Illimitée',
-      description: 'Créez autant de projets que vous voulez, sans limite de crédits'
+      title: 'Multi-IA Expert',
+      description: '6 modèles IA de pointe : GPT-5, Claude 4, Gemini 3 avec fallback automatique'
     },
     {
       icon: Zap,
@@ -36,7 +36,7 @@ const HomePage = () => {
     { icon: Globe, label: 'Types de Projets', value: '6+' },
     { icon: Code2, label: 'Langages Supportés', value: '10+' },
     { icon: Database, label: 'Templates', value: '50+' },
-    { icon: Cpu, label: 'IA Modèles', value: '3' }
+    { icon: Cpu, label: 'Modèles IA Experts', value: '6' }
   ];
 
   return (
@@ -70,7 +70,7 @@ const HomePage = () => {
       <section className="container mx-auto px-4 py-20">
         <div className="text-center max-w-4xl mx-auto">
           <Badge className="mb-6 bg-purple-500/10 text-purple-300 border-purple-500/20 hover:bg-purple-500/20 transition-colors">
-            ✨ Gratuit & Illimité
+            ✨ Nouveau : Multi-IA Expert (GPT-5, Claude 4, Gemini 3)
           </Badge>
           <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent leading-tight">
             Créez N'importe Quel Projet avec l'IA

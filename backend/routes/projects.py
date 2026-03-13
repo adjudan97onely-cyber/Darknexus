@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
 from models.project import Project, ProjectCreate, ProjectResponse, CodeFile
-from services.ai_service import ai_generator
+from services.ai_service import ai_generator, AICodeGenerator
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -16,6 +16,20 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 projects_collection = db.projects
+
+
+@router.get("/models")
+async def get_available_models():
+    """
+    Récupère la liste des modèles IA disponibles
+    """
+    return {
+        "models": [
+            {"id": key, "name": config["name"]}
+            for key, config in AICodeGenerator.AVAILABLE_MODELS.items()
+        ],
+        "recommended": "gpt-5.1"
+    }
 
 
 @router.post("", response_model=ProjectResponse)
@@ -43,12 +57,15 @@ async def create_project(project_input: ProjectCreate):
         try:
             logger.info(f"Starting code generation for project: {project.name}")
             
-            ai_result = await ai_generator.generate_code({
-                'name': project.name,
-                'description': project.description,
-                'type': project.type,
-                'tech_stack': ', '.join(project.tech_stack) if project.tech_stack else None
-            })
+            ai_result = await ai_generator.generate_code(
+                project_data={
+                    'name': project.name,
+                    'description': project.description,
+                    'type': project.type,
+                    'tech_stack': ', '.join(project.tech_stack) if project.tech_stack else None
+                },
+                preferred_model=project_input.ai_model
+            )
             
             # Convertir les fichiers
             code_files = [
@@ -63,6 +80,7 @@ async def create_project(project_input: ProjectCreate):
             # Mettre à jour le projet
             project.code_files = code_files
             project.tech_stack = ai_result.get('tech_stack', project.tech_stack)
+            project.ai_model_used = ai_result.get('model_used', 'unknown')
             project.status = "completed"
             project.updated_at = datetime.utcnow()
             
@@ -93,6 +111,7 @@ async def create_project(project_input: ProjectCreate):
             type=project.type,
             tech_stack=project.tech_stack,
             status=project.status,
+            ai_model_used=project.ai_model_used,
             created_at=project.created_at.isoformat(),
             code_files=project.code_files
         )
@@ -117,6 +136,7 @@ async def get_projects():
                 type=p['type'],
                 tech_stack=p['tech_stack'],
                 status=p['status'],
+                ai_model_used=p.get('ai_model_used'),
                 created_at=p['created_at'].isoformat() if isinstance(p['created_at'], datetime) else p['created_at'],
                 code_files=[
                     CodeFile(**cf) for cf in p.get('code_files', [])
@@ -147,6 +167,7 @@ async def get_project(project_id: str):
             type=project['type'],
             tech_stack=project['tech_stack'],
             status=project['status'],
+            ai_model_used=project.get('ai_model_used'),
             created_at=project['created_at'].isoformat() if isinstance(project['created_at'], datetime) else project['created_at'],
             code_files=[
                 CodeFile(**cf) for cf in project.get('code_files', [])

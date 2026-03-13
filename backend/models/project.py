@@ -15,6 +15,7 @@ class ProjectCreate(BaseModel):
     description: str = Field(..., min_length=20, max_length=2000)
     type: str = Field(..., pattern="^(web-app|python-script|excel-automation|game-script|ai-app|api)$")
     tech_stack: Optional[str] = None
+    ai_model: Optional[str] = Field(default='gpt-5.1', description="Modèle IA à utiliser")
 
 
 class Project(BaseModel):
@@ -24,6 +25,7 @@ class Project(BaseModel):
     type: str
     tech_stack: List[str] = []
     status: str = "pending"  # pending, in-progress, completed, error
+    ai_model_used: Optional[str] = None  # Modèle IA utilisé pour la génération
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     code_files: List[CodeFile] = []
@@ -41,5 +43,6 @@ class ProjectResponse(BaseModel):
     type: str
     tech_stack: List[str]
     status: str
+    ai_model_used: Optional[str] = None
     created_at: str
     code_files: List[CodeFile] = []

@@ -122,6 +122,11 @@ const ProjectDetailPage = () => {
                   <span className="text-sm">Complété</span>
                 </div>
               )}
+              {project.ai_model_used && (
+                <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/5">
+                  🤖 {project.ai_model_used}
+                </Badge>
+              )}
             </div>
             <h1 className="text-4xl font-bold text-white mb-3">{project.name}</h1>
             <p className="text-slate-400 text-lg mb-4">{project.description}</p>
