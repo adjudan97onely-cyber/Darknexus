@@ -11,6 +11,7 @@ import { Sparkles, ArrowLeft, Wand2, Loader2, Cpu } from 'lucide-react';
 import { projectTypes } from '../mock/mockData';
 import { useToast } from '../hooks/use-toast';
 import { projectsAPI } from '../services/api';
+import VoiceInput from '../components/VoiceInput';
 
 const CreateProjectPage = () => {
   const navigate = useNavigate();
@@ -34,6 +35,14 @@ const CreateProjectPage = () => {
     { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', description: 'Google - Très performant' },
     { id: 'gemini-3-flash', name: 'Gemini 3 Flash', description: 'Ultra rapide - Génération en secondes' }
   ];
+
+  const handleVoiceTranscript = (transcript) => {
+    // Ajouter le texte dicté à la description existante
+    setFormData(prev => ({
+      ...prev,
+      description: prev.description + (prev.description ? ' ' : '') + transcript
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -195,7 +204,16 @@ const CreateProjectPage = () => {
 
                 {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-slate-200">Description Détaillée *</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="description" className="text-slate-200">Description Détaillée *</Label>
+                    <div className="flex items-center gap-2">
+                      <VoiceInput 
+                        onTranscript={handleVoiceTranscript}
+                        disabled={isGenerating}
+                      />
+                      <span className="text-xs text-slate-500">ou dictez vocalement 🎤</span>
+                    </div>
+                  </div>
                   <Textarea
                     id="description"
                     placeholder="Décrivez votre projet en détail. Plus vous donnez de détails, meilleur sera le code généré.\n\nExemple:\n- Une application qui prend une photo d'ingrédients\n- Utilise l'IA pour identifier les ingrédients\n- Suggère des recettes possibles\n- Affiche les recettes avec instructions\n- Permet de sauvegarder les favoris"
@@ -204,7 +222,12 @@ const CreateProjectPage = () => {
                     rows={10}
                     className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-purple-500 transition-colors resize-none"
                   />
-                  <p className="text-sm text-slate-500">Minimum 50 caractères recommandés</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-slate-500">Minimum 50 caractères recommandés</p>
+                    <p className="text-sm text-slate-400">
+                      {formData.description.length} caractères
+                    </p>
+                  </div>
                 </div>
 
                 {/* Selected type info */}
