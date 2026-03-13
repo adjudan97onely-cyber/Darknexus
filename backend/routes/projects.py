@@ -180,8 +180,186 @@ async def get_project(project_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/{project_id}")
-async def delete_project(project_id: str):
+@router.post("/{project_id}/improve")
+async def improve_project(project_id: str, improvement_request: dict):
+    """
+    Améliore un projet existant avec de nouvelles instructions
+    """
+    try:
+        # Récupérer le projet existant
+        project = await projects_collection.find_one({"id": project_id})
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Projet non trouvé")
+        
+        # Extraire la demande d'amélioration
+        improvement_description = improvement_request.get("description", "")
+        ai_model = improvement_request.get("ai_model", "gpt-5.1")
+        
+        if not improvement_description:
+            raise HTTPException(status_code=400, detail="Description de l'amélioration requise")
+        
+        # Construire le contexte pour l'IA
+        context = f"""Projet existant à améliorer:
+Nom: {project['name']}
+Description originale: {project['description']}
+Technologies: {', '.join(project['tech_stack'])}
+
+Code actuel:
+{chr(10).join([f"Fichier: {f['filename']}" for f in project.get('code_files', [])])}
+
+DEMANDE D'AMÉLIORATION:
+{improvement_description}
+
+Génère le code AMÉLIORÉ en gardant la structure existante mais en intégrant les améliorations demandées."""
+
+        # Mettre à jour le statut
+        await projects_collection.update_one(
+            {"id": project_id},
+            {"$set": {"status": "in-progress", "updated_at": datetime.utcnow()}}
+        )
+        
+        try:
+            # Générer le code amélioré
+            logger.info(f"Improving project: {project['name']}")
+            
+            ai_result = await ai_generator.generate_code(
+                project_data={
+                    'name': project['name'],
+                    'description': context,
+                    'type': project['type'],
+                    'tech_stack': ', '.join(project['tech_stack'])
+                },
+                preferred_model=ai_model
+            )
+            
+            # Mettre à jour avec le nouveau code
+            code_files = [
+                CodeFile(
+                    filename=f['filename'],
+                    language=f['language'],
+                    content=f['content']
+                )
+                for f in ai_result['files']
+            ]
+            
+            update_data = {
+                "code_files": [cf.dict() for cf in code_files],
+                "tech_stack": ai_result.get('tech_stack', project['tech_stack']),
+                "ai_model_used": ai_result.get('model_used', 'unknown'),
+                "status": "completed",
+                "updated_at": datetime.utcnow(),
+                "description": f"{project['description']}\n\nAméliorations: {improvement_description}"
+            }
+            
+            await projects_collection.update_one(
+                {"id": project_id},
+                {"$set": update_data}
+            )
+            
+            logger.info(f"Project improvement completed: {project['name']}")
+            
+            # Récupérer et retourner le projet mis à jour
+            updated_project = await projects_collection.find_one({"id": project_id})
+            
+            return ProjectResponse(
+                id=updated_project['id'],
+                name=updated_project['name'],
+                description=updated_project['description'],
+                type=updated_project['type'],
+                tech_stack=updated_project['tech_stack'],
+                status=updated_project['status'],
+                ai_model_used=updated_project.get('ai_model_used'),
+                created_at=updated_project['created_at'].isoformat() if isinstance(updated_project['created_at'], datetime) else updated_project['created_at'],
+                code_files=[CodeFile(**cf) for cf in updated_project.get('code_files', [])]
+            )
+            
+        except Exception as e:
+            logger.error(f"Error during project improvement: {str(e)}")
+            await projects_collection.update_one(
+                {"id": project_id},
+                {"$set": {"status": "error", "updated_at": datetime.utcnow()}}
+            )
+            raise HTTPException(status_code=500, detail=f"Erreur lors de l'amélioration: {str(e)}")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error improving project: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{project_id}/download")
+async def download_project(project_id: str):
+    """
+    Télécharge le projet en tant que fichier ZIP
+    """
+    import zipfile
+    import io
+    from fastapi.responses import StreamingResponse
+    
+    try:
+        project = await projects_collection.find_one({"id": project_id})
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Projet non trouvé")
+        
+        # Créer un fichier ZIP en mémoire
+        zip_buffer = io.BytesIO()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            # Ajouter tous les fichiers de code
+            for file in project.get('code_files', []):
+                zip_file.writestr(file['filename'], file['content'])
+            
+            # Créer un README avec instructions
+            readme_content = f"""# {project['name']}
+
+{project['description']}
+
+## Technologies
+{', '.join(project['tech_stack'])}
+
+## Installation
+
+### Pour les projets Python:
+```bash
+pip install -r requirements.txt
+python main.py  # ou le nom du fichier principal
+```
+
+### Pour les projets JavaScript/React:
+```bash
+npm install  # ou yarn install
+npm start
+```
+
+### Pour les projets Web simples:
+Ouvrez index.html dans votre navigateur
+
+## Généré par
+ADJ KILLAGAIN IA 2.0
+Modèle IA utilisé: {project.get('ai_model_used', 'N/A')}
+Date: {project.get('created_at', 'N/A')}
+"""
+            zip_file.writestr('README.md', readme_content)
+        
+        # Préparer le téléchargement
+        zip_buffer.seek(0)
+        
+        return StreamingResponse(
+            iter([zip_buffer.getvalue()]),
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": f"attachment; filename={project['name'].replace(' ', '_')}.zip"
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error downloading project: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
     """
     Supprime un projet
     """

@@ -22,6 +22,29 @@ export const projectsAPI = {
     return response.data;
   },
 
+  // Améliorer un projet existant
+  improveProject: async (projectId, improvementData) => {
+    const response = await axios.post(`${API}/projects/${projectId}/improve`, improvementData);
+    return response.data;
+  },
+
+  // Télécharger un projet en ZIP
+  downloadProject: async (projectId, projectName) => {
+    const response = await axios.get(`${API}/projects/${projectId}/download`, {
+      responseType: 'blob'
+    });
+    
+    // Créer un lien de téléchargement
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${projectName.replace(/\s+/g, '_')}.zip`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  },
+
   // Supprimer un projet
   deleteProject: async (projectId) => {
     const response = await axios.delete(`${API}/projects/${projectId}`);

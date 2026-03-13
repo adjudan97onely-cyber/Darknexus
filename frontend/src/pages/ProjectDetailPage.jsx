@@ -4,9 +4,13 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Sparkles, ArrowLeft, Download, Copy, CheckCircle2, Code2, FileCode, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Textarea } from '../components/ui/textarea';
+import { Label } from '../components/ui/label';
+import { Sparkles, ArrowLeft, Download, Copy, CheckCircle2, Code2, FileCode, Loader2, Wrench, Share2 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { projectsAPI } from '../services/api';
+import VoiceInput from '../components/VoiceInput';
 
 const ProjectDetailPage = () => {
   const navigate = useNavigate();
@@ -15,6 +19,9 @@ const ProjectDetailPage = () => {
   const [copiedFile, setCopiedFile] = useState(null);
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isImproving, setIsImproving] = useState(false);
+  const [improvementDescription, setImprovementDescription] = useState('');
+  const [showImproveModal, setShowImproveModal] = useState(false);
 
   useEffect(() => {
     loadProject();
@@ -71,12 +78,62 @@ const ProjectDetailPage = () => {
     setTimeout(() => setCopiedFile(null), 2000);
   };
 
-  const handleDownloadProject = () => {
-    toast({
-      title: "Téléchargement démarré",
-      description: "Votre projet est en cours de téléchargement"
-    });
-    // Logique de téléchargement à implémenter
+  const handleDownloadProject = async () => {
+    try {
+      await projectsAPI.downloadProject(projectId, project.name);
+      toast({
+        title: "📦 Téléchargement démarré",
+        description: "Votre projet est en cours de téléchargement"
+      });
+    } catch (error) {
+      console.error('Error downloading project:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de télécharger le projet",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleImproveProject = async () => {
+    if (!improvementDescription || improvementDescription.length < 20) {
+      toast({
+        title: "Erreur",
+        description: "Décrivez les améliorations souhaitées (min 20 caractères)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsImproving(true);
+    try {
+      const updatedProject = await projectsAPI.improveProject(projectId, {
+        description: improvementDescription,
+        ai_model: 'gpt-5.1'
+      });
+      
+      setProject(updatedProject);
+      setShowImproveModal(false);
+      setImprovementDescription('');
+      
+      toast({
+        title: "✨ Projet amélioré !",
+        description: "Les améliorations ont été appliquées avec succès"
+      });
+    } catch (error) {
+      console.error('Error improving project:', error);
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible d'améliorer le projet",
+        variant: "destructive"
+      });
+    } finally {
+      setIsImproving(false);
+    }
+  };
+
+  const handleVoiceTranscript = (transcript) => {
+    setImprovementDescription(prev => prev + (prev ? ' ' : '') + transcript);
   };
 
   return (
@@ -99,10 +156,75 @@ const ProjectDetailPage = () => {
                 </span>
               </div>
             </div>
-            <Button onClick={handleDownloadProject} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-              <Download className="w-4 h-4 mr-2" />
-              Télécharger
-            </Button>
+            <div className="flex items-center gap-3">
+              <Dialog open={showImproveModal} onOpenChange={setShowImproveModal}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10">
+                    <Wrench className="w-4 h-4 mr-2" />
+                    Améliorer
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl flex items-center">
+                      <Wrench className="w-6 h-6 mr-2 text-purple-400" />
+                      Améliorer le Projet
+                    </DialogTitle>
+                    <DialogDescription className="text-slate-400">
+                      Décrivez les améliorations ou modifications souhaitées
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-slate-200">Améliorations *</Label>
+                        <VoiceInput onTranscript={handleVoiceTranscript} disabled={isImproving} />
+                      </div>
+                      <Textarea
+                        placeholder="Exemple:\n- Ajouter une recherche\n- Améliorer le design\n- Ajouter sauvegarde\n- Corriger bug..."
+                        value={improvementDescription}
+                        onChange={(e) => setImprovementDescription(e.target.value)}
+                        rows={6}
+                        className="bg-slate-800 border-slate-700 text-white resize-none"
+                        disabled={isImproving}
+                      />
+                      <p className="text-sm text-slate-500">{improvementDescription.length} / 20 min</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowImproveModal(false)}
+                        className="flex-1 border-slate-700"
+                        disabled={isImproving}
+                      >
+                        Annuler
+                      </Button>
+                      <Button
+                        onClick={handleImproveProject}
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600"
+                        disabled={isImproving}
+                      >
+                        {isImproving ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            En cours...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Améliorer
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button onClick={handleDownloadProject} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+                <Download className="w-4 h-4 mr-2" />
+                Télécharger ZIP
+              </Button>
+            </div>
           </div>
         </div>
       </nav>
