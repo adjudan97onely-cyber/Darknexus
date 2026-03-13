@@ -10,34 +10,34 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   const features = [
-    {
-      icon: Sparkles,
-      title: 'Multi-IA Expert',
-      description: '6 modèles IA de pointe : GPT-5, Claude 4, Gemini 3 avec fallback automatique'
-    },
-    {
-      icon: Zap,
-      title: 'Génération Ultra-Rapide',
-      description: 'Code généré en quelques secondes par IA avancée'
-    },
-    {
-      icon: Code2,
-      title: 'Multi-Langages',
-      description: 'Python, JavaScript, React, APIs, Scripts et plus encore'
-    },
-    {
-      icon: Rocket,
-      title: 'Templates Prêts',
-      description: 'Bibliothèque de templates pour démarrer instantanément'
-    }
-  ];
+  {
+    icon: Sparkles,
+    title: 'Multi-IA Expert',
+    description: '6 modèles IA de pointe : GPT-5, Claude 4, Gemini 3 avec fallback automatique'
+  },
+  {
+    icon: Zap,
+    title: 'Génération Ultra-Rapide',
+    description: 'Code généré en quelques secondes par IA avancée'
+  },
+  {
+    icon: Code2,
+    title: 'Multi-Langages',
+    description: 'Python, JavaScript, React, APIs, Scripts et plus encore'
+  },
+  {
+    icon: Rocket,
+    title: 'Templates Prêts',
+    description: 'Bibliothèque de templates pour démarrer instantanément'
+  }];
+
 
   const stats = [
-    { icon: Globe, label: 'Types de Projets', value: '6+' },
-    { icon: Code2, label: 'Langages Supportés', value: '10+' },
-    { icon: Database, label: 'Templates', value: '50+' },
-    { icon: Cpu, label: 'Modèles IA Experts', value: '6' }
-  ];
+  { icon: Globe, label: 'Types de Projets', value: '6+' },
+  { icon: Code2, label: 'Langages Supportés', value: '10+' },
+  { icon: Database, label: 'Templates', value: '50+' },
+  { icon: Cpu, label: 'Modèles IA Experts', value: '6' }];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
@@ -72,29 +72,29 @@ const HomePage = () => {
           <Badge className="mb-6 bg-purple-500/10 text-purple-300 border-purple-500/20 hover:bg-purple-500/20 transition-colors">
             ✨ Nouveau : Multi-IA Expert (GPT-5, Claude 4, Gemini 3)
           </Badge>
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent leading-tight">
-            Créez N'importe Quel Projet avec l'IA
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent leading-tight">ADJ KILLAGAIN IA 2.0
+
           </h1>
           <p className="text-xl text-slate-400 mb-8 leading-relaxed">
             Génération illimitée de code par IA. Web apps, scripts Python, automatisation Excel, 
             applications IA et plus encore. Aucune limite de crédits.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               onClick={() => navigate('/create')}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 transition-all duration-300 shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105"
-            >
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 transition-all duration-300 shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105">
+
               <Rocket className="w-5 h-5 mr-2" />
-              Commencer Maintenant
+              je veux creer une application pour telephone qui trie les photos similaire, les vielles photos et tout, histoire de faire de la place sur mon telephone
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="outline"
               onClick={() => navigate('/projects')}
-              className="border-slate-700 text-slate-300 hover:bg-slate-800 text-lg px-8 py-6 transition-all duration-300"
-            >
+              className="border-slate-700 text-slate-300 hover:bg-slate-800 text-lg px-8 py-6 transition-all duration-300">
+
               Voir les Exemples
             </Button>
           </div>
@@ -104,13 +104,13 @@ const HomePage = () => {
       {/* Stats Section */}
       <section className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-          {stats.map((stat, index) => (
-            <div key={index} className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center hover:bg-slate-900 transition-all duration-300 hover:border-purple-500/30">
+          {stats.map((stat, index) =>
+          <div key={index} className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 text-center hover:bg-slate-900 transition-all duration-300 hover:border-purple-500/30">
               <stat.icon className="w-8 h-8 mx-auto mb-3 text-purple-400" />
               <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
               <div className="text-sm text-slate-400">{stat.label}</div>
             </div>
-          ))}
+          )}
         </div>
       </section>
 
@@ -121,8 +121,8 @@ const HomePage = () => {
           <p className="text-slate-400 text-lg">La plateforme la plus puissante pour générer du code</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {features.map((feature, index) => (
-            <Card key={index} className="bg-slate-900/50 border-slate-800 hover:bg-slate-900 transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1">
+          {features.map((feature, index) =>
+          <Card key={index} className="bg-slate-900/50 border-slate-800 hover:bg-slate-900 transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1">
               <CardHeader>
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-purple-400" />
@@ -133,7 +133,7 @@ const HomePage = () => {
                 <CardDescription className="text-slate-400">{feature.description}</CardDescription>
               </CardContent>
             </Card>
-          ))}
+          )}
         </div>
       </section>
 
@@ -144,8 +144,8 @@ const HomePage = () => {
           <p className="text-slate-400 text-lg">De tout, pour tous vos besoins</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {projectTypes.map((type) => (
-            <Card key={type.id} className="bg-slate-900/50 border-slate-800 hover:bg-slate-900 transition-all duration-300 hover:border-purple-500/30 cursor-pointer hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1" onClick={() => navigate('/create', { state: { selectedType: type.id } })}>
+          {projectTypes.map((type) =>
+          <Card key={type.id} className="bg-slate-900/50 border-slate-800 hover:bg-slate-900 transition-all duration-300 hover:border-purple-500/30 cursor-pointer hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1" onClick={() => navigate('/create', { state: { selectedType: type.id } })}>
               <CardHeader>
                 <div className="text-4xl mb-3">{type.icon}</div>
                 <CardTitle className="text-white">{type.name}</CardTitle>
@@ -153,15 +153,15 @@ const HomePage = () => {
               <CardContent>
                 <CardDescription className="text-slate-400 mb-4">{type.description}</CardDescription>
                 <div className="flex flex-wrap gap-2">
-                  {type.stacks.map((stack, idx) => (
-                    <Badge key={idx} variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700">
+                  {type.stacks.map((stack, idx) =>
+                <Badge key={idx} variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700">
                       {stack}
                     </Badge>
-                  ))}
+                )}
                 </div>
               </CardContent>
             </Card>
-          ))}
+          )}
         </div>
       </section>
 
@@ -172,8 +172,8 @@ const HomePage = () => {
           <p className="text-slate-400 text-lg">Démarrez avec un template pré-configuré</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {templates.map((template) => (
-            <Card key={template.id} className="bg-slate-900/50 border-slate-800 hover:bg-slate-900 transition-all duration-300 hover:border-purple-500/30 cursor-pointer hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1" onClick={() => navigate('/create', { state: { templateId: template.id } })}>
+          {templates.map((template) =>
+          <Card key={template.id} className="bg-slate-900/50 border-slate-800 hover:bg-slate-900 transition-all duration-300 hover:border-purple-500/30 cursor-pointer hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1" onClick={() => navigate('/create', { state: { templateId: template.id } })}>
               <CardHeader>
                 <CardTitle className="text-white text-lg">{template.name}</CardTitle>
               </CardHeader>
@@ -190,7 +190,7 @@ const HomePage = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          )}
         </div>
       </section>
 
@@ -201,11 +201,11 @@ const HomePage = () => {
           <p className="text-slate-300 text-lg mb-8">
             Rejoignez des milliers de créateurs qui utilisent CodeForge AI pour donner vie à leurs idées
           </p>
-          <Button 
+          <Button
             size="lg"
             onClick={() => navigate('/create')}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-10 py-6 transition-all duration-300 shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105"
-          >
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-10 py-6 transition-all duration-300 shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105">
+
             <Rocket className="w-5 h-5 mr-2" />
             Créer Mon Premier Projet
             <ChevronRight className="w-5 h-5 ml-2" />
@@ -221,8 +221,8 @@ const HomePage = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default HomePage;
