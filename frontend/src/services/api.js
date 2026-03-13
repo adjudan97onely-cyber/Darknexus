@@ -28,6 +28,12 @@ export const projectsAPI = {
     return response.data;
   },
 
+  // Mettre à jour les informations d'un projet
+  updateProject: async (projectId, updateData) => {
+    const response = await axios.put(`${API}/projects/${projectId}`, updateData);
+    return response.data;
+  },
+
   // Télécharger un projet en ZIP
   downloadProject: async (projectId, projectName) => {
     const response = await axios.get(`${API}/projects/${projectId}/download`, {

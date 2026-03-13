@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
-import { Sparkles, ArrowLeft, Download, Copy, CheckCircle2, Code2, FileCode, Loader2, Wrench, Share2 } from 'lucide-react';
+import { Input } from '../components/ui/input';
+import { Sparkles, ArrowLeft, Download, Copy, CheckCircle2, Code2, FileCode, Loader2, Wrench, Share2, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { projectsAPI } from '../services/api';
 import VoiceInput from '../components/VoiceInput';
@@ -22,6 +23,8 @@ const ProjectDetailPage = () => {
   const [isImproving, setIsImproving] = useState(false);
   const [improvementDescription, setImprovementDescription] = useState('');
   const [showImproveModal, setShowImproveModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({ name: '', description: '', type: '' });
 
   useEffect(() => {
     loadProject();
@@ -32,6 +35,11 @@ const ProjectDetailPage = () => {
       setLoading(true);
       const data = await projectsAPI.getProject(projectId);
       setProject(data);
+      setEditFormData({
+        name: data.name,
+        description: data.description,
+        type: data.type
+      });
     } catch (error) {
       console.error('Error loading project:', error);
       toast({
@@ -136,6 +144,57 @@ const ProjectDetailPage = () => {
     setImprovementDescription(prev => prev + (prev ? ' ' : '') + transcript);
   };
 
+  const handleEditProject = async () => {
+    if (!editFormData.name || editFormData.name.length < 3) {
+      toast({
+        title: "Erreur",
+        description: "Le nom doit contenir au moins 3 caractères",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const updatedProject = await projectsAPI.updateProject(projectId, editFormData);
+      setProject(updatedProject);
+      setShowEditModal(false);
+      
+      toast({
+        title: "✅ Projet mis à jour !",
+        description: "Les modifications ont été enregistrées"
+      });
+    } catch (error) {
+      console.error('Error updating project:', error);
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible de mettre à jour le projet",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
+      return;
+    }
+
+    try {
+      await projectsAPI.deleteProject(projectId);
+      toast({
+        title: "🗑️ Projet supprimé",
+        description: "Le projet a été supprimé avec succès"
+      });
+      navigate('/projects');
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible de supprimer le projet",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       {/* Header */}
@@ -157,6 +216,60 @@ const ProjectDetailPage = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800">
+                    <Edit className="w-4 h-4 mr-2" />
+                    Éditer
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-900 border-slate-800 text-white max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl flex items-center">
+                      <Edit className="w-6 h-6 mr-2 text-purple-400" />
+                      Éditer le Projet
+                    </DialogTitle>
+                    <DialogDescription className="text-slate-400">
+                      Modifiez les informations de votre projet
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <Label className="text-slate-200">Nom du projet *</Label>
+                      <Input
+                        value={editFormData.name}
+                        onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                        className="bg-slate-800 border-slate-700 text-white"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-slate-200">Description *</Label>
+                      <Textarea
+                        value={editFormData.description}
+                        onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                        rows={5}
+                        className="bg-slate-800 border-slate-700 text-white resize-none"
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowEditModal(false)}
+                        className="flex-1 border-slate-700"
+                      >
+                        Annuler
+                      </Button>
+                      <Button
+                        onClick={handleEditProject}
+                        className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600"
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Enregistrer
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Dialog open={showImproveModal} onOpenChange={setShowImproveModal}>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10">
@@ -223,6 +336,10 @@ const ProjectDetailPage = () => {
               <Button onClick={handleDownloadProject} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                 <Download className="w-4 h-4 mr-2" />
                 Télécharger ZIP
+              </Button>
+              <Button onClick={handleDeleteProject} variant="destructive" className="bg-red-600 hover:bg-red-700">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Supprimer
               </Button>
             </div>
           </div>

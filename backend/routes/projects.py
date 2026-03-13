@@ -360,6 +360,66 @@ Date: {project.get('created_at', 'N/A')}
     except Exception as e:
         logger.error(f"Error downloading project: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/{project_id}")
+async def update_project(project_id: str, update_data: dict):
+    """
+    Met à jour les informations d'un projet (nom, description, type)
+    """
+    try:
+        project = await projects_collection.find_one({"id": project_id})
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Projet non trouvé")
+        
+        # Préparer les données de mise à jour
+        update_fields = {}
+        
+        if "name" in update_data and update_data["name"]:
+            update_fields["name"] = update_data["name"]
+        
+        if "description" in update_data and update_data["description"]:
+            update_fields["description"] = update_data["description"]
+        
+        if "type" in update_data and update_data["type"]:
+            update_fields["type"] = update_data["type"]
+        
+        if not update_fields:
+            raise HTTPException(status_code=400, detail="Aucune donnée à mettre à jour")
+        
+        update_fields["updated_at"] = datetime.utcnow()
+        
+        # Mettre à jour le projet
+        await projects_collection.update_one(
+            {"id": project_id},
+            {"$set": update_fields}
+        )
+        
+        # Récupérer et retourner le projet mis à jour
+        updated_project = await projects_collection.find_one({"id": project_id})
+        
+        return ProjectResponse(
+            id=updated_project['id'],
+            name=updated_project['name'],
+            description=updated_project['description'],
+            type=updated_project['type'],
+            tech_stack=updated_project['tech_stack'],
+            status=updated_project['status'],
+            ai_model_used=updated_project.get('ai_model_used'),
+            created_at=updated_project['created_at'].isoformat() if isinstance(updated_project['created_at'], datetime) else updated_project['created_at'],
+            code_files=[CodeFile(**cf) for cf in updated_project.get('code_files', [])]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating project: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/{project_id}")
+async def delete_project(project_id: str):
     """
     Supprime un projet
     """
