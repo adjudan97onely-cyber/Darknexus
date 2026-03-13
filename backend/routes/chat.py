@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from typing import List, Optional
 from pydantic import BaseModel
 from services.ai_service import ai_generator
+from services.intelligent_agent import get_intelligent_agent
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -37,7 +38,7 @@ class ChatRequest(BaseModel):
 @router.post("/message")
 async def send_chat_message(chat_request: ChatRequest):
     """
-    Envoie un message au chat et reçoit une réponse de l'IA
+    Envoie un message au chat et reçoit une réponse de l'AGENT INTELLIGENT
     """
     try:
         project_id = chat_request.project_id
@@ -59,76 +60,76 @@ async def send_chat_message(chat_request: ChatRequest):
         }
         await messages_collection.insert_one(user_msg)
         
-        # Récupérer l'historique récent (10 derniers messages)
+        # Récupérer l'historique récent
         history = await messages_collection.find(
             {"project_id": project_id}
         ).sort("timestamp", -1).limit(10).to_list(10)
         history.reverse()
         
-        # Construire le contexte
-        context = f"""Tu es l'assistant IA de ADJ KILLAGAIN IA 2.0. Tu aides l'utilisateur avec son projet.
+        # Utiliser l'AGENT INTELLIGENT
+        agent = get_intelligent_agent()
+        
+        # Déterminer l'action à effectuer
+        if "analys" in user_message.lower() or "audit" in user_message.lower():
+            logger.info("Action: ANALYZE")
+            response_data = await agent.analyze_project(project)
+        elif "debug" in user_message.lower() or "bug" in user_message.lower() or "erreur" in user_message.lower():
+            logger.info("Action: DEBUG")
+            response_data = await agent.debug_project(project, user_message)
+        else:
+            logger.info("Action: IMPROVE")
+            response_data = await agent.improve_intelligently(
+                project, 
+                user_message, 
+                [{"role": msg["role"], "content": msg["content"]} for msg in history[-5:]]
+            )
+        
+        # Construire la réponse utilisateur
+        response_text = f"""💭 **Analyse**: {response_data.get('thinking', 'En cours...')}
 
-PROJET ACTUEL:
-Nom: {project['name']}
-Description: {project['description']}
-Type: {project['type']}
-Technologies: {', '.join(project['tech_stack'])}
-Statut: {project['status']}
+📋 **Action**: {response_data.get('action', 'N/A').upper()}
 
-HISTORIQUE DE CONVERSATION:
-{chr(10).join([f"{msg['role'].upper()}: {msg['content']}" for msg in history[-5:]])}
-
-CODE ACTUEL:
-{chr(10).join([f"Fichier: {f['filename']}" for f in project.get('code_files', [])[:5]])}
-
-INSTRUCTION:
-L'utilisateur dit: "{user_message}"
+💬 **Explication**:
+{response_data.get('explanation', 'Réponse en cours...')}
 """
         
-        if action == "improve":
-            context += "\n\nACTION: Améliorer le code selon la demande"
-        elif action == "debug":
-            context += "\n\nACTION: Déboguer et corriger les erreurs"
-        elif action == "modify":
-            context += "\n\nACTION: Modifier le code selon la demande"
+        if response_data.get('code_changes'):
+            response_text += f"\n\n🔧 **Modifications proposées**: {len(response_data['code_changes'])} fichier(s)"
         
-        context += """
-
-Réponds de manière conversationnelle et utile. Si tu dois modifier du code, explique ce que tu vas faire.
-Si c'est une question simple, réponds directement.
-Sois concis mais complet."""
+        if response_data.get('suggestions'):
+            response_text += f"\n\n💡 **Suggestions**:\n" + "\n".join([f"- {s}" for s in response_data['suggestions'][:3]])
         
-        # Générer la réponse de l'IA
-        try:
-            from emergentintegrations.llm.chat import LlmChat, UserMessage
-            
-            session_id = f"chat_{project_id}_{datetime.utcnow().timestamp()}"
-            chat = LlmChat(
-                api_key=os.environ.get('EMERGENT_LLM_KEY'),
-                session_id=session_id,
-                system_message="Tu es un assistant de développement expert, amical et efficace."
-            )
-            chat.with_model("openai", "gpt-5.1")
-            
-            response_text = await chat.send_message(UserMessage(text=context))
-            
-        except Exception as e:
-            logger.error(f"Error generating AI response: {str(e)}")
-            response_text = "Désolé, je rencontre un problème technique. Pouvez-vous reformuler votre demande ?"
+        if response_data.get('next_steps'):
+            response_text += f"\n\n📝 **Prochaines étapes**:\n" + "\n".join([f"{i+1}. {s}" for i, s in enumerate(response_data['next_steps'][:3])])
         
-        # Sauvegarder la réponse de l'IA
+        # Appliquer les modifications de code si demandé
+        code_updated = False
+        if response_data.get('code_changes') and ("applique" in user_message.lower() or "modifie" in user_message.lower()):
+            try:
+                # Appliquer les modifications
+                await _apply_code_changes(project_id, response_data['code_changes'])
+                code_updated = True
+                response_text += "\n\n✅ **Modifications appliquées avec succès!**"
+            except Exception as e:
+                logger.error(f"Error applying code changes: {str(e)}")
+                response_text += f"\n\n❌ **Erreur lors de l'application**: {str(e)}"
+        
+        # Sauvegarder la réponse de l'agent
         ai_msg = {
             "project_id": project_id,
             "role": "assistant",
             "content": response_text,
             "timestamp": datetime.utcnow(),
-            "action": action
+            "action": action,
+            "agent_data": response_data
         }
         await messages_collection.insert_one(ai_msg)
         
         return {
             "message": response_text,
-            "timestamp": ai_msg["timestamp"].isoformat()
+            "timestamp": ai_msg["timestamp"].isoformat(),
+            "code_updated": code_updated,
+            "agent_analysis": response_data
         }
         
     except HTTPException:
@@ -136,6 +137,47 @@ Sois concis mais complet."""
     except Exception as e:
         logger.error(f"Error in chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+async def _apply_code_changes(project_id: str, code_changes: List[Dict]):
+    """Applique les modifications de code au projet"""
+    project = await projects_collection.find_one({"id": project_id})
+    if not project:
+        raise Exception("Projet non trouvé")
+    
+    current_files = {f['filename']: f for f in project.get('code_files', [])}
+    
+    for change in code_changes:
+        filename = change.get('file')
+        action_type = change.get('action')
+        content = change.get('content', '')
+        
+        if action_type == 'create' or action_type == 'modify':
+            # Détecter le langage
+            ext = filename.split('.')[-1] if '.' in filename else 'txt'
+            lang_map = {
+                'py': 'python', 'js': 'javascript', 'jsx': 'javascript',
+                'ts': 'typescript', 'tsx': 'typescript', 'html': 'html',
+                'css': 'css', 'md': 'markdown', 'json': 'json'
+            }
+            language = lang_map.get(ext, 'text')
+            
+            current_files[filename] = {
+                'filename': filename,
+                'language': language,
+                'content': content
+            }
+        elif action_type == 'delete':
+            current_files.pop(filename, None)
+    
+    # Mettre à jour le projet
+    await projects_collection.update_one(
+        {"id": project_id},
+        {"$set": {
+            "code_files": list(current_files.values()),
+            "updated_at": datetime.utcnow()
+        }}
+    )
 
 
 @router.get("/history/{project_id}")
