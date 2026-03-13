@@ -30,7 +30,6 @@ class AICodeGenerator:
             raise ValueError("EMERGENT_LLM_KEY not found in environment")
     
     async def generate_code(self, project_data: Dict[str, Any], preferred_model: Optional[str] = None, max_retries: int = 3) -> Dict[str, Any]:
-    async def generate_code(self, project_data: Dict[str, Any], preferred_model: Optional[str] = None, max_retries: int = 3) -> Dict[str, Any]:
         """
         Génère du code pour un projet en utilisant l'IA avec fallback automatique
         

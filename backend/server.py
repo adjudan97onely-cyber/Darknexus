@@ -10,6 +10,7 @@ from typing import List
 import uuid
 from datetime import datetime, timezone
 from routes.projects import router as projects_router
+from routes.chat import router as chat_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -72,6 +73,9 @@ app.include_router(api_router)
 
 # Include projects router
 app.include_router(projects_router)
+
+# Include chat router
+app.include_router(chat_router)
 
 app.add_middleware(
     CORSMiddleware,

@@ -8,10 +8,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
-import { Sparkles, ArrowLeft, Download, Copy, CheckCircle2, Code2, FileCode, Loader2, Wrench, Share2, Edit, Trash2 } from 'lucide-react';
+import { Sparkles, ArrowLeft, Download, Copy, CheckCircle2, Code2, FileCode, Loader2, Wrench, Share2, Edit, Trash2, MessageSquare } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { projectsAPI } from '../services/api';
 import VoiceInput from '../components/VoiceInput';
+import ChatBot from '../components/ChatBot';
 
 const ProjectDetailPage = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const ProjectDetailPage = () => {
   const [showImproveModal, setShowImproveModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editFormData, setEditFormData] = useState({ name: '', description: '', type: '' });
+  const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
     loadProject();
@@ -378,8 +380,8 @@ const ProjectDetailPage = () => {
             </div>
           </div>
 
-          {/* Project Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Project Stats & Chat */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <Card className="bg-slate-900/50 border-slate-800">
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
@@ -404,20 +406,43 @@ const ProjectDetailPage = () => {
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-slate-900/50 border-slate-800">
+            <Card className="bg-slate-900/50 border-slate-800 cursor-pointer hover:bg-slate-900 transition-colors" onClick={() => setShowChat(!showChat)}>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-400 text-sm mb-1">Créé le</p>
-                    <p className="text-lg font-semibold text-white">
-                      {new Date(project.created_at).toLocaleDateString('fr-FR')}
-                    </p>
+                    <p className="text-slate-400 text-sm mb-1">Chat IA Live</p>
+                    <p className="text-lg font-semibold text-purple-400">💬 Cliquez ici</p>
                   </div>
-                  <Sparkles className="w-8 h-8 text-purple-400" />
+                  <MessageSquare className="w-8 h-8 text-purple-400" />
                 </div>
               </CardContent>
             </Card>
           </div>
+
+          {/* Chat Bot Section */}
+          {showChat && (
+            <div className="mb-8">
+              <Card className="bg-slate-900/50 border-slate-800 overflow-hidden">
+                <CardHeader className="border-b border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-white flex items-center">
+                      <MessageSquare className="w-5 h-5 mr-2 text-purple-400" />
+                      Chat IA Live - Modifiez tout en temps réel
+                    </CardTitle>
+                    <Button variant="ghost" size="sm" onClick={() => setShowChat(false)} className="text-slate-400">
+                      Fermer
+                    </Button>
+                  </div>
+                  <CardDescription className="text-slate-400">
+                    Demandez n'importe quoi : améliorer, corriger, ajouter des fonctionnalités...
+                  </CardDescription>
+                </CardHeader>
+                <div className="h-[600px]">
+                  <ChatBot projectId={projectId} onCodeUpdate={loadProject} />
+                </div>
+              </Card>
+            </div>
+          )}
 
           {/* Code Files */}
           <Card className="bg-slate-900/50 border-slate-800">
