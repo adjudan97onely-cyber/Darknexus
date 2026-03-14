@@ -8,11 +8,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
-import { Sparkles, ArrowLeft, Download, Copy, CheckCircle2, Code2, FileCode, Loader2, Wrench, Share2, Edit, Trash2, MessageSquare } from 'lucide-react';
+import { Sparkles, ArrowLeft, Download, Copy, CheckCircle2, Code2, FileCode, Loader2, Wrench, Share2, Edit, Trash2, MessageSquare, Rocket, Eye } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { projectsAPI } from '../services/api';
 import VoiceInput from '../components/VoiceInput';
 import ChatBot from '../components/ChatBot';
+import LivePreview from '../components/LivePreview';
 
 const ProjectDetailPage = () => {
   const navigate = useNavigate();
@@ -444,12 +445,12 @@ const ProjectDetailPage = () => {
             </div>
           )}
 
-          {/* Code Files */}
+          {/* Code Files, Live Preview & Deploy */}
           <Card className="bg-slate-900/50 border-slate-800">
             <CardHeader>
-              <CardTitle className="text-white">Code Généré</CardTitle>
+              <CardTitle className="text-white">Votre Projet</CardTitle>
               <CardDescription className="text-slate-400">
-                Tous les fichiers de code générés par l'IA pour votre projet
+                Code, Aperçu en direct et Déploiement
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -459,47 +460,277 @@ const ProjectDetailPage = () => {
                   <p className="text-slate-400">Le code est en cours de génération...</p>
                 </div>
               ) : (
-                <Tabs defaultValue={project.code_files[0]?.filename} className="w-full">
-                  <TabsList className="bg-slate-800 border-slate-700 flex-wrap h-auto">
-                    {project.code_files.map((file) => (
-                      <TabsTrigger
-                        key={file.filename}
-                        value={file.filename}
-                        className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-slate-300"
-                      >
-                        {file.filename}
-                      </TabsTrigger>
-                    ))}
+                <Tabs defaultValue="code" className="w-full">
+                  <TabsList className="bg-slate-800 border-slate-700 w-full grid grid-cols-3">
+                    <TabsTrigger
+                      value="code"
+                      className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-slate-300"
+                    >
+                      <Code2 className="w-4 h-4 mr-2" />
+                      Code
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="preview"
+                      className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-slate-300"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Live Preview
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="deploy"
+                      className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-slate-300"
+                    >
+                      <Rocket className="w-4 h-4 mr-2" />
+                      Déployer
+                    </TabsTrigger>
                   </TabsList>
-                  {project.code_files.map((file) => (
-                    <TabsContent key={file.filename} value={file.filename} className="mt-4">
-                      <div className="relative">
-                        <div className="absolute top-3 right-3 z-10">
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleCopyCode(file.content, file.filename)}
-                            className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700"
+
+                  {/* Tab: Code */}
+                  <TabsContent value="code" className="mt-4">
+                    <Tabs defaultValue={project.code_files[0]?.filename} className="w-full">
+                      <TabsList className="bg-slate-800 border-slate-700 flex-wrap h-auto">
+                        {project.code_files.map((file) => (
+                          <TabsTrigger
+                            key={file.filename}
+                            value={file.filename}
+                            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-slate-300"
                           >
-                            {copiedFile === file.filename ? (
-                              <>
-                                <CheckCircle2 className="w-4 h-4 mr-2" />
-                                Copié !
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-4 h-4 mr-2" />
-                                Copier
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                        <pre className="bg-slate-950 border border-slate-800 rounded-lg p-6 overflow-x-auto">
-                          <code className="text-sm text-slate-300 font-mono">{file.content}</code>
-                        </pre>
+                            {file.filename}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
+                      {project.code_files.map((file) => (
+                        <TabsContent key={file.filename} value={file.filename} className="mt-4">
+                          <div className="relative">
+                            <div className="absolute top-3 right-3 z-10">
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => handleCopyCode(file.content, file.filename)}
+                                className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700"
+                              >
+                                {copiedFile === file.filename ? (
+                                  <>
+                                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                                    Copié !
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-4 h-4 mr-2" />
+                                    Copier
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                            <pre className="bg-slate-950 border border-slate-800 rounded-lg p-6 overflow-x-auto">
+                              <code className="text-sm text-slate-300 font-mono">{file.content}</code>
+                            </pre>
+                          </div>
+                        </TabsContent>
+                      ))}
+                    </Tabs>
+                  </TabsContent>
+
+                  {/* Tab: Live Preview */}
+                  <TabsContent value="preview" className="mt-4">
+                    <div className="h-[700px]">
+                      <LivePreview projectId={projectId} files={project.code_files} />
+                    </div>
+                  </TabsContent>
+
+                  {/* Tab: Deploy */}
+                  <TabsContent value="deploy" className="mt-4">
+                    <div className="space-y-6">
+                      <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-6">
+                        <h3 className="text-xl font-bold text-white mb-2 flex items-center">
+                          <Rocket className="w-6 h-6 mr-2 text-purple-400" />
+                          Déploiement Automatique
+                        </h3>
+                        <p className="text-slate-400 mb-4">
+                          Mettez votre projet en ligne en quelques clics. Choisissez votre plateforme préférée !
+                        </p>
                       </div>
-                    </TabsContent>
-                  ))}
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Vercel */}
+                        <Card className="bg-slate-800 border-slate-700 hover:border-purple-500 transition-colors">
+                          <CardHeader>
+                            <CardTitle className="text-white flex items-center">
+                              <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mr-3">
+                                <span className="text-white font-bold">▲</span>
+                              </div>
+                              Vercel
+                            </CardTitle>
+                            <CardDescription className="text-slate-400">
+                              Idéal pour React, Next.js, Vue.js
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Gratuit pour usage personnel</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Déploiement ultra-rapide</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>HTTPS automatique</span>
+                              </div>
+                              <Button 
+                                className="w-full bg-black hover:bg-gray-900 text-white mt-4"
+                                onClick={() => window.open('https://vercel.com', '_blank')}
+                              >
+                                Déployer sur Vercel
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Netlify */}
+                        <Card className="bg-slate-800 border-slate-700 hover:border-cyan-500 transition-colors">
+                          <CardHeader>
+                            <CardTitle className="text-white flex items-center">
+                              <div className="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center mr-3">
+                                <span className="text-white font-bold">N</span>
+                              </div>
+                              Netlify
+                            </CardTitle>
+                            <CardDescription className="text-slate-400">
+                              Simple et rapide, drag & drop
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>100% gratuit</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Glisser-déposer le ZIP</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>CDN global inclus</span>
+                              </div>
+                              <Button 
+                                className="w-full bg-cyan-500 hover:bg-cyan-600 text-white mt-4"
+                                onClick={() => window.open('https://netlify.com', '_blank')}
+                              >
+                                Déployer sur Netlify
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* GitHub Pages */}
+                        <Card className="bg-slate-800 border-slate-700 hover:border-gray-500 transition-colors">
+                          <CardHeader>
+                            <CardTitle className="text-white flex items-center">
+                              <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center mr-3">
+                                <span className="text-white">🐙</span>
+                              </div>
+                              GitHub Pages
+                            </CardTitle>
+                            <CardDescription className="text-slate-400">
+                              Hébergement gratuit via GitHub
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Totalement gratuit</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Intégré à GitHub</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Parfait pour sites statiques</span>
+                              </div>
+                              <Button 
+                                className="w-full bg-gray-800 hover:bg-gray-700 text-white mt-4"
+                                onClick={() => window.open('https://pages.github.com', '_blank')}
+                              >
+                                Déployer sur GitHub Pages
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Replit */}
+                        <Card className="bg-slate-800 border-slate-700 hover:border-orange-500 transition-colors">
+                          <CardHeader>
+                            <CardTitle className="text-white flex items-center">
+                              <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3">
+                                <span className="text-white font-bold">R</span>
+                              </div>
+                              Replit
+                            </CardTitle>
+                            <CardDescription className="text-slate-400">
+                              IDE en ligne + hébergement
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Gratuit avec limitations</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Code et hébergement</span>
+                              </div>
+                              <div className="flex items-center space-x-2 text-sm text-slate-300">
+                                <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                <span>Support Python, JS, etc.</span>
+                              </div>
+                              <Button 
+                                className="w-full bg-orange-500 hover:bg-orange-600 text-white mt-4"
+                                onClick={() => window.open('https://replit.com', '_blank')}
+                              >
+                                Déployer sur Replit
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* Instructions */}
+                      <Card className="bg-slate-800/50 border-slate-700">
+                        <CardHeader>
+                          <CardTitle className="text-white">📘 Comment déployer ?</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-slate-300 space-y-3">
+                          <div className="flex items-start space-x-3">
+                            <span className="font-bold text-purple-400">1.</span>
+                            <p>Téléchargez votre projet en cliquant sur "Télécharger ZIP" en haut</p>
+                          </div>
+                          <div className="flex items-start space-x-3">
+                            <span className="font-bold text-purple-400">2.</span>
+                            <p>Choisissez une plateforme de déploiement ci-dessus</p>
+                          </div>
+                          <div className="flex items-start space-x-3">
+                            <span className="font-bold text-purple-400">3.</span>
+                            <p>Créez un compte gratuit sur la plateforme choisie</p>
+                          </div>
+                          <div className="flex items-start space-x-3">
+                            <span className="font-bold text-purple-400">4.</span>
+                            <p>Suivez les instructions de la plateforme pour importer votre projet</p>
+                          </div>
+                          <div className="flex items-start space-x-3">
+                            <span className="font-bold text-purple-400">5.</span>
+                            <p>🎉 Votre projet est en ligne ! Partagez l'URL avec le monde entier !</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </TabsContent>
                 </Tabs>
               )}
             </CardContent>
