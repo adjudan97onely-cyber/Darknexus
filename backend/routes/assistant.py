@@ -11,6 +11,8 @@ import logging
 from services.ai_service import ai_generator
 from services.intelligent_agent import get_intelligent_agent
 from services.web_search_service import web_search_service
+from services.n8n_generator import n8n_generator
+from services.user_memory import user_memory
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import os
 from datetime import datetime
@@ -44,16 +46,35 @@ class AssistantChatRequest(BaseModel):
     conversation_history: List[ChatMessage] = []
     images: Optional[List[str]] = None  # Base64 encoded images
     current_project_id: Optional[str] = None  # Pour modifier un projet existant
+    user_id: Optional[str] = None  # ID de l'utilisateur pour la mémoire
 
 
 @router.post("/chat")
 async def chat_with_assistant(request: AssistantChatRequest):
     """
     Discute avec l'assistant IA de manière naturelle - VERSION COMPLÈTE
-    Supporte : Vision AI, modification de projets, création avancée, RECHERCHE WEB
+    Supporte : Vision AI, modification de projets, création avancée, RECHERCHE WEB, N8N, MÉMOIRE
     """
     try:
         user_message = request.message.lower()
+        user_id = request.user_id or "default_user"  # TODO: Récupérer depuis JWT
+        
+        # ÉTAPE 0 : Charger le contexte utilisateur depuis la mémoire
+        user_context = await user_memory.get_user_context_summary(user_id)
+        
+        # Détect if user wants n8n workflow
+        wants_n8n = _wants_n8n_workflow(user_message, request.message)
+        
+        if wants_n8n:
+            result = await _handle_n8n_generation(request.message, user_id)
+            # Stocker dans l'historique
+            await user_memory.store_conversation(
+                user_id,
+                request.message,
+                result['response'],
+                {'action': 'n8n_workflow'}
+            )
+            return result
         
         # ÉTAPE 1 : Détecter si on a besoin de chercher des infos
         needs_search = _needs_web_search(user_message, request.message)
@@ -71,20 +92,23 @@ async def chat_with_assistant(request: AssistantChatRequest):
         logger.info(f"Detected intention: {intention}")
         logger.info(f"Has images: {bool(request.images)}")
         logger.info(f"Web search done: {bool(search_results)}")
+        logger.info(f"User context loaded: {bool(user_context)}")
         
         # Si des images sont fournies, analyser d'abord
         image_analysis = None
         if request.images and len(request.images) > 0:
             image_analysis = await _analyze_images(request.images, request.message)
         
-        # Construire le contexte enrichi avec la recherche web
+        # Construire le contexte enrichi avec la recherche web ET la mémoire utilisateur
         enriched_message = request.message
+        if user_context:
+            enriched_message = f"[CONTEXTE UTILISATEUR]\n{user_context}\n\n{request.message}"
         if search_results:
-            enriched_message = f"{request.message}\n\n[INFORMATIONS TROUVÉES]\n{search_results}"
+            enriched_message += f"\n\n[INFORMATIONS TROUVÉES]\n{search_results}"
         
         # Si l'utilisateur veut modifier un projet existant
         if intention == 'modify_project' and request.current_project_id:
-            return await _handle_project_modification(
+            result = await _handle_project_modification(
                 enriched_message, 
                 request.current_project_id,
                 request.conversation_history,
@@ -93,16 +117,18 @@ async def chat_with_assistant(request: AssistantChatRequest):
         
         # Si l'utilisateur veut créer quelque chose
         elif intention == 'create_project':
-            return await _handle_project_creation(
+            result = await _handle_project_creation(
                 enriched_message, 
                 request.conversation_history,
                 image_analysis,
                 search_results
             )
+            # Apprendre le pattern
+            await user_memory.learn_pattern(user_id, 'project_creation', {'type': 'create'})
         
         # Si l'utilisateur pose une question ou discute
         elif intention == 'question' or intention == 'chat':
-            return await _handle_conversation(
+            result = await _handle_conversation(
                 enriched_message, 
                 request.conversation_history,
                 image_analysis
@@ -110,7 +136,7 @@ async def chat_with_assistant(request: AssistantChatRequest):
         
         # Si l'utilisateur demande de l'aide
         elif intention == 'help':
-            return {
+            result = {
                 'response': _get_help_message(),
                 'action': 'help',
                 'progress': ['Affichage de l\'aide']
@@ -118,15 +144,97 @@ async def chat_with_assistant(request: AssistantChatRequest):
         
         # Réponse par défaut - conversation normale
         else:
-            return await _handle_conversation(
+            result = await _handle_conversation(
                 enriched_message, 
                 request.conversation_history,
                 image_analysis
             )
+        
+        # Stocker la conversation dans la mémoire
+        await user_memory.store_conversation(
+            user_id,
+            request.message,
+            result.get('response', ''),
+            {'action': result.get('action', 'unknown')}
+        )
+        
+        return result
             
     except Exception as e:
         logger.error(f"Error in assistant chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def _wants_n8n_workflow(message_lower: str, original_message: str) -> bool:
+    """Détecte si l'utilisateur veut un workflow n8n"""
+    
+    n8n_keywords = [
+        'n8n', 'workflow', 'automatisation', 'automatiser',
+        'automatique', 'trigger', 'webhook', 'zapier',
+        'intégration', 'connecter', 'synchroniser'
+    ]
+    
+    return any(keyword in message_lower for keyword in n8n_keywords)
+
+
+async def _handle_n8n_generation(message: str, user_id: str) -> Dict[str, Any]:
+    """Génère un workflow n8n basé sur la demande"""
+    try:
+        # Détecter le type de workflow
+        use_case = None
+        if 'facture' in message.lower():
+            use_case = 'facture_ocr'
+        elif 'email' in message.lower():
+            use_case = 'email_automation'
+        
+        # Générer le workflow
+        result = await n8n_generator.generate_workflow(message, use_case)
+        
+        if result['success']:
+            # Stocker la préférence
+            await user_memory.store_preference(user_id, 'uses_n8n', True)
+            
+            return {
+                'response': f"""🤖 **WORKFLOW N8N GÉNÉRÉ !**
+
+{result['workflow']}
+
+**💡 INSTRUCTIONS** :
+1. Copie le JSON du workflow
+2. Va dans n8n → Click + → Import from JSON
+3. Colle le JSON
+4. Configure les credentials
+5. Active le workflow !
+
+**🎯 NOTE** : Ce workflow est un point de départ. Adapte-le selon tes besoins !""",
+                'action': 'n8n_workflow_generated',
+                'progress': [
+                    '🔍 Analyse de ta demande d\'automatisation...',
+                    '🤖 Sélection des nodes n8n appropriés...',
+                    '⚙️ Configuration du workflow...',
+                    '✅ Workflow n8n généré !'
+                ]
+            }
+        else:
+            return {
+                'response': f"""Désolé, je n'ai pas pu générer le workflow n8n ! 😅
+
+**Erreur** : {result.get('error', 'Inconnue')}
+
+Peux-tu reformuler ta demande d'automatisation ?
+
+**Exemple** :
+"Je veux un workflow n8n qui envoie un email quand je reçois un paiement Stripe"
+"Crée un workflow pour extraire les données d'une facture par OCR"""",
+                'action': 'error'
+            }
+            
+    except Exception as e:
+        logger.error(f"Error handling n8n generation: {str(e)}")
+        return {
+            'response': f"Erreur lors de la génération du workflow n8n : {str(e)}",
+            'action': 'error'
+        }
 
 
 def _needs_web_search(message_lower: str, original_message: str) -> bool:
