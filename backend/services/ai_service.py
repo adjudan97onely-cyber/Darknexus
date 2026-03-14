@@ -6,6 +6,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 from dotenv import load_dotenv
 import logging
 from services.pwa_generator import pwa_generator
+from services.ai_agent_generator import ai_agent_generator
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -45,6 +46,9 @@ class AICodeGenerator:
         # Vérifier si c'est une PWA
         is_pwa = project_data.get('is_pwa', False) or project_data.get('type', '').lower() in ['pwa', 'mobile-app', 'mobile_app']
         
+        # Vérifier si c'est un Agent IA
+        is_ai_agent = project_data.get('type', '').lower() == 'ai-agent'
+        
         # Déterminer l'ordre des modèles à essayer
         models_to_try = []
         if preferred_model and preferred_model in self.AVAILABLE_MODELS:
@@ -57,7 +61,24 @@ class AICodeGenerator:
         
         last_error = None
         
-        # Essayer chaque modèle
+        # Si c'est un Agent IA, générer directement le template
+        if is_ai_agent:
+            logger.info("🤖 Génération d'un Agent IA autonome")
+            agent_type = self._detect_agent_type(project_data.get('description', ''))
+            agent_files = ai_agent_generator.generate_agent_code(
+                agent_description=project_data.get('description', ''),
+                agent_type=agent_type
+            )
+            return {
+                'files': agent_files,
+                'tech_stack': ['Python', 'LangChain', 'OpenAI', 'AsyncIO'],
+                'model_used': 'ai-agent-generator',
+                'model_name': 'AI Agent Generator (Template)',
+                'is_ai_agent': True,
+                'agent_type': agent_type
+            }
+        
+        # Essayer chaque modèle pour génération normale
         for model_key in models_to_try:
             model_config = self.AVAILABLE_MODELS[model_key]
             logger.info(f"Trying model: {model_config['name']}")
@@ -88,6 +109,21 @@ class AICodeGenerator:
         
         # Si tous les modèles ont échoué
         raise Exception(f"Échec de génération avec tous les modèles. Dernière erreur: {str(last_error)}")
+    
+    def _detect_agent_type(self, description: str) -> str:
+        """Détecte le type d'agent à partir de la description"""
+        description_lower = description.lower()
+        
+        if any(word in description_lower for word in ['pari', 'bet', 'match', 'foot', 'sport']):
+            return 'betting'
+        elif any(word in description_lower for word in ['automation', 'automate', 'install', 'command', 'pc']):
+            return 'automation'
+        elif any(word in description_lower for word in ['scrape', 'scraping', 'extract', 'web']):
+            return 'scraping'
+        elif any(word in description_lower for word in ['dev', 'code', 'program', 'develop']):
+            return 'dev'
+        else:
+            return 'general'
     
     async def _generate_with_model(self, project_data: Dict[str, Any], model_config: Dict[str, str], attempt: int) -> Dict[str, Any]:
         """Génère du code avec un modèle spécifique"""

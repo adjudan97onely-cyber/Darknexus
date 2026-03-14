@@ -98,6 +98,13 @@ export const projectTypes = [
     description: 'Application installable sur mobile et desktop',
     icon: '📱',
     stacks: ['PWA', 'React', 'Service Worker', 'Manifest']
+  },
+  {
+    id: 'ai-agent',
+    name: '🤖 Agent IA Autonome',
+    description: 'Agent intelligent qui automatise des tâches complexes',
+    icon: '🤖',
+    stacks: ['Python', 'LangChain', 'AutoGPT', 'OpenAI']
   }
 ];
 
