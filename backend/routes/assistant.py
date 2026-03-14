@@ -499,8 +499,15 @@ async def _handle_conversation(
     history: List[ChatMessage],
     image_analysis: Dict = None
 ) -> Dict:
-    """Gère une conversation normale avec l'IA + Vision"""
+    """Gère une conversation normale avec l'IA + Vision + GUIDE DE PROJET"""
     try:
+        # Détecter si l'utilisateur décrit un projet qu'il veut créer
+        wants_project_guide = _wants_project_creation_guide(message)
+        
+        if wants_project_guide:
+            # L'utilisateur décrit un projet - on lui donne un guide formaté
+            return await _generate_project_template(message, history, image_analysis)
+        
         # Créer une session de chat avec l'IA
         api_key = os.environ.get('EMERGENT_LLM_KEY')
         chat = LlmChat(
@@ -541,6 +548,7 @@ async def _handle_conversation(
 
 Tu peux me demander de :
 - **Créer des projets** : "Crée-moi une application de gestion de tâches"
+- **Te guider** : "Je veux créer une app, aide-moi à remplir le formulaire"
 - **Répondre à des questions** : "Comment créer une API ?"
 - **Te conseiller** : "Quelle technologie utiliser pour..."
 - **Analyser des images** : Envoie une capture d'écran et pose ta question
@@ -548,6 +556,126 @@ Tu peux me demander de :
 **Qu'est-ce que je peux faire pour toi ?** 🚀""",
             'action': 'fallback',
             'progress': ['En attente de ta demande...']
+        }
+
+
+def _wants_project_creation_guide(message: str) -> bool:
+    """Détecte si l'utilisateur veut un guide pour créer un projet"""
+    
+    guide_indicators = [
+        'aide-moi à créer', 'je veux créer', 'j\'aimerais créer',
+        'comment créer', 'guide-moi', 'aide-moi pour',
+        'prépare-moi', 'formule pour', 'template pour',
+        'je veux faire', 'j\'aimerais faire', 'comment faire'
+    ]
+    
+    project_words = [
+        'projet', 'application', 'app', 'site', 'outil',
+        'script', 'programme', 'logiciel'
+    ]
+    
+    has_guide_word = any(ind in message.lower() for ind in guide_indicators)
+    has_project_word = any(word in message.lower() for word in project_words)
+    
+    # Si c'est une longue description (>50 mots) c'est probablement un projet
+    is_long_description = len(message.split()) > 50
+    
+    return (has_guide_word and has_project_word) or is_long_description
+
+
+async def _generate_project_template(
+    message: str,
+    history: List[ChatMessage],
+    image_analysis: Dict = None
+) -> Dict:
+    """Génère un template de projet formaté pour copier-coller"""
+    try:
+        # Utiliser l'IA pour analyser la demande et créer le template
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        chat = LlmChat(api_key=api_key, session_id=f"template_{datetime.utcnow().timestamp()}")
+        chat.with_model("openai", "gpt-5.1")
+        
+        context = message
+        if image_analysis and image_analysis.get('success'):
+            context += f"\n\nInformations depuis l'image : {image_analysis['analysis']}"
+        
+        prompt = f"""L'utilisateur veut créer un projet. Voici sa description :
+
+{context}
+
+Génère un TEMPLATE DE PROJET formaté qu'il peut COPIER-COLLER dans le formulaire de création.
+
+Format EXACT à suivre :
+
+📋 **VOICI TON FORMULAIRE DE PROJET** 
+
+**📝 Nom du Projet :**
+[Nom court et clair, max 50 caractères]
+
+**🔧 Type de Projet :**
+[Choisis parmi : Application Web, Script Python, API REST, Application Mobile, Script de Jeux, Automatisation Excel, CLI Tool]
+
+**🤖 Modèle IA Expert Recommandé :**
+[Choisis parmi : 
+- GPT-5.1 (Recommandé) - Pour projets standards
+- GPT-5.2 (Ultra) - Pour projets très complexes
+- Claude 4 Sonnet - Pour analyse et raisonnement
+- GPT-5.1 Vision - Pour projets avec images
+- Gemini 2.5 Flash - Pour rapidité
+- Gemini 2.5 Pro - Pour projets ambitieux]
+
+**📚 Stack Technique (optionnel) :**
+[Technologies suggérées, ex: React, Python, FastAPI, MongoDB]
+
+**📄 Description Détaillée :**
+[Description complète et structurée avec :
+- Objectif principal
+- Fonctionnalités clés (bullet points)
+- Détails techniques importants
+- Ce que l'app doit pouvoir faire]
+
+---
+
+**💡 INSTRUCTIONS DE COPIE-COLLE :**
+1. Copie le contenu après "Nom du Projet :" → Colle dans le champ "Nom du Projet"
+2. Copie le type suggéré → Sélectionne-le dans le menu déroulant "Type de Projet"
+3. Copie le modèle IA → Sélectionne-le dans "Modèle IA Expert"
+4. Copie la stack technique → Colle dans "Stack Technique"
+5. Copie la description détaillée → Colle dans "Description Détaillée"
+6. Clique sur "Générer le Code" !
+
+**🎯 POURQUOI CES CHOIX :**
+[Brève explication des recommandations]
+
+Sois précis, structuré et fais en sorte que ce soit facile à copier-coller !"""
+
+        response = await chat.send_message(UserMessage(text=prompt))
+        
+        return {
+            'response': response,
+            'action': 'project_guide',
+            'progress': [
+                '🎯 Analyse de ton idée de projet...',
+                '🧠 Choix du meilleur type et modèle...',
+                '📝 Génération du template...',
+                '✅ Template prêt à copier-coller !'
+            ]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error generating project template: {str(e)}")
+        return {
+            'response': f"""Je peux t'aider à préparer ton projet ! 😊
+
+Redis-moi ce que tu veux créer avec plus de détails :
+- Quel type d'application ?
+- À quoi ça va servir ?
+- Quelles fonctionnalités tu veux ?
+
+Et je te préparerai un formulaire prêt à copier-coller ! 💪
+
+**Erreur** : {str(e)}""",
+            'action': 'error'
         }
 
 
