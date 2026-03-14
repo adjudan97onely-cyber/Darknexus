@@ -1,5 +1,6 @@
 import React from "react";
 import "@/App.css";
+import "@/animations.css";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import CreateProjectPage from "./pages/CreateProjectPage";
