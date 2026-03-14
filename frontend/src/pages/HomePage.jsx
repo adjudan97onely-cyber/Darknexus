@@ -114,10 +114,18 @@ const HomePage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
+              onClick={() => navigate('/quick-create')}
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-8 py-6 transition-all duration-300 shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 animate-pulse">
+              <Zap className="w-5 h-5 mr-2" />
+              Création Express ⚡
+              <span className="ml-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold">NOUVEAU</span>
+            </Button>
+            <Button
+              size="lg"
               onClick={() => navigate('/assistant')}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 transition-all duration-300 shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105">
               <Sparkles className="w-5 h-5 mr-2" />
-              Assistant IA (Nouveau !)
+              Assistant IA
               <ChevronRight className="w-5 h-5 ml-2" />
             </Button>
             <Button
