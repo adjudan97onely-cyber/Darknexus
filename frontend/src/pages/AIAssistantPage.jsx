@@ -74,34 +74,60 @@ const AIAssistantPage = () => {
     if (!input.trim() && attachedFiles.length === 0) return;
 
     const userMessage = input.trim();
+    const files = [...attachedFiles];
     setInput('');
+    setAttachedFiles([]);
 
     // Ajouter le message utilisateur
     const newUserMsg = {
       role: 'user',
       content: userMessage,
       timestamp: new Date().toISOString(),
-      files: attachedFiles.length > 0 ? attachedFiles.map(f => f.name) : null
+      files: files.length > 0 ? files.map(f => f.name) : null
     };
     setMessages(prev => [...prev, newUserMsg]);
-    setAttachedFiles([]);
 
+    // Ajouter un message de progression
+    const progressMsg = {
+      role: 'assistant',
+      content: '🔄 Traitement en cours...',
+      timestamp: new Date().toISOString(),
+      isProgress: true,
+      progress: ['Analyse de ta demande...']
+    };
+    setMessages(prev => [...prev, progressMsg]);
+    
     setIsLoading(true);
 
     try {
-      // Envoyer au backend pour obtenir une vraie réponse IA
+      // Convertir les images en base64 si présentes
+      const imageData = [];
+      for (const file of files) {
+        if (file.type.startsWith('image/')) {
+          const base64 = await fileToBase64(file);
+          imageData.push(base64);
+        }
+      }
+
+      // Envoyer au backend avec images
       const response = await axios.post(`${API}/assistant/chat`, {
         message: userMessage,
-        conversation_history: messages.slice(-10) // Derniers 10 messages pour le contexte
+        conversation_history: messages.slice(-10),
+        images: imageData.length > 0 ? imageData : null
       });
 
-      // Ajouter la réponse de l'IA
+      // Retirer le message de progression
+      setMessages(prev => prev.filter(m => !m.isProgress));
+
+      // Ajouter la réponse de l'IA avec les étapes de progression
       const aiMessage = {
         role: 'assistant',
         content: response.data.response,
         timestamp: new Date().toISOString(),
         action: response.data.action || null,
-        project_created: response.data.project_id || null
+        project_created: response.data.project_id || null,
+        files_created: response.data.files_created || null,
+        progress: response.data.progress || null
       };
       setMessages(prev => [...prev, aiMessage]);
 
@@ -109,7 +135,7 @@ const AIAssistantPage = () => {
       if (response.data.project_id) {
         toast({
           title: "✨ Projet créé !",
-          description: "Ton projet a été créé avec succès",
+          description: `${response.data.files_count} fichiers générés`,
           action: (
             <Button
               size="sm"
@@ -155,6 +181,19 @@ Je suis là pour t'aider ! 💪`,
       e.preventDefault();
       sendMessage();
     }
+  };
+
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // Extraire juste le base64 sans le préfixe data:image/...;base64,
+        const base64 = reader.result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = error => reject(error);
+    });
   };
 
   const quickPrompts = [
@@ -215,9 +254,44 @@ Je suis là pour t'aider ! 💪`,
                     <Card className={`p-4 ${
                       msg.role === 'user'
                         ? 'bg-blue-600 text-white border-blue-500'
+                        : msg.isProgress
+                        ? 'bg-purple-900/50 text-purple-200 border-purple-700 animate-pulse'
                         : 'bg-slate-800 text-slate-100 border-slate-700'
                     }`}>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                      
+                      {/* Étapes de progression */}
+                      {msg.progress && msg.progress.length > 0 && (
+                        <div className="mt-3 space-y-1 border-t border-slate-700 pt-3">
+                          <p className="text-xs font-semibold text-slate-400 mb-2">📋 Étapes :</p>
+                          {msg.progress.map((step, i) => (
+                            <div key={i} className="flex items-center space-x-2 text-xs text-slate-300">
+                              <span className="text-green-400">✓</span>
+                              <span>{step}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Fichiers créés */}
+                      {msg.files_created && msg.files_created.length > 0 && (
+                        <div className="mt-3 border-t border-slate-700 pt-3">
+                          <p className="text-xs font-semibold text-slate-400 mb-2">📁 Fichiers créés :</p>
+                          <div className="grid grid-cols-2 gap-1">
+                            {msg.files_created.slice(0, 6).map((file, i) => (
+                              <div key={i} className="flex items-center space-x-1 bg-slate-700/50 rounded px-2 py-1 text-xs">
+                                <span className="text-green-400">✓</span>
+                                <span className="truncate">{file}</span>
+                              </div>
+                            ))}
+                          </div>
+                          {msg.files_created.length > 6 && (
+                            <p className="text-xs text-slate-500 mt-1">
+                              +{msg.files_created.length - 6} autres fichiers
+                            </p>
+                          )}
+                        </div>
+                      )}
                       
                       {/* Fichiers attachés */}
                       {msg.files && msg.files.length > 0 && (
