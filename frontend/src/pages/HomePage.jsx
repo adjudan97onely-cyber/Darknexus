@@ -81,6 +81,10 @@ const HomePage = () => {
                 <Sparkles className="w-4 h-4 mr-2" />
                 Créer un Projet
               </Button>
+              <Button onClick={() => navigate('/scraper')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white transition-all duration-300 shadow-lg shadow-blue-500/25">
+                <Globe className="w-4 h-4 mr-2" />
+                Web Scraper
+              </Button>
               <Button 
                 variant="ghost" 
                 onClick={handleLogout} 

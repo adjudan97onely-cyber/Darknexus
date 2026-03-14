@@ -13,6 +13,7 @@ from routes.projects import router as projects_router
 from routes.chat import router as chat_router
 from routes.auth import router as auth_router
 from routes.assistant import router as assistant_router
+from routes.scraper import router as scraper_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -84,6 +85,9 @@ app.include_router(auth_router)
 
 # Include assistant router
 app.include_router(assistant_router)
+
+# Include scraper router
+app.include_router(scraper_router)
 
 app.add_middleware(
     CORSMiddleware,
