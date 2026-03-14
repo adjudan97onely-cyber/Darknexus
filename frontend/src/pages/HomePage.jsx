@@ -3,11 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Sparkles, Zap, Code2, Rocket, ChevronRight, Globe, Database, Cpu, Mic } from 'lucide-react';
+import { Sparkles, Zap, Code2, Rocket, ChevronRight, Globe, Database, Cpu, Mic, LogOut } from 'lucide-react';
 import { projectTypes, templates } from '../mock/mockData';
+import { useToast } from '../hooks/use-toast';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast({
+      title: "✅ Déconnexion réussie",
+      description: "À bientôt !"
+    });
+    navigate('/login');
+  };
 
   const features = [
   {
@@ -68,6 +80,14 @@ const HomePage = () => {
               <Button onClick={() => navigate('/create')} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transition-all duration-300 shadow-lg shadow-purple-500/25">
                 <Sparkles className="w-4 h-4 mr-2" />
                 Créer un Projet
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={handleLogout} 
+                className="text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Déconnexion
               </Button>
             </div>
           </div>
