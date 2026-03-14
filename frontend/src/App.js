@@ -14,7 +14,9 @@ import { Toaster } from "./components/ui/sonner";
 
 function AppContent() {
   const location = useLocation();
-  const showFloatingAssistant = location.pathname !== '/login';
+  const showFloatingAssistant = location.pathname !== '/login' && 
+                                 location.pathname !== '/create' &&
+                                 location.pathname !== '/assistant';
 
   return (
     <>
