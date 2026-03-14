@@ -19,6 +19,8 @@ class N8NWorkflowGenerator:
     
     def __init__(self):
         self.api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not self.api_key:
+            logger.warning("⚠️ EMERGENT_LLM_KEY non configurée - Le générateur n8n utilisera des templates")
     
     async def generate_workflow(self, description: str, use_case: str = None) -> Dict[str, Any]:
         """

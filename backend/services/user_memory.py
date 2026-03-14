@@ -11,15 +11,25 @@ import os
 
 logger = logging.getLogger(__name__)
 
-# MongoDB
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+# MongoDB - avec fallback si variable manquante
+try:
+    mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+    db_name = os.environ.get('DB_NAME', 'codeforge')
+    client = AsyncIOMotorClient(mongo_url)
+    db = client[db_name]
+except Exception as e:
+    logger.error(f"Error connecting to MongoDB: {e}")
+    db = None
 
 # Collections
-user_preferences_collection = db.user_preferences
-conversation_history_collection = db.conversation_history
-user_patterns_collection = db.user_patterns
+if db is not None:
+    user_preferences_collection = db.user_preferences
+    conversation_history_collection = db.conversation_history
+    user_patterns_collection = db.user_patterns
+else:
+    user_preferences_collection = None
+    conversation_history_collection = None
+    user_patterns_collection = None
 
 
 class UserMemoryService:

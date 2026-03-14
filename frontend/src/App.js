@@ -18,6 +18,7 @@ function AppContent() {
   const location = useLocation();
   const showFloatingAssistant = location.pathname !== '/login' && 
                                  location.pathname !== '/create' &&
+                                 location.pathname !== '/quick-create' &&
                                  location.pathname !== '/assistant';
 
   return (
