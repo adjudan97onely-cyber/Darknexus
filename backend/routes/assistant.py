@@ -10,7 +10,7 @@ from typing import List, Dict, Optional, Any
 import logging
 from services.ai_service import ai_generator
 from services.intelligent_agent import get_intelligent_agent
-from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageMessage
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 import os
 from datetime import datetime
 from uuid import uuid4
@@ -303,7 +303,7 @@ Veux-tu d'autres modifications ? 😊""",
 
 Peux-tu reformuler ta demande plus clairement ?
 
-Exemple: "Change la couleur du titre en rouge" ou "Ajoute un bouton de connexion"""",
+Exemple: "Change la couleur du titre en rouge" ou "Ajoute un bouton de connexion" """,
             'action': 'error'
         }
 
