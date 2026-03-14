@@ -16,7 +16,7 @@ from uuid import uuid4
 logger = logging.getLogger(__name__)
 
 # Configuration JWT
-SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'adj-killagain-super-secret-key-2025-change-in-production')
+SECRET_KEY = os.environ['JWT_SECRET_KEY']
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 30  # Token valide 30 jours
 
