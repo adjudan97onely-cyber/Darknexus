@@ -167,7 +167,7 @@ const LoginPage = () => {
       {/* Footer */}
       <div className="absolute bottom-8 text-center">
         <p className="text-slate-500 text-sm">
-          © 2025 ADJ KILLAGAIN IA 2.0 - Application Privée et Sécurisée
+          © 2026 ADJ KILLAGAIN IA 2.0 - Application Privée et Sécurisée
         </p>
       </div>
     </div>
