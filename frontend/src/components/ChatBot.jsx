@@ -90,7 +90,8 @@ const ChatBot = ({ projectId, onCodeUpdate }) => {
   };
 
   const handleVoiceTranscript = (transcript) => {
-    setInput(prev => prev + (prev ? ' ' : '') + transcript);
+    // Remplacer l'input par la transcription complète
+    setInput(transcript);
   };
 
   const handleKeyPress = (e) => {
@@ -199,7 +200,7 @@ const ChatBot = ({ projectId, onCodeUpdate }) => {
       {/* Input */}
       <div className="p-4 border-t border-slate-800">
         <div className="flex items-end space-x-2">
-          <div className="flex-1">
+          <div className="flex-1 space-y-2">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -208,13 +209,20 @@ const ChatBot = ({ projectId, onCodeUpdate }) => {
               className="bg-slate-800 border-slate-700 text-white resize-none min-h-[60px]"
               disabled={isLoading}
             />
+            <div className="flex items-center gap-2">
+              <VoiceInput 
+                onTranscript={handleVoiceTranscript} 
+                disabled={isLoading}
+                showTranscript={true}
+              />
+              <span className="text-xs text-slate-500">🎤 Parlez en continu jusqu'au stop</span>
+            </div>
           </div>
           <div className="flex flex-col space-y-2">
-            <VoiceInput onTranscript={handleVoiceTranscript} disabled={isLoading} />
             <Button
               onClick={sendMessage}
               disabled={!input.trim() || isLoading}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 h-[76px]"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

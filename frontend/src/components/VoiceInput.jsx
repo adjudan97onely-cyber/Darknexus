@@ -2,11 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { Badge } from './ui/badge';
 
-const VoiceInput = ({ onTranscript, disabled = false }) => {
+const VoiceInput = ({ onTranscript, disabled = false, showTranscript = false }) => {
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(true);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [fullTranscript, setFullTranscript] = useState('');
   const recognitionRef = useRef(null);
+  const restartTimeoutRef = useRef(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -26,48 +30,55 @@ const VoiceInput = ({ onTranscript, disabled = false }) => {
     recognition.maxAlternatives = 1;
 
     recognition.onstart = () => {
+      console.log('🎤 Reconnaissance vocale démarrée');
       setIsListening(true);
-      toast({
-        title: "🎤 Écoute en cours...",
-        description: "Parlez maintenant pour décrire votre projet"
-      });
     };
 
     recognition.onresult = (event) => {
-      let finalTranscript = '';
-      let interimTranscript = '';
+      let interim = '';
+      let final = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
+          final += transcript + ' ';
         } else {
-          interimTranscript += transcript;
+          interim += transcript;
         }
       }
 
-      if (finalTranscript) {
-        onTranscript(finalTranscript.trim());
+      // Mettre à jour la transcription intermédiaire pour l'affichage
+      setInterimTranscript(interim);
+
+      // Si on a du texte final, l'ajouter à la transcription complète
+      if (final) {
+        setFullTranscript(prev => {
+          const newTranscript = prev + final;
+          // Envoyer au parent
+          onTranscript(newTranscript.trim());
+          return newTranscript;
+        });
       }
     };
 
     recognition.onerror = (event) => {
       console.error('Erreur de reconnaissance vocale:', event.error);
+      
+      // Ne pas arrêter sur "no-speech" - juste continuer d'écouter
+      if (event.error === 'no-speech') {
+        console.log('Aucune voix détectée, mais on continue d\'écouter...');
+        return;
+      }
+      
       setIsListening(false);
       
-      if (event.error === 'no-speech') {
-        toast({
-          title: "Aucune voix détectée",
-          description: "Parlez plus fort ou vérifiez votre microphone",
-          variant: "destructive"
-        });
-      } else if (event.error === 'not-allowed') {
+      if (event.error === 'not-allowed') {
         toast({
           title: "Accès micro refusé",
           description: "Autorisez l'accès au microphone dans les paramètres du navigateur",
           variant: "destructive"
         });
-      } else {
+      } else if (event.error !== 'aborted') {
         toast({
           title: "Erreur d'enregistrement",
           description: event.error,
@@ -77,29 +88,95 @@ const VoiceInput = ({ onTranscript, disabled = false }) => {
     };
 
     recognition.onend = () => {
-      setIsListening(false);
+      console.log('🛑 Reconnaissance vocale terminée');
+      
+      // Si on était en train d'écouter et que ça s'arrête, redémarrer automatiquement
+      if (isListening && recognitionRef.current) {
+        console.log('🔄 Redémarrage automatique...');
+        restartTimeoutRef.current = setTimeout(() => {
+          try {
+            recognitionRef.current?.start();
+          } catch (error) {
+            console.error('Erreur lors du redémarrage:', error);
+            setIsListening(false);
+          }
+        }, 100);
+      } else {
+        setIsListening(false);
+      }
     };
 
     recognitionRef.current = recognition;
 
     return () => {
+      if (restartTimeoutRef.current) {
+        clearTimeout(restartTimeoutRef.current);
+      }
       if (recognitionRef.current) {
-        recognitionRef.current.stop();
+        try {
+          recognitionRef.current.stop();
+        } catch (error) {
+          console.error('Erreur lors de l\'arrêt:', error);
+        }
       }
     };
-  }, [onTranscript, toast]);
+  }, [onTranscript, toast, isListening]);
 
-  const toggleListening = () => {
+  const startListening = () => {
     if (!recognitionRef.current) return;
 
-    if (isListening) {
+    try {
+      // Réinitialiser les transcriptions
+      setFullTranscript('');
+      setInterimTranscript('');
+      
+      recognitionRef.current.start();
+      
+      toast({
+        title: "🎤 Écoute en cours...",
+        description: "Parlez maintenant ! Cliquez à nouveau pour arrêter."
+      });
+    } catch (error) {
+      console.error('Erreur lors du démarrage:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de démarrer l'enregistrement",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const stopListening = () => {
+    if (!recognitionRef.current) return;
+
+    setIsListening(false);
+    
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current);
+    }
+
+    try {
       recognitionRef.current.stop();
+      
       toast({
         title: "⏸️ Enregistrement arrêté",
-        description: "Vous pouvez éditer le texte ou recommencer"
+        description: fullTranscript ? "Transcription terminée !" : "Aucun texte capturé"
       });
+
+      // Réinitialiser après l'arrêt
+      setTimeout(() => {
+        setInterimTranscript('');
+      }, 500);
+    } catch (error) {
+      console.error('Erreur lors de l\'arrêt:', error);
+    }
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
     } else {
-      recognitionRef.current.start();
+      startListening();
     }
   };
 
@@ -112,25 +189,45 @@ const VoiceInput = ({ onTranscript, disabled = false }) => {
   }
 
   return (
-    <Button
-      type="button"
-      variant={isListening ? "destructive" : "outline"}
-      size="icon"
-      onClick={toggleListening}
-      disabled={disabled}
-      className={`transition-all duration-300 ${
-        isListening 
-          ? 'bg-red-600 hover:bg-red-700 animate-pulse border-red-500' 
-          : 'border-slate-700 hover:bg-slate-800 hover:border-purple-500'
-      }`}
-      title={isListening ? "Arrêter l'enregistrement" : "Commencer la dictée vocale"}
-    >
-      {isListening ? (
-        <MicOff className="w-5 h-5" />
-      ) : (
-        <Mic className="w-5 h-5 text-slate-300" />
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant={isListening ? "destructive" : "outline"}
+          size="icon"
+          onClick={toggleListening}
+          disabled={disabled}
+          className={`transition-all duration-300 ${
+            isListening 
+              ? 'bg-red-600 hover:bg-red-700 animate-pulse border-red-500' 
+              : 'border-slate-700 hover:bg-slate-800 hover:border-purple-500'
+          }`}
+          title={isListening ? "Arrêter l'enregistrement (cliquez pour stop)" : "Commencer la dictée vocale"}
+        >
+          {isListening ? (
+            <MicOff className="w-5 h-5" />
+          ) : (
+            <Mic className="w-5 h-5 text-slate-300" />
+          )}
+        </Button>
+        {isListening && (
+          <Badge variant="destructive" className="animate-pulse">
+            🔴 En cours d'écoute...
+          </Badge>
+        )}
+      </div>
+      
+      {/* Affichage en temps réel de la transcription si demandé */}
+      {showTranscript && isListening && (fullTranscript || interimTranscript) && (
+        <div className="p-3 bg-slate-800 border border-slate-700 rounded-lg">
+          <p className="text-xs text-slate-400 mb-1">Transcription en direct :</p>
+          <p className="text-sm text-white">
+            {fullTranscript}
+            <span className="text-slate-400 italic">{interimTranscript}</span>
+          </p>
+        </div>
       )}
-    </Button>
+    </div>
   );
 };
 

@@ -37,10 +37,10 @@ const CreateProjectPage = () => {
   ];
 
   const handleVoiceTranscript = (transcript) => {
-    // Ajouter le texte dicté à la description existante
+    // Remplacer la description par la transcription complète
     setFormData(prev => ({
       ...prev,
-      description: prev.description + (prev.description ? ' ' : '') + transcript
+      description: transcript
     }));
   };
 
@@ -207,11 +207,12 @@ const CreateProjectPage = () => {
                   <div className="flex items-center justify-between">
                     <Label htmlFor="description" className="text-slate-200">Description Détaillée *</Label>
                     <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-500">🎤 Dictée vocale (parlez en continu) :</span>
                       <VoiceInput 
                         onTranscript={handleVoiceTranscript}
                         disabled={isGenerating}
+                        showTranscript={true}
                       />
-                      <span className="text-xs text-slate-500">ou dictez vocalement 🎤</span>
                     </div>
                   </div>
                   <Textarea

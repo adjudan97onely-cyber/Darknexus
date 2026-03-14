@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic import BaseModel
 from services.ai_service import ai_generator
 from services.intelligent_agent import get_intelligent_agent
+from services.voice_commands import parse_voice_command, get_voice_commands_list
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -281,3 +282,109 @@ async def execute_chat_action(project_id: str, action_data: dict):
     except Exception as e:
         logger.error(f"Error executing action: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+class VoiceCommandRequest(BaseModel):
+    voice_input: str
+    project_id: Optional[str] = None
+
+
+@router.post("/voice-command")
+async def process_voice_command(request: VoiceCommandRequest):
+    """
+    Traite une commande vocale et retourne l'action à effectuer
+    """
+    try:
+        # Parser la commande vocale
+        command_result = parse_voice_command(request.voice_input)
+        
+        if not command_result['is_command']:
+            # Pas une commande, juste un message normal
+            return {
+                "is_command": False,
+                "action": "chat",
+                "message": command_result['message'],
+                "suggestion": "Utilisez ceci comme message dans le chat"
+            }
+        
+        # C'est une commande !
+        action = command_result['action']
+        params = command_result.get('params', {})
+        
+        # Préparer la réponse selon le type de commande
+        response = {
+            "is_command": True,
+            "action": action,
+            "params": params,
+            "original_text": request.voice_input,
+            "confirmation": _get_confirmation_message(action, params)
+        }
+        
+        # Si on a un project_id, on peut exécuter certaines actions directement
+        if request.project_id and action in ['change_title', 'change_description']:
+            project = await projects_collection.find_one({"id": request.project_id})
+            if project:
+                updates = {}
+                if action == 'change_title' and 'new_title' in params:
+                    updates['name'] = params['new_title']
+                elif action == 'change_description' and 'new_description' in params:
+                    updates['description'] = params['new_description']
+                
+                if updates:
+                    updates['updated_at'] = datetime.utcnow()
+                    await projects_collection.update_one(
+                        {"id": request.project_id},
+                        {"$set": updates}
+                    )
+                    response['executed'] = True
+                    response['message'] = f"✅ {_get_success_message(action, params)}"
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error processing voice command: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/voice-commands")
+async def get_available_voice_commands():
+    """
+    Retourne la liste des commandes vocales disponibles
+    """
+    return {
+        "commands": get_voice_commands_list(),
+        "examples": [
+            "Modifie le titre en Mon Super Projet",
+            "Améliore le design de l'application",
+            "Ajoute une fonctionnalité de recherche",
+            "Optimise les performances",
+            "Corrige tous les bugs"
+        ],
+        "note": "Vous pouvez aussi parler naturellement - l'agent comprendra !"
+    }
+
+
+def _get_confirmation_message(action: str, params: dict) -> str:
+    """Génère un message de confirmation pour une commande"""
+    messages = {
+        'change_title': f"Je vais modifier le titre en : {params.get('new_title', '[nouveau titre]')}",
+        'change_description': f"Je vais modifier la description en : {params.get('new_description', '[nouvelle description]')}",
+        'improve_design': "Je vais améliorer le design de votre application",
+        'improve_performance': "Je vais optimiser les performances de votre code",
+        'add_feature': f"Je vais ajouter : {params.get('feature_description', '[fonctionnalité]')}",
+        'fix_bugs': "Je vais analyser et corriger les bugs du projet",
+        'create_project': "Je vais vous guider pour créer un nouveau projet",
+        'generate_code': "Je vais lancer la génération du code",
+        'help': "Voici les commandes que je peux comprendre..."
+    }
+    return messages.get(action, "Je vais traiter votre demande")
+
+
+def _get_success_message(action: str, params: dict) -> str:
+    """Génère un message de succès"""
+    messages = {
+        'change_title': f"Titre modifié avec succès : {params.get('new_title')}",
+        'change_description': f"Description modifiée avec succès"
+    }
+    return messages.get(action, "Action effectuée avec succès")

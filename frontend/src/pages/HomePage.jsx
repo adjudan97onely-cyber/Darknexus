@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Sparkles, Zap, Code2, Rocket, ChevronRight, Globe, Database, Cpu } from 'lucide-react';
+import { Sparkles, Zap, Code2, Rocket, ChevronRight, Globe, Database, Cpu, Mic } from 'lucide-react';
 import { projectTypes, templates } from '../mock/mockData';
 
 const HomePage = () => {
@@ -54,6 +54,14 @@ const HomePage = () => {
               </span>
             </div>
             <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate('/voice-assistant')} 
+                className="text-slate-300 hover:text-white transition-colors"
+              >
+                <Mic className="w-4 h-4 mr-2" />
+                Assistant Vocal
+              </Button>
               <Button variant="ghost" onClick={() => navigate('/projects')} className="text-slate-300 hover:text-white transition-colors">
                 Mes Projets
               </Button>
