@@ -10,6 +10,7 @@ from typing import List, Dict, Optional, Any
 import logging
 from services.ai_service import ai_generator
 from services.intelligent_agent import get_intelligent_agent
+from services.web_search_service import web_search_service
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import os
 from datetime import datetime
@@ -49,10 +50,19 @@ class AssistantChatRequest(BaseModel):
 async def chat_with_assistant(request: AssistantChatRequest):
     """
     Discute avec l'assistant IA de manière naturelle - VERSION COMPLÈTE
-    Supporte : Vision AI, modification de projets, création avancée
+    Supporte : Vision AI, modification de projets, création avancée, RECHERCHE WEB
     """
     try:
         user_message = request.message.lower()
+        
+        # ÉTAPE 1 : Détecter si on a besoin de chercher des infos
+        needs_search = _needs_web_search(user_message, request.message)
+        
+        # Si on a besoin de chercher, faire une recherche web d'abord
+        search_results = None
+        if needs_search:
+            logger.info(f"Web search needed for: {request.message}")
+            search_results = await web_search_service.search_and_summarize(request.message)
         
         # Déterminer l'intention de l'utilisateur
         intention = _detect_intention(user_message, request.current_project_id)
@@ -60,17 +70,22 @@ async def chat_with_assistant(request: AssistantChatRequest):
         logger.info(f"User message: {request.message}")
         logger.info(f"Detected intention: {intention}")
         logger.info(f"Has images: {bool(request.images)}")
-        logger.info(f"Current project: {request.current_project_id}")
+        logger.info(f"Web search done: {bool(search_results)}")
         
         # Si des images sont fournies, analyser d'abord
         image_analysis = None
         if request.images and len(request.images) > 0:
             image_analysis = await _analyze_images(request.images, request.message)
         
+        # Construire le contexte enrichi avec la recherche web
+        enriched_message = request.message
+        if search_results:
+            enriched_message = f"{request.message}\n\n[INFORMATIONS TROUVÉES]\n{search_results}"
+        
         # Si l'utilisateur veut modifier un projet existant
         if intention == 'modify_project' and request.current_project_id:
             return await _handle_project_modification(
-                request.message, 
+                enriched_message, 
                 request.current_project_id,
                 request.conversation_history,
                 image_analysis
@@ -79,15 +94,16 @@ async def chat_with_assistant(request: AssistantChatRequest):
         # Si l'utilisateur veut créer quelque chose
         elif intention == 'create_project':
             return await _handle_project_creation(
-                request.message, 
+                enriched_message, 
                 request.conversation_history,
-                image_analysis
+                image_analysis,
+                search_results
             )
         
         # Si l'utilisateur pose une question ou discute
         elif intention == 'question' or intention == 'chat':
             return await _handle_conversation(
-                request.message, 
+                enriched_message, 
                 request.conversation_history,
                 image_analysis
             )
@@ -103,7 +119,7 @@ async def chat_with_assistant(request: AssistantChatRequest):
         # Réponse par défaut - conversation normale
         else:
             return await _handle_conversation(
-                request.message, 
+                enriched_message, 
                 request.conversation_history,
                 image_analysis
             )
@@ -111,6 +127,38 @@ async def chat_with_assistant(request: AssistantChatRequest):
     except Exception as e:
         logger.error(f"Error in assistant chat: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def _needs_web_search(message_lower: str, original_message: str) -> bool:
+    """Détecte si on a besoin de faire une recherche web"""
+    
+    # Mots-clés qui indiquent qu'on a besoin de chercher
+    search_indicators = [
+        # Fichiers spécifiques
+        'dt18', 'fichier', 'file',
+        # Jeux et logiciels
+        'football live', 'football life', 'pes', 'fifa', 'jeu', 'game',
+        # Demandes d'info
+        'qu\'est-ce que', 'c\'est quoi', 'comment faire', 'où trouver',
+        'explique', 'parle-moi de', 'informe-moi',
+        # Technologies spécifiques
+        'api de', 'library', 'framework', 'outil',
+        # Termes techniques non communs
+        'patch', 'mod', 'modding', 'data folder'
+    ]
+    
+    # Patterns qui suggèrent des sujets spécifiques
+    specific_patterns = [
+        len(original_message.split()) > 15,  # Messages longs = sujets complexes
+        any(word.isupper() and len(word) > 2 for word in original_message.split()),  # Acronymes
+        '?' in original_message,  # Questions
+    ]
+    
+    # Vérifier si on a besoin de chercher
+    has_indicator = any(indicator in message_lower for indicator in search_indicators)
+    has_pattern = any(specific_patterns)
+    
+    return has_indicator or has_pattern
 
 
 def _detect_intention(message: str, current_project_id: str = None) -> str:
@@ -311,22 +359,33 @@ Exemple: "Change la couleur du titre en rouge" ou "Ajoute un bouton de connexion
 async def _handle_project_creation(
     message: str, 
     history: List[ChatMessage],
-    image_analysis: Dict = None
+    image_analysis: Dict = None,
+    search_results: str = None
 ) -> Dict:
-    """Gère la création de projet via conversation naturelle + Vision AI"""
+    """Gère la création de projet via conversation naturelle + Vision AI + Web Search"""
     try:
         # Ajouter l'analyse d'image au contexte si disponible
         full_message = message
         if image_analysis and image_analysis.get('success'):
             full_message += f"\n\nINFORMATIONS DEPUIS L'IMAGE:\n{image_analysis['analysis']}"
         
+        # Ajouter les résultats de recherche si disponibles
+        context_info = ""
+        if search_results:
+            context_info = f"\n\n📚 CONTEXTE (depuis recherche web):\n{search_results}\n\n"
+        
         # Extraire les informations du projet
         project_info = _extract_project_info(full_message)
         
-        # Si les informations sont insuffisantes, demander plus de détails
-        if not project_info['sufficient']:
+        # CHANGEMENT : Même si les infos semblent insuffisantes, on essaie quand même
+        # si on a des résultats de recherche ou une description détaillée
+        has_context = bool(search_results) or len(message.split()) > 20
+        
+        if not project_info['sufficient'] and not has_context:
             return {
                 'response': f"""Je comprends que tu veux créer quelque chose ! 🚀
+
+{context_info if context_info else ''}
 
 Pour que je puisse générer le meilleur code possible, j'ai besoin de quelques détails :
 
@@ -342,24 +401,26 @@ Donne-moi plus de détails et je vais créer ça pour toi ! 💪""",
                 'progress': ['Analyse de ta demande...', 'Besoin de plus de détails']
             }
         
-        # Créer le projet
+        # Créer le projet avec le contexte enrichi
         project_data = {
             'name': project_info['name'],
-            'description': project_info['description'],
+            'description': full_message + context_info,  # Ajouter le contexte
             'type': project_info['type'],
             'tech_stack': project_info.get('tech_stack', '')
         }
         
         # Retourner la progression
         progress_steps = [
-            '🎯 Analyse de ta demande...',
+            '🔍 Recherche d\'informations...' if search_results else '🎯 Analyse de ta demande...',
             '🧠 Choix des technologies...',
             '⚙️ Configuration du projet...',
             '📝 Génération du code...'
         ]
         
-        # Générer le code
+        # Générer le code avec le contexte enrichi
         logger.info(f"Generating code for project: {project_data['name']}")
+        logger.info(f"With web search context: {bool(search_results)}")
+        
         ai_result = await ai_generator.generate_code(
             project_data=project_data,
             preferred_model='gpt-5.1'
@@ -387,6 +448,8 @@ Donne-moi plus de détails et je vais créer ça pour toi ! 💪""",
         
         return {
             'response': f"""✨ **Projet créé avec succès !** ✨
+
+{context_info if context_info else ''}
 
 📦 **{project_data['name']}**
 
