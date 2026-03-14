@@ -91,6 +91,13 @@ export const projectTypes = [
     description: 'API backend pour vos applications',
     icon: '🔌',
     stacks: ['FastAPI', 'Express', 'Django', 'Flask']
+  },
+  {
+    id: 'mobile-app',
+    name: 'Application Mobile (PWA)',
+    description: 'Application installable sur mobile et desktop',
+    icon: '📱',
+    stacks: ['PWA', 'React', 'Service Worker', 'Manifest']
   }
 ];
 

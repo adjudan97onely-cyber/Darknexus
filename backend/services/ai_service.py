@@ -5,6 +5,7 @@ from typing import Dict, Any, Optional
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from dotenv import load_dotenv
 import logging
+from services.pwa_generator import pwa_generator
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -41,6 +42,9 @@ class AICodeGenerator:
         Returns:
             Dict avec 'files' (liste de fichiers), 'tech_stack' (liste de technologies), et 'model_used'
         """
+        # Vérifier si c'est une PWA
+        is_pwa = project_data.get('is_pwa', False) or project_data.get('type', '').lower() in ['pwa', 'mobile-app', 'mobile_app']
+        
         # Déterminer l'ordre des modèles à essayer
         models_to_try = []
         if preferred_model and preferred_model in self.AVAILABLE_MODELS:
@@ -64,6 +68,15 @@ class AICodeGenerator:
                     result = await self._generate_with_model(project_data, model_config, attempt + 1)
                     result['model_used'] = model_key
                     result['model_name'] = model_config['name']
+                    
+                    # Si PWA, ajouter les fichiers PWA
+                    if is_pwa:
+                        logger.info("📱 Generating PWA files...")
+                        pwa_files = pwa_generator.generate_pwa_files(project_data)
+                        result['files'].extend(pwa_files)
+                        result['is_pwa'] = True
+                        logger.info(f"✅ Added {len(pwa_files)} PWA files")
+                    
                     logger.info(f"✅ Success with {model_config['name']} on attempt {attempt + 1}")
                     return result
                     

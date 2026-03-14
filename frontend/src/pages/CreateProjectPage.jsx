@@ -24,7 +24,8 @@ const CreateProjectPage = () => {
     description: '',
     type: location.state?.selectedType || '',
     tech_stack: '',
-    ai_model: 'gpt-5.1'  // Modèle par défaut
+    ai_model: 'gpt-5.1',  // Modèle par défaut
+    is_pwa: false  // Option PWA
   });
 
   const aiModels = [
@@ -200,6 +201,34 @@ const CreateProjectPage = () => {
                   <p className="text-sm text-slate-500">
                     <span className="text-purple-400 font-semibold">Nouveau !</span> Système multi-IA avec fallback automatique
                   </p>
+                </div>
+
+                {/* Option PWA */}
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3 bg-gradient-to-r from-purple-900/20 to-pink-900/20 p-4 rounded-lg border border-purple-800/30">
+                    <input
+                      type="checkbox"
+                      id="is_pwa"
+                      checked={formData.is_pwa}
+                      onChange={(e) => setFormData({ ...formData, is_pwa: e.target.checked })}
+                      className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-purple-600 focus:ring-purple-500 focus:ring-offset-slate-900"
+                    />
+                    <div className="flex-1">
+                      <Label htmlFor="is_pwa" className="text-white font-semibold cursor-pointer flex items-center">
+                        📱 Générer en PWA (Application Mobile Installable)
+                      </Label>
+                      <p className="text-sm text-slate-400 mt-1">
+                        Votre app pourra être installée sur téléphone et bureau comme une vraie application native
+                      </p>
+                    </div>
+                  </div>
+                  {formData.is_pwa && (
+                    <div className="bg-green-900/20 border border-green-800/30 rounded-lg p-3">
+                      <p className="text-green-400 text-sm">
+                        ✅ Votre projet inclura : manifest.json, service worker, mode hors ligne, et instructions d'installation complètes
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
