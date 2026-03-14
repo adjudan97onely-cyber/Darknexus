@@ -224,8 +224,8 @@ async def _handle_n8n_generation(message: str, user_id: str) -> Dict[str, Any]:
 Peux-tu reformuler ta demande d'automatisation ?
 
 **Exemple** :
-"Je veux un workflow n8n qui envoie un email quand je reçois un paiement Stripe"
-"Crée un workflow pour extraire les données d'une facture par OCR"""",
+- Je veux un workflow n8n qui envoie un email quand je reçois un paiement Stripe
+- Crée un workflow pour extraire les données d'une facture par OCR""",
                 'action': 'error'
             }
             
