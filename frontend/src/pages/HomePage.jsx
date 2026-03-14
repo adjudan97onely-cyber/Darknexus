@@ -110,18 +110,24 @@ const HomePage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              onClick={() => navigate('/create')}
+              onClick={() => navigate('/assistant')}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 transition-all duration-300 shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105">
-              <Rocket className="w-5 h-5 mr-2" />
-              Commencer Maintenant
+              <Sparkles className="w-5 h-5 mr-2" />
+              Assistant IA (Nouveau !)
               <ChevronRight className="w-5 h-5 ml-2" />
+            </Button>
+            <Button
+              size="lg"
+              onClick={() => navigate('/create')}
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white text-lg px-8 py-6 transition-all duration-300">
+              <Rocket className="w-5 h-5 mr-2" />
+              Créer un Projet
             </Button>
             <Button
               size="lg"
               variant="outline"
               onClick={() => navigate('/projects')}
               className="border-slate-700 text-slate-300 hover:bg-slate-800 text-lg px-8 py-6 transition-all duration-300">
-
               Voir les Exemples
             </Button>
           </div>

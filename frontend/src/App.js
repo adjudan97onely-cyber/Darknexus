@@ -6,6 +6,7 @@ import CreateProjectPage from "./pages/CreateProjectPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import VoiceAssistantPage from "./pages/VoiceAssistantPage";
+import AIAssistantPage from "./pages/AIAssistantPage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingVoiceAssistant from "./components/FloatingVoiceAssistant";
@@ -27,6 +28,7 @@ function AppContent() {
         <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
         <Route path="/project/:projectId" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
         <Route path="/voice-assistant" element={<ProtectedRoute><VoiceAssistantPage /></ProtectedRoute>} />
+        <Route path="/assistant" element={<ProtectedRoute><AIAssistantPage /></ProtectedRoute>} />
       </Routes>
       
       {/* Assistant Vocal Flottant - Accessible partout sauf sur la page de login */}
