@@ -31,6 +31,43 @@ const ProjectDetailPage = () => {
 
   useEffect(() => {
     loadProject();
+    
+    // Si le projet est en cours de génération, poller toutes les 3 secondes
+    let pollInterval;
+    
+    const startPolling = async () => {
+      try {
+        const data = await projectsAPI.getProject(projectId);
+        setProject(data);
+        
+        // Si toujours en génération, continuer le polling
+        if (data.status === 'generating') {
+          pollInterval = setTimeout(startPolling, 3000);
+        } else if (data.status === 'completed') {
+          // Génération terminée !
+          toast({
+            title: "✅ Génération terminée !",
+            description: `${data.code_files?.length || 0} fichiers générés`
+          });
+        } else if (data.status === 'error') {
+          toast({
+            title: "❌ Erreur de génération",
+            description: "La génération a échoué",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+      }
+    };
+    
+    // Démarrer le polling initial
+    startPolling();
+    
+    // Cleanup
+    return () => {
+      if (pollInterval) clearTimeout(pollInterval);
+    };
   }, [projectId]);
 
   const loadProject = async () => {
@@ -200,6 +237,20 @@ const ProjectDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+      {/* Bannière de génération en cours */}
+      {project.status === 'generating' && (
+        <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-b border-purple-500/30">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-center gap-3">
+              <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+              <span className="text-white font-medium">
+                🚀 Génération en cours... Vos fichiers sont en train d'être créés par l'IA
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Header */}
       <nav className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">

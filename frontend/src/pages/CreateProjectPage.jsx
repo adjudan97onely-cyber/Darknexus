@@ -69,14 +69,15 @@ const CreateProjectPage = () => {
     setIsGenerating(true);
     
     try {
+      // Créer le projet (retourne immédiatement avec status "generating")
       const project = await projectsAPI.createProject(formData);
       
       toast({
-        title: "✨ Projet créé !",
-        description: "Votre code a été généré avec succès"
+        title: "🚀 Génération lancée !",
+        description: "Votre projet est en cours de génération..."
       });
       
-      // Rediriger vers la page du projet
+      // Rediriger immédiatement vers la page du projet (qui va poller le status)
       navigate(`/project/${project.id}`);
     } catch (error) {
       console.error('Error creating project:', error);
@@ -85,7 +86,6 @@ const CreateProjectPage = () => {
         description: error.response?.data?.detail || "Erreur lors de la création du projet",
         variant: "destructive"
       });
-    } finally {
       setIsGenerating(false);
     }
   };

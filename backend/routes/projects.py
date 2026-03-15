@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from typing import List
 from models.project import Project, ProjectCreate, ProjectResponse, CodeFile
 from services.ai_service import ai_generator, AICodeGenerator
+from services.background_tasks import launch_background_generation, get_task_status
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -35,7 +36,8 @@ async def get_available_models():
 @router.post("", response_model=ProjectResponse)
 async def create_project(project_input: ProjectCreate):
     """
-    Crée un nouveau projet et génère le code via IA
+    Crée un nouveau projet et lance la génération IA en arrière-plan
+    Retourne immédiatement avec status 'generating'
     """
     try:
         # Créer l'objet projet initial
@@ -44,76 +46,43 @@ async def create_project(project_input: ProjectCreate):
             description=project_input.description,
             type=project_input.type,
             tech_stack=project_input.tech_stack.split(',') if project_input.tech_stack else [],
-            status="in-progress"
+            status="generating"
         )
         
-        # Sauvegarder le projet en DB (status: in-progress)
+        # Sauvegarder le projet en DB (status: generating)
         project_dict = project.dict()
         project_dict['created_at'] = project.created_at
         project_dict['updated_at'] = project.updated_at
         await projects_collection.insert_one(project_dict)
         
-        # Générer le code en arrière-plan (pour l'instant synchrone, mais devrait être async)
-        try:
-            logger.info(f"Starting code generation for project: {project.name}")
-            
-            ai_result = await ai_generator.generate_code(
-                project_data={
-                    'name': project.name,
-                    'description': project.description,
-                    'type': project.type,
-                    'tech_stack': ', '.join(project.tech_stack) if project.tech_stack else None
-                },
-                preferred_model=project_input.ai_model
-            )
-            
-            # Convertir les fichiers
-            code_files = [
-                CodeFile(
-                    filename=f['filename'],
-                    language=f['language'],
-                    content=f['content']
-                )
-                for f in ai_result['files']
-            ]
-            
-            # Mettre à jour le projet
-            project.code_files = code_files
-            project.tech_stack = ai_result.get('tech_stack', project.tech_stack)
-            project.ai_model_used = ai_result.get('model_used', 'unknown')
-            project.status = "completed"
-            project.updated_at = datetime.utcnow()
-            
-            # Sauvegarder en DB
-            update_dict = project.dict()
-            update_dict['updated_at'] = project.updated_at
-            await projects_collection.update_one(
-                {"id": project.id},
-                {"$set": update_dict}
-            )
-            
-            logger.info(f"Code generation completed for project: {project.name}")
-            
-        except Exception as e:
-            logger.error(f"Error during code generation: {str(e)}")
-            # Mettre le statut en erreur
-            await projects_collection.update_one(
-                {"id": project.id},
-                {"$set": {"status": "error", "updated_at": datetime.utcnow()}}
-            )
-            raise HTTPException(status_code=500, detail=f"Erreur lors de la génération du code: {str(e)}")
+        # Lancer la génération en arrière-plan (non-bloquant)
+        logger.info(f"🚀 Launching background generation for project: {project.name}")
         
-        # Retourner le projet
+        launch_background_generation(
+            project_id=project.id,
+            project_data={
+                'name': project.name,
+                'description': project.description,
+                'type': project.type,
+                'tech_stack': ', '.join(project.tech_stack) if project.tech_stack else None,
+                'is_pwa': project_input.is_pwa
+            },
+            ai_generator=ai_generator,
+            db_collection=projects_collection,
+            preferred_model=project_input.ai_model
+        )
+        
+        # Retourner IMMÉDIATEMENT le projet avec status "generating"
         return ProjectResponse(
             id=project.id,
             name=project.name,
             description=project.description,
             type=project.type,
             tech_stack=project.tech_stack,
-            status=project.status,
-            ai_model_used=project.ai_model_used,
+            status="generating",
+            ai_model_used=None,
             created_at=project.created_at.isoformat(),
-            code_files=project.code_files
+            code_files=[]
         )
         
     except Exception as e:
@@ -152,13 +121,19 @@ async def get_projects():
 @router.get("/{project_id}", response_model=ProjectResponse)
 async def get_project(project_id: str):
     """
-    Récupère un projet spécifique
+    Récupère un projet spécifique avec son statut de génération
     """
     try:
         project = await projects_collection.find_one({"id": project_id})
         
         if not project:
             raise HTTPException(status_code=404, detail="Projet non trouvé")
+        
+        # Vérifier si une tâche est en cours
+        task_status = get_task_status(project_id)
+        if task_status["exists"] and not task_status["done"]:
+            # Forcer le statut à "generating" si la tâche est en cours
+            project['status'] = "generating"
         
         return ProjectResponse(
             id=project['id'],
