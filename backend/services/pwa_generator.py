@@ -35,7 +35,7 @@ class PWAGenerator:
             
             pwa_files = []
             
-            # 1. Générer manifest.json
+            # 1. Générer manifest.json (dans public/ pour structure Vite)
             manifest = self._generate_manifest(name, description, theme_color, background_color)
             pwa_files.append({
                 'filename': 'public/manifest.json',
@@ -43,7 +43,7 @@ class PWAGenerator:
                 'content': json.dumps(manifest, indent=2)
             })
             
-            # 2. Générer service-worker.js
+            # 2. Générer service-worker.js (dans public/ pour accès direct)
             service_worker = self._generate_service_worker(name)
             pwa_files.append({
                 'filename': 'public/service-worker.js',
@@ -59,18 +59,26 @@ class PWAGenerator:
                 'content': sw_register
             })
             
-            # 4. Générer HTML avec les meta tags PWA
-            html_head = self._generate_html_head(name, description, theme_color)
+            # 4. Générer index.html COMPLET avec PWA meta tags
+            html_full = self._generate_pwa_index_html(name, description, theme_color)
             pwa_files.append({
-                'filename': 'PWA_HTML_HEAD.txt',
-                'language': 'text',
-                'content': html_head
+                'filename': 'index.html',
+                'language': 'html',
+                'content': html_full
             })
             
-            # 5. Instructions d'installation
+            # 5. Générer icônes placeholder (instructions)
+            icons_instructions = self._generate_icons_instructions()
+            pwa_files.append({
+                'filename': 'public/ICONS_README.txt',
+                'language': 'text',
+                'content': icons_instructions
+            })
+            
+            # 6. Instructions d'installation PWA
             instructions = self._generate_installation_instructions(name)
             pwa_files.append({
-                'filename': 'PWA_INSTRUCTIONS.md',
+                'filename': 'PWA_INSTALLATION.md',
                 'language': 'markdown',
                 'content': instructions
             })
@@ -246,6 +254,57 @@ export function unregister() {
 
 <!-- Splash screens iOS (optionnel) -->
 <link rel="apple-touch-startup-image" href="/splash-screen.png">
+"""
+    
+    def _generate_pwa_index_html(self, name: str, description: str, theme_color: str) -> str:
+        """Génère un index.html COMPLET avec toutes les meta tags PWA"""
+        return f"""<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Meta tags PWA -->
+    <meta name="application-name" content="{name}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="{name}">
+    <meta name="description" content="{description}">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="{theme_color}">
+    
+    <!-- Liens PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512x512.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icon-512x512.png">
+    
+    <title>{name}</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+"""
+    
+    def _generate_icons_instructions(self) -> str:
+        """Instructions pour créer les icônes PWA"""
+        return """📱 ICÔNES PWA REQUISES
+
+Placez les fichiers suivants dans le dossier public/:
+
+1. icon-192x192.png (192x192 pixels)
+2. icon-512x512.png (512x512 pixels)
+
+Générateurs d'icônes en ligne:
+- https://www.pwabuilder.com/imageGenerator
+- https://realfavicongenerator.net/
+- https://favicon.io/
+
+Astuce: Utilisez un logo carré avec fond uni pour un meilleur rendu.
 """
     
     def _generate_installation_instructions(self, name: str) -> str:

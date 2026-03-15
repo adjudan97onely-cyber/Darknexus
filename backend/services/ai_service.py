@@ -1,7 +1,7 @@
 import os
 import json
 import asyncio
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from dotenv import load_dotenv
 import logging
@@ -90,13 +90,43 @@ class AICodeGenerator:
                     result['model_used'] = model_key
                     result['model_name'] = model_config['name']
                     
-                    # Si PWA, ajouter les fichiers PWA
+                    # Si PWA, ajouter les fichiers PWA et remplacer index.html
                     if is_pwa:
                         logger.info("📱 Generating PWA files...")
                         pwa_files = pwa_generator.generate_pwa_files(project_data)
-                        result['files'].extend(pwa_files)
+                        
+                        # Remplacer index.html existant par la version PWA
+                        existing_index = None
+                        for i, f in enumerate(result['files']):
+                            if f['filename'] == 'index.html':
+                                existing_index = i
+                                break
+                        
+                        # Filtrer les fichiers PWA pour séparer l'index.html
+                        pwa_index = None
+                        other_pwa_files = []
+                        for pwa_file in pwa_files:
+                            if pwa_file['filename'] == 'index.html':
+                                pwa_index = pwa_file
+                            else:
+                                other_pwa_files.append(pwa_file)
+                        
+                        # Remplacer ou ajouter l'index.html PWA
+                        if existing_index is not None and pwa_index:
+                            result['files'][existing_index] = pwa_index
+                            logger.info("✅ Replaced index.html with PWA version")
+                        elif pwa_index:
+                            result['files'].append(pwa_index)
+                            logger.info("✅ Added PWA index.html")
+                        
+                        # Ajouter les autres fichiers PWA
+                        result['files'].extend(other_pwa_files)
                         result['is_pwa'] = True
-                        logger.info(f"✅ Added {len(pwa_files)} PWA files")
+                        logger.info(f"✅ Added {len(pwa_files)} PWA files total")
+                    
+                    # Validation post-génération pour web-app/PWA
+                    if project_data.get('type', '').lower() in ['web-app', 'pwa', 'mobile-app', 'mobile_app']:
+                        self._validate_web_app_structure(result['files'])
                     
                     logger.info(f"✅ Success with {model_config['name']} on attempt {attempt + 1}")
                     return result
@@ -182,15 +212,118 @@ Tu ajoutes des commentaires explicatifs en français pour faciliter la compréhe
         name = project_data.get('name', 'Unknown')
         description = project_data.get('description', '')
         tech_stack = project_data.get('tech_stack', '')
+        is_pwa = project_data.get('is_pwa', False) or project_type.lower() in ['pwa', 'mobile-app', 'mobile_app', 'web-app']
         
         # Guidelines détaillées par type avec technologies 2025
         type_guidelines = {
-            'web-app': """Génère une application web moderne et complète :
-- Frontend: React 19 avec hooks, TypeScript, Tailwind CSS, shadcn/ui
-- Backend: FastAPI avec async/await, Pydantic v2, type hints
-- Base de données: MongoDB avec Motor (async)
-- Architecture: Composants réutilisables, state management moderne
-- Fichiers: App.tsx, components/, api/, types/, README.md avec setup complet""",
+            'web-app': """Génère une APPLICATION WEB COMPLÈTE avec VITE + REACT 18 déployable sur Vercel :
+
+📁 STRUCTURE OBLIGATOIRE (CRITIQUE pour Vercel):
+```
+projet/
+├── index.html (À LA RACINE - OBLIGATOIRE)
+├── package.json (config build Vite)
+├── vite.config.js (config Vite)
+├── vercel.json (config déploiement)
+├── src/
+│   ├── App.jsx (composant principal)
+│   ├── main.jsx (point d'entrée)
+│   ├── index.css (styles Tailwind)
+│   └── components/ (si nécessaire)
+└── public/ (assets statiques)
+```
+
+🔧 FICHIERS OBLIGATOIRES:
+
+1. **index.html** - À LA RACINE:
+```html
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[NOM_APP]</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+```
+
+2. **package.json** - Avec scripts de build:
+```json
+{
+  "name": "[nom-projet]",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7",
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.33"
+  }
+}
+```
+
+3. **vite.config.js**:
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  base: '/'
+})
+```
+
+4. **vercel.json**:
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite"
+}
+```
+
+5. **src/main.jsx** - Point d'entrée React:
+```jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+```
+
+6. **src/App.jsx** - Application principale avec Tailwind
+7. **src/index.css** - Styles Tailwind
+8. **README.md** - Instructions complètes
+
+⚠️ RÈGLES ABSOLUES:
+- React 18.3.1 (PAS 19 - problèmes de compatibilité)
+- index.html À LA RACINE (pas dans public/)
+- Tous les chemins relatifs depuis /src/
+- Tailwind CSS intégré correctement""",
+            
+            'pwa': """IDENTIQUE à 'web-app' - Structure Vite + React 18 obligatoire (les fichiers PWA seront ajoutés automatiquement)""",
+            
+            'mobile-app': """IDENTIQUE à 'web-app' - Structure Vite + React 18 obligatoire (les fichiers PWA seront ajoutés automatiquement)""",
             
             'python-script': """Génère un script Python moderne et professionnel :
 - Python 3.11+ avec type hints et async/await si pertinent
@@ -228,7 +361,20 @@ Tu ajoutes des commentaires explicatifs en français pour faciliter la compréhe
 - Fichiers: main.py, models/, routes/, requirements.txt, README.md"""
         }
         
-        guideline = type_guidelines.get(project_type, "Génère du code moderne selon la description.")
+        guideline = type_guidelines.get(project_type, type_guidelines['web-app'] if is_pwa else "Génère du code moderne selon la description.")
+        
+        # Avertissement spécial pour les web apps
+        vercel_warning = ""
+        if project_type in ['web-app', 'pwa', 'mobile-app', 'mobile_app']:
+            vercel_warning = """
+🚨 ATTENTION VERCEL - STRUCTURE CRITIQUE:
+- index.html DOIT être à la racine du projet
+- package.json DOIT contenir "build": "vite build"
+- vite.config.js DOIT être présent
+- vercel.json DOIT spécifier outputDirectory: "dist"
+- Utiliser React 18.3.1 (PAS 19)
+
+Si tu ne respectes pas cette structure EXACTE, le déploiement Vercel ÉCHOUERA."""
         
         prompt = f"""🚀 Projet à Développer - Année 2025
 
@@ -236,36 +382,66 @@ TYPE: {project_type.upper()}
 NOM: {name}
 DESCRIPTION: {description}
 {f'STACK DEMANDÉE: {tech_stack}' if tech_stack else 'Tu choisis la stack la plus moderne et adaptée.'}
+{vercel_warning}
 
 📋 GUIDELINES SPÉCIFIQUES:
 {guideline}
 
 🎯 EXIGENCES CRITIQUES:
 1. ✅ Code COMPLET et FONCTIONNEL (ZÉRO TODO, ZÉRO placeholder)
-2. 🆕 Utilise les DERNIÈRES versions 2025 (React 19, Python 3.11+, FastAPI latest, etc.)
+2. 🆕 Utilise les versions STABLES (React 18.3.1, Python 3.11+, FastAPI latest)
 3. 💎 Best practices et patterns modernes
 4. 📝 Commentaires en français, clairs et utiles
 5. 🎨 Code propre, lisible, maintenable
 6. 🔒 Gestion d'erreurs et sécurité de base
-7. 📦 Fichiers: 5-8 maximum, ~200-400 lignes chacun
-8. 📖 README.md avec setup clair et exemples
-
-🏗️ STRUCTURE ATTENDUE:
-- Architecture modulaire et scalable
-- Séparation des concerns
-- Configuration via variables d'environnement
-- Dependencies clairement listées
+7. 📦 Tous les fichiers de configuration nécessaires
+8. 📖 README.md avec setup clair et exemples de déploiement
 
 ⚠️ FORMAT DE RÉPONSE - JSON PUR UNIQUEMENT:
 {{
   "files": [
     {{
-      "filename": "nom_fichier.ext",
-      "language": "python|javascript|typescript|html|css|markdown|json",
-      "content": "CONTENU COMPLET DU FICHIER"
+      "filename": "index.html",
+      "language": "html",
+      "content": "CONTENU COMPLET"
+    }},
+    {{
+      "filename": "package.json",
+      "language": "json",
+      "content": "CONTENU COMPLET"
+    }},
+    {{
+      "filename": "vite.config.js",
+      "language": "javascript",
+      "content": "CONTENU COMPLET"
+    }},
+    {{
+      "filename": "vercel.json",
+      "language": "json",
+      "content": "CONTENU COMPLET"
+    }},
+    {{
+      "filename": "src/main.jsx",
+      "language": "javascript",
+      "content": "CONTENU COMPLET"
+    }},
+    {{
+      "filename": "src/App.jsx",
+      "language": "javascript",
+      "content": "CONTENU COMPLET"
+    }},
+    {{
+      "filename": "src/index.css",
+      "language": "css",
+      "content": "CONTENU COMPLET"
+    }},
+    {{
+      "filename": "README.md",
+      "language": "markdown",
+      "content": "CONTENU COMPLET"
     }}
   ],
-  "tech_stack": ["techno1", "techno2", "techno3"]
+  "tech_stack": ["React 18", "Vite", "Tailwind CSS"]
 }}
 
 🚫 NE RÉPONDS QU'AVEC LE JSON. Aucun texte avant/après. Juste le JSON valide."""
@@ -309,6 +485,30 @@ DESCRIPTION: {description}
         except Exception as e:
             logger.error(f"Error parsing response: {str(e)}")
             raise
+    
+    def _validate_web_app_structure(self, files: List[Dict[str, Any]]) -> None:
+        """Valide que la structure d'une web-app est correcte pour Vercel"""
+        required_files = {
+            'index.html': False,
+            'package.json': False,
+            'vite.config.js': False,
+            'src/main.jsx': False,
+            'src/App.jsx': False
+        }
+        
+        filenames = [f['filename'] for f in files]
+        
+        for required_file in required_files.keys():
+            if required_file in filenames:
+                required_files[required_file] = True
+        
+        missing_files = [f for f, present in required_files.items() if not present]
+        
+        if missing_files:
+            logger.warning(f"⚠️ Fichiers critiques manquants pour Vercel: {', '.join(missing_files)}")
+            logger.warning("Le déploiement Vercel pourrait échouer!")
+        else:
+            logger.info("✅ Structure Vite + React validée - prête pour Vercel")
 
 
 # Instance globale
