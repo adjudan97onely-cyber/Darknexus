@@ -12,6 +12,7 @@ import { projectTypes } from '../mock/mockData';
 import { useToast } from '../hooks/use-toast';
 import { projectsAPI } from '../services/api';
 import VoiceInput from '../components/VoiceInput';
+import AIAssistantExpress from '../components/AIAssistantExpress';
 
 const CreateProjectPage = () => {
   const navigate = useNavigate();
@@ -120,6 +121,22 @@ const CreateProjectPage = () => {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-white mb-3">Créer un Nouveau Projet</h1>
             <p className="text-slate-400 text-lg">Décrivez votre projet et laissez l'IA générer le code</p>
+          </div>
+
+          {/* Assistant IA Express */}
+          <div className="mb-6">
+            <AIAssistantExpress 
+              onProjectGenerated={(project) => {
+                setFormData({
+                  name: project.name,
+                  description: project.description,
+                  type: project.type,
+                  tech_stack: project.tech_stack,
+                  ai_model: 'gemini-3-flash',
+                  is_pwa: project.is_pwa || false
+                });
+              }}
+            />
           </div>
 
           <Card className="bg-slate-900/50 border-slate-800">
