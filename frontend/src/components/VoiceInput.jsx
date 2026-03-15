@@ -4,11 +4,12 @@ import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { Badge } from './ui/badge';
 
-const VoiceInput = ({ onTranscript, disabled = false, showTranscript = false }) => {
+const VoiceInput = ({ onTranscript, disabled = false, showTranscript = false, mode = 'live' }) => {
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(true);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [fullTranscript, setFullTranscript] = useState('');
+  const [recordedTranscript, setRecordedTranscript] = useState(''); // Pour le mode "record-then-send"
   const recognitionRef = useRef(null);
   const restartTimeoutRef = useRef(null);
   const { toast } = useToast();
@@ -54,8 +55,16 @@ const VoiceInput = ({ onTranscript, disabled = false, showTranscript = false }) 
       if (final) {
         setFullTranscript(prev => {
           const newTranscript = prev + final;
-          // Envoyer au parent
-          onTranscript(newTranscript.trim());
+          
+          // MODE LIVE : Envoyer immédiatement au parent
+          if (mode === 'live') {
+            onTranscript(newTranscript.trim());
+          }
+          // MODE RECORD : Stocker localement, envoyer seulement à l'arrêt
+          else if (mode === 'record') {
+            setRecordedTranscript(newTranscript.trim());
+          }
+          
           return newTranscript;
         });
       }
@@ -133,8 +142,10 @@ const VoiceInput = ({ onTranscript, disabled = false, showTranscript = false }) 
       recognitionRef.current.start();
       
       toast({
-        title: "🎤 Écoute en cours...",
-        description: "Parlez maintenant ! Cliquez à nouveau pour arrêter."
+        title: "🎤 Enregistrement en cours...",
+        description: mode === 'record' 
+          ? "Parlez librement ! Le texte apparaîtra quand vous arrêterez." 
+          : "Parlez maintenant ! Cliquez à nouveau pour arrêter."
       });
     } catch (error) {
       console.error('Erreur lors du démarrage:', error);
@@ -158,14 +169,26 @@ const VoiceInput = ({ onTranscript, disabled = false, showTranscript = false }) 
     try {
       recognitionRef.current.stop();
       
-      toast({
-        title: "⏸️ Enregistrement arrêté",
-        description: fullTranscript ? "Transcription terminée !" : "Aucun texte capturé"
-      });
+      // MODE RECORD : Envoyer la transcription complète au parent MAINTENANT !
+      if (mode === 'record' && recordedTranscript) {
+        onTranscript(recordedTranscript);
+        
+        toast({
+          title: "✅ Transcription terminée !",
+          description: `${recordedTranscript.split(' ').length} mots capturés`
+        });
+      } else {
+        toast({
+          title: "⏸️ Enregistrement arrêté",
+          description: fullTranscript ? "Transcription terminée !" : "Aucun texte capturé"
+        });
+      }
 
       // Réinitialiser après l'arrêt
       setTimeout(() => {
         setInterimTranscript('');
+        setFullTranscript('');
+        setRecordedTranscript('');
       }, 500);
     } catch (error) {
       console.error('Erreur lors de l\'arrêt:', error);
@@ -202,7 +225,10 @@ const VoiceInput = ({ onTranscript, disabled = false, showTranscript = false }) 
               ? 'bg-red-600 hover:bg-red-700 animate-pulse border-red-500' 
               : 'border-slate-700 hover:bg-slate-800 hover:border-purple-500'
           }`}
-          title={isListening ? "Arrêter l'enregistrement (cliquez pour stop)" : "Commencer la dictée vocale"}
+          title={isListening 
+            ? (mode === 'record' ? "Arrêter et transcrire" : "Arrêter l'enregistrement")
+            : (mode === 'record' ? "Enregistrer puis transcrire" : "Commencer la dictée vocale")
+          }
         >
           {isListening ? (
             <MicOff className="w-5 h-5" />
