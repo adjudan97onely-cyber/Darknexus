@@ -66,14 +66,15 @@ const HomePage = () => {
               </span>
             </div>
             <div className="flex items-center space-x-4">
-              <Button 
+              {/* Assistant Vocal - DÉSACTIVÉ (non fonctionnel) */}
+              {/* <Button 
                 variant="ghost" 
                 onClick={() => navigate('/voice-assistant')} 
                 className="text-slate-300 hover:text-white transition-colors"
               >
                 <Mic className="w-4 h-4 mr-2" />
                 Assistant Vocal
-              </Button>
+              </Button> */}
               <Button variant="ghost" onClick={() => navigate('/projects')} className="text-slate-300 hover:text-white transition-colors">
                 Mes Projets
               </Button>

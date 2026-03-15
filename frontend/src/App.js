@@ -12,7 +12,7 @@ import AIAssistantPage from "./pages/AIAssistantPage";
 import WebScraperPage from "./pages/WebScraperPage";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-import FloatingVoiceAssistant from "./components/FloatingVoiceAssistant";
+// import FloatingVoiceAssistant from "./components/FloatingVoiceAssistant"; // DÉSACTIVÉ
 import { Toaster } from "./components/ui/sonner";
 
 function AppContent() {
@@ -39,8 +39,8 @@ function AppContent() {
         <Route path="/scraper" element={<ProtectedRoute><WebScraperPage /></ProtectedRoute>} />
       </Routes>
       
-      {/* Assistant Vocal Flottant - Accessible partout sauf sur la page de login */}
-      {showFloatingAssistant && <FloatingVoiceAssistant />}
+      {/* Assistant Vocal Flottant - DÉSACTIVÉ (non fonctionnel) */}
+      {/* {showFloatingAssistant && <FloatingVoiceAssistant />} */}
       
       <Toaster />
     </>
