@@ -11,7 +11,20 @@ logger = logging.getLogger(__name__)
 
 class AIAssistant:
     def __init__(self):
-        self.llm = LlmChat(api_key=os.environ.get('EMERGENT_LLM_KEY'))
+        self.api_key = os.environ.get('EMERGENT_LLM_KEY')
+        # On initialise LlmChat à la demande avec session_id unique
+    
+    def _get_llm_client(self, session_id: str = None):
+        """Crée un client LLM avec les bons paramètres"""
+        if session_id is None:
+            import uuid
+            session_id = str(uuid.uuid4())
+        
+        return LlmChat(
+            api_key=self.api_key,
+            session_id=session_id,
+            system_message="Tu es un assistant IA expert en développement."
+        )
     
     async def analyze_project_idea(self, user_input: str) -> dict:
         """
@@ -54,9 +67,12 @@ Si l'idée est claire, mets needs_clarification=false et génère directement l'
             # Créer le prompt complet avec system + user
             full_prompt = f"{system_prompt}\n\n{user_input}"
             
+            # Créer un client LLM pour cette requête
+            llm = self._get_llm_client()
+            
             messages = [UserMessage(content=full_prompt)]
             
-            response = await self.llm.chat(
+            response = await llm.chat(
                 messages=messages,
                 model="gemini-3-flash",
                 temperature=0.7
@@ -125,9 +141,12 @@ Réponds en JSON:
             # Créer le prompt complet
             full_prompt = f"{system_prompt}\n\n{user_message}"
             
+            # Créer un client LLM pour cette requête
+            llm = self._get_llm_client()
+            
             messages = [UserMessage(content=full_prompt)]
             
-            response = await self.llm.chat(
+            response = await llm.chat(
                 messages=messages,
                 model="gemini-3-flash",
                 temperature=0.7
