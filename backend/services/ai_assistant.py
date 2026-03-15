@@ -3,7 +3,7 @@ SERVICE ASSISTANT IA INTELLIGENT
 Aide à la création de projets avec guidage intelligent
 """
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage, SystemMessage
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 import os
 import logging
 
@@ -51,10 +51,10 @@ Réponds en JSON avec cette structure:
 Si l'idée est claire, mets needs_clarification=false et génère directement l'analyse complète."""
 
         try:
-            messages = [
-                SystemMessage(content=system_prompt),
-                UserMessage(content=f"Idée de projet: {user_input}")
-            ]
+            # Créer le prompt complet avec system + user
+            full_prompt = f"{system_prompt}\n\n{user_input}"
+            
+            messages = [UserMessage(content=full_prompt)]
             
             response = await self.llm.chat(
                 messages=messages,
@@ -122,10 +122,10 @@ Réponds en JSON:
             user_message += f"\n\nRéponses aux questions: {answers}"
         
         try:
-            messages = [
-                SystemMessage(content=system_prompt),
-                UserMessage(content=user_message)
-            ]
+            # Créer le prompt complet
+            full_prompt = f"{system_prompt}\n\n{user_message}"
+            
+            messages = [UserMessage(content=full_prompt)]
             
             response = await self.llm.chat(
                 messages=messages,
