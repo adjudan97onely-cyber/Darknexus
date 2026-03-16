@@ -96,7 +96,8 @@ async def get_projects():
     Récupère tous les projets
     """
     try:
-        projects = await projects_collection.find().to_list(1000)
+        # Exclure code_files pour optimiser la performance (peut être lourd)
+        projects = await projects_collection.find({}, {"_id": 0, "code_files": 0}).to_list(1000)
         return [
             ProjectResponse(
                 id=p['id'],
