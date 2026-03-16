@@ -11,7 +11,7 @@ import { Sparkles, ArrowLeft, Wand2, Loader2, Cpu } from 'lucide-react';
 import { projectTypes } from '../mock/mockData';
 import { useToast } from '../hooks/use-toast';
 import { projectsAPI } from '../services/api';
-import VoiceInput from '../components/VoiceInput';
+import WhisperVoiceInput from '../components/WhisperVoiceInput';
 import AIAssistantExpress from '../components/AIAssistantExpress';
 
 const CreateProjectPage = () => {
