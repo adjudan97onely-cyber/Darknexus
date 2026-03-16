@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Sparkles, Zap, Code2, Rocket, ChevronRight, Globe, Database, Cpu, Mic, LogOut } from 'lucide-react';
+import { Sparkles, Zap, Code2, Rocket, ChevronRight, Globe, Database, Cpu, Mic, LogOut, Settings } from 'lucide-react';
 import { projectTypes, templates } from '../mock/mockData';
 import { useToast } from '../hooks/use-toast';
 
@@ -88,6 +88,14 @@ const HomePage = () => {
               </Button>
               <Button 
                 variant="ghost" 
+                onClick={() => navigate('/admin/settings')} 
+                className="text-orange-400 hover:text-orange-300 hover:bg-orange-900/20 transition-colors"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Admin
+              </Button>
+              <Button 
+                variant="ghost" 
                 onClick={handleLogout} 
                 className="text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors"
               >
@@ -105,7 +113,7 @@ const HomePage = () => {
           <Badge className="mb-6 bg-purple-500/10 text-purple-300 border-purple-500/20 hover:bg-purple-500/20 transition-colors">
             ✨ Nouveau : Multi-IA Expert (GPT-5, Claude 4, Gemini 3)
           </Badge>
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent leading-tight">ADJ KILLAGAIN IA 2.0
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent leading-tight">Oracle
 
           </h1>
           <p className="text-xl text-slate-400 mb-8 leading-relaxed">
@@ -266,7 +274,7 @@ const HomePage = () => {
       <footer className="border-t border-slate-800 bg-slate-950/50 mt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-slate-500">
-            <p>© 2026 ADJ KILLAGAIN IA 2.0. Générez du code sans limites.</p>
+            <p>© 2026 Oracle. Générez du code sans limites.</p>
           </div>
         </div>
       </footer>

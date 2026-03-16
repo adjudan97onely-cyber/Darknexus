@@ -11,6 +11,7 @@ import VoiceAssistantPage from "./pages/VoiceAssistantPage";
 import AIAssistantPage from "./pages/AIAssistantPage";
 import WebScraperPage from "./pages/WebScraperPage";
 import LoginPage from "./pages/LoginPage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 // import FloatingVoiceAssistant from "./components/FloatingVoiceAssistant"; // DÉSACTIVÉ
 import { Toaster } from "./components/ui/sonner";
@@ -37,6 +38,7 @@ function AppContent() {
         <Route path="/voice-assistant" element={<ProtectedRoute><VoiceAssistantPage /></ProtectedRoute>} />
         <Route path="/assistant" element={<ProtectedRoute><AIAssistantPage /></ProtectedRoute>} />
         <Route path="/scraper" element={<ProtectedRoute><WebScraperPage /></ProtectedRoute>} />
+        <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
       </Routes>
       
       {/* Assistant Vocal Flottant - DÉSACTIVÉ (non fonctionnel) */}
