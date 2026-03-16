@@ -10,7 +10,7 @@ import { Progress } from '../components/ui/progress';
 import { ArrowLeft, Sparkles, Loader2, CheckCircle2, Zap, Rocket } from 'lucide-react';
 import { projectTypes } from '../mock/mockData';
 import { useToast } from '../hooks/use-toast';
-import VoiceInput from '../components/VoiceInput';
+import WhisperVoiceInput from '../components/WhisperVoiceInput';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -213,12 +213,11 @@ const QuickCreatePage = () => {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="description" className="text-slate-200">Description *</Label>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500">🎤 Parle à l'IA :</span>
-                    <VoiceInput 
+                    <span className="text-xs text-slate-400">✨ Whisper AI :</span>
+                    <WhisperVoiceInput 
                       onTranscript={handleVoiceTranscript}
                       disabled={isGenerating}
                       showTranscript={false}
-                      mode="record"
                     />
                   </div>
                 </div>

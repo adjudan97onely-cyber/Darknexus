@@ -253,12 +253,11 @@ const CreateProjectPage = () => {
                   <div className="flex items-center justify-between">
                     <Label htmlFor="description" className="text-slate-200">Description Détaillée *</Label>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-500">🎤 Enregistrer puis transcrire :</span>
-                      <VoiceInput 
+                      <span className="text-xs text-slate-400">✨ Whisper AI :</span>
+                      <WhisperVoiceInput 
                         onTranscript={handleVoiceTranscript}
                         disabled={isGenerating}
                         showTranscript={false}
-                        mode="record"
                       />
                     </div>
                   </div>
