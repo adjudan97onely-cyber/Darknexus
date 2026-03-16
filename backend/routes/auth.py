@@ -60,6 +60,9 @@ async def login(login_data: UserLogin):
         
         return token
         
+    except HTTPException:
+        # Re-raise HTTPException pour garder le bon status code
+        raise
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
         raise HTTPException(status_code=500, detail="Erreur lors de la connexion")
