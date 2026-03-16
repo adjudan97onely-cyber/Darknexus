@@ -10,6 +10,7 @@ import { Progress } from '../components/ui/progress';
 import { ArrowLeft, Sparkles, Loader2, CheckCircle2, Zap, Rocket } from 'lucide-react';
 import { projectTypes } from '../mock/mockData';
 import { useToast } from '../hooks/use-toast';
+import VoiceInput from '../components/VoiceInput';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -35,6 +36,13 @@ const QuickCreatePage = () => {
     { id: 'gpt-5.1', name: 'GPT-5.1 (Équilibré)', icon: '⭐' },
     { id: 'gemini-3-flash', name: 'Gemini 3 Flash (Rapide)', icon: '🚀' }
   ];
+
+  const handleVoiceTranscript = (transcript) => {
+    setFormData(prev => ({
+      ...prev,
+      description: transcript
+    }));
+  };
 
   const handleQuickGenerate = async () => {
     if (!formData.name || !formData.description || !formData.type) {
@@ -202,7 +210,18 @@ const QuickCreatePage = () => {
 
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-slate-200">Description *</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="description" className="text-slate-200">Description *</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500">🎤 Parle à l'IA :</span>
+                    <VoiceInput 
+                      onTranscript={handleVoiceTranscript}
+                      disabled={isGenerating}
+                      showTranscript={false}
+                      mode="record"
+                    />
+                  </div>
+                </div>
                 <Textarea
                   id="description"
                   placeholder="Décris ton projet rapidement..."
