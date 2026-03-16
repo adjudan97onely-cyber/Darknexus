@@ -113,7 +113,7 @@ const HomePage = () => {
           <Badge className="mb-6 bg-purple-500/10 text-purple-300 border-purple-500/20 hover:bg-purple-500/20 transition-colors">
             ✨ Nouveau : Multi-IA Expert (GPT-5, Claude 4, Gemini 3)
           </Badge>
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent leading-tight">Oracle
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent leading-tight">Dark Nexus AI
 
           </h1>
           <p className="text-xl text-slate-400 mb-8 leading-relaxed">
@@ -274,7 +274,7 @@ const HomePage = () => {
       <footer className="border-t border-slate-800 bg-slate-950/50 mt-20">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-slate-500">
-            <p>© 2026 Oracle. Générez du code sans limites.</p>
+            <p>© 2042 Dark Nexus AI. Générez du code sans limites.</p>
           </div>
         </div>
       </footer>

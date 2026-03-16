@@ -83,7 +83,7 @@ const LoginPage = () => {
           {/* Title */}
           <div>
             <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Oracle
+              Dark Nexus AI
             </CardTitle>
             <CardDescription className="text-slate-400 mt-2">
               Connexion à votre espace personnel
@@ -167,7 +167,7 @@ const LoginPage = () => {
       {/* Footer */}
       <div className="absolute bottom-8 text-center">
         <p className="text-slate-500 text-sm">
-          © 2026 Oracle - Application Privée et Sécurisée
+          © 2042 Dark Nexus AI - Application Privée et Sécurisée
         </p>
       </div>
     </div>
