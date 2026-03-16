@@ -18,6 +18,7 @@ from routes.scraper import router as scraper_router
 from routes.streaming import router as streaming_router
 from routes.ai_assistant import router as ai_assistant_router
 from routes.whisper import router as whisper_router
+from routes.copilot import router as copilot_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -104,6 +105,9 @@ app.include_router(ai_assistant_router)
 
 # Include Whisper STT router
 app.include_router(whisper_router)
+
+# Include Copilot Intelligent router
+app.include_router(copilot_router)
 
 app.add_middleware(
     CORSMiddleware,
