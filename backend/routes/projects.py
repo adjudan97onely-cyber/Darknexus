@@ -556,6 +556,19 @@ async def get_deployment_instructions(project_id: str):
         
         instructions = vercel_deployer.generate_deployment_instructions(
             project_name=project['name'],
+            files=project.get('code_files', [])
+        )
+        
+        return {
+            "project_name": project['name'],
+            "instructions": instructions
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting deployment instructions: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{project_id}/analytics")
@@ -638,16 +651,3 @@ async def get_stripe_template_code(template_id: str):
         logger.error(f"Error getting stripe template code: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-            files=project.get('code_files', [])
-        )
-        
-        return {
-            "project_name": project['name'],
-            "instructions": instructions
-        }
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting deployment instructions: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
