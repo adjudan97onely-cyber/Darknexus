@@ -159,11 +159,14 @@ async def get_project(project_id: str):
 @router.post("/{project_id}/improve")
 async def improve_project(project_id: str, improvement_request: dict):
     """
-    Améliore un projet existant avec de nouvelles instructions
+    Améliore un projet existant avec de nouvelles instructions (NIVEAU E5: Mode Patch Intelligent)
     """
     try:
+        from services.smart_improver import smart_improver
+        from services.auto_healer import auto_healer
+        
         # Récupérer le projet existant
-        project = await projects_collection.find_one({"id": project_id})
+        project = await projects_collection.find_one({"id": project_id}, {"_id": 0})
         
         if not project:
             raise HTTPException(status_code=404, detail="Projet non trouvé")
@@ -175,24 +178,24 @@ async def improve_project(project_id: str, improvement_request: dict):
         if not improvement_description:
             raise HTTPException(status_code=400, detail="Description de l'amélioration requise")
         
-        # Construire le contexte pour l'IA
-        context = f"""Projet existant à améliorer:
-Nom: {project['name']}
-Description originale: {project['description']}
-Technologies: {', '.join(project['tech_stack'])}
-
-Code actuel:
-{chr(10).join([f"Fichier: {f['filename']}" for f in project.get('code_files', [])])}
-
-DEMANDE D'AMÉLIORATION:
-{improvement_description}
-
-Génère le code AMÉLIORÉ en gardant la structure existante mais en intégrant les améliorations demandées."""
+        logger.info(f"🎯 Amélioration intelligente demandée: {improvement_description[:100]}...")
+        
+        # NIVEAU E5: Analyser la demande d'amélioration
+        analysis = smart_improver.analyze_improvement_request(improvement_description)
+        logger.info(f"📊 Type d'amélioration: {analysis['type']} - Stratégie: {analysis['strategy']}")
+        
+        # Construire un prompt intelligent (mode patch)
+        context = smart_improver.build_smart_prompt(
+            improvement_description=improvement_description,
+            project_data=project,
+            existing_files=project.get('code_files', []),
+            analysis=analysis
+        )
 
         # Mettre à jour le statut
         await projects_collection.update_one(
             {"id": project_id},
-            {"$set": {"status": "in-progress", "updated_at": datetime.utcnow()}}
+            {"$set": {"status": "improving", "updated_at": datetime.utcnow()}}
         )
         
         try:
@@ -209,14 +212,34 @@ Génère le code AMÉLIORÉ en gardant la structure existante mais en intégrant
                 preferred_model=ai_model
             )
             
-            # Mettre à jour avec le nouveau code
+            # NIVEAU E5: Fusionner intelligemment avec les fichiers existants
+            if not analysis.get('requires_full_regeneration', False):
+                logger.info("🔀 Mode patch: fusion avec fichiers existants")
+                merged_files = smart_improver.merge_improvements(
+                    existing_files=project.get('code_files', []),
+                    improved_files=ai_result['files']
+                )
+            else:
+                logger.info("🔄 Régénération complète demandée")
+                merged_files = ai_result['files']
+            
+            # NIVEAU E5: Auto-healing sur le code amélioré
+            logger.info("🩹 Auto-healing du code amélioré...")
+            healing_result = await auto_healer.heal_project(
+                files=merged_files,
+                project_type=project['type']
+            )
+            
+            final_files = healing_result['files']
+            
+            # Convertir en CodeFile
             code_files = [
                 CodeFile(
                     filename=f['filename'],
                     language=f['language'],
                     content=f['content']
                 )
-                for f in ai_result['files']
+                for f in final_files
             ]
             
             update_data = {
@@ -225,18 +248,23 @@ Génère le code AMÉLIORÉ en gardant la structure existante mais en intégrant
                 "ai_model_used": ai_result.get('model_used', 'unknown'),
                 "status": "completed",
                 "updated_at": datetime.utcnow(),
-                "description": f"{project['description']}\n\nAméliorations: {improvement_description}"
+                "description": f"{project['description']}\n\nAméliorations: {improvement_description}",
+                "improvement_type": analysis['type'],
+                "auto_fixes_applied": healing_result.get('auto_fixes_applied', 0)
             }
+            
+            if healing_result.get('applied_fixes'):
+                update_data["improvement_notes"] = healing_result['applied_fixes']
             
             await projects_collection.update_one(
                 {"id": project_id},
                 {"$set": update_data}
             )
             
-            logger.info(f"Project improvement completed: {project['name']}")
+            logger.info(f"✅ Project improvement completed: {project['name']}")
             
             # Récupérer et retourner le projet mis à jour
-            updated_project = await projects_collection.find_one({"id": project_id})
+            updated_project = await projects_collection.find_one({"id": project_id}, {"_id": 0})
             
             return ProjectResponse(
                 id=updated_project['id'],
@@ -410,4 +438,134 @@ async def delete_project(project_id: str):
         raise
     except Exception as e:
         logger.error(f"Error deleting project: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@router.post("/{project_id}/deploy")
+async def deploy_project(project_id: str, deployment_config: dict):
+    """
+    Déploie un projet sur Vercel (NIVEAU E5: Déploiement 1-clic)
+    """
+    try:
+        from services.vercel_deployer import vercel_deployer
+        
+        # Récupérer le projet
+        project = await projects_collection.find_one({"id": project_id}, {"_id": 0})
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Projet non trouvé")
+        
+        if project['status'] != 'completed':
+            raise HTTPException(status_code=400, detail="Le projet doit être complété avant déploiement")
+        
+        # Extraire le token Vercel de l'utilisateur (optionnel)
+        vercel_token = deployment_config.get("vercel_token")
+        platform = deployment_config.get("platform", "vercel")
+        
+        if platform != "vercel":
+            raise HTTPException(status_code=400, detail="Seul Vercel est supporté pour le moment")
+        
+        logger.info(f"🚀 Déploiement demandé pour: {project['name']}")
+        
+        # Mettre à jour le statut
+        await projects_collection.update_one(
+            {"id": project_id},
+            {"$set": {"status": "deploying", "updated_at": datetime.utcnow()}}
+        )
+        
+        # Déployer sur Vercel
+        deployment_result = await vercel_deployer.deploy_to_vercel(
+            project_name=project['name'],
+            files=project.get('code_files', []),
+            vercel_token=vercel_token
+        )
+        
+        if deployment_result['success']:
+            # Déploiement réussi
+            await projects_collection.update_one(
+                {"id": project_id},
+                {"$set": {
+                    "status": "deployed",
+                    "deployment_url": deployment_result['url'],
+                    "deployment_id": deployment_result.get('deployment_id'),
+                    "deployed_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            logger.info(f"✅ Déploiement réussi: {deployment_result['url']}")
+            
+            return {
+                "success": True,
+                "url": deployment_result['url'],
+                "deployment_id": deployment_result.get('deployment_id'),
+                "message": f"✅ Projet déployé sur Vercel ! URL: {deployment_result['url']}"
+            }
+        else:
+            # Déploiement échoué
+            await projects_collection.update_one(
+                {"id": project_id},
+                {"$set": {
+                    "status": "completed",  # Retour au statut précédent
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            logger.error(f"❌ Déploiement échoué: {deployment_result.get('error')}")
+            
+            # Si pas de token, retourner les instructions
+            if 'Token' in deployment_result.get('error', ''):
+                instructions = vercel_deployer.generate_deployment_instructions(
+                    project_name=project['name'],
+                    files=project.get('code_files', [])
+                )
+                return {
+                    "success": False,
+                    "error": deployment_result['error'],
+                    "instructions": instructions,
+                    "message": "⚠️ Token Vercel requis. Voici les instructions de déploiement manuel."
+                }
+            
+            return {
+                "success": False,
+                "error": deployment_result.get('error', 'Erreur inconnue'),
+                "details": deployment_result.get('details')
+            }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deploying project: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{project_id}/deployment-instructions")
+async def get_deployment_instructions(project_id: str):
+    """
+    Retourne les instructions de déploiement manuel pour un projet
+    """
+    try:
+        from services.vercel_deployer import vercel_deployer
+        
+        # Récupérer le projet
+        project = await projects_collection.find_one({"id": project_id}, {"_id": 0})
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Projet non trouvé")
+        
+        instructions = vercel_deployer.generate_deployment_instructions(
+            project_name=project['name'],
+            files=project.get('code_files', [])
+        )
+        
+        return {
+            "project_name": project['name'],
+            "instructions": instructions
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting deployment instructions: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
