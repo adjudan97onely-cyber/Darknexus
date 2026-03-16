@@ -314,7 +314,7 @@ def _detect_intention(message: str, current_project_id: str = None) -> str:
 async def _analyze_images(images: List[str], context: str) -> Dict[str, Any]:
     """Analyse des images avec Vision AI"""
     try:
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         
         # Utiliser GPT-5.1 avec Vision
         chat = LlmChat(
@@ -396,7 +396,7 @@ DEMANDE DE L'UTILISATEUR:
             context += f"\n\nANALYSE D'IMAGE:\n{image_analysis['analysis']}"
         
         # Utiliser l'IA pour générer les modifications
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         chat = LlmChat(api_key=api_key, session_id=f"modify_{project_id}")
         chat.with_model("openai", "gpt-5.1")
         
@@ -617,7 +617,7 @@ async def _handle_conversation(
             return await _generate_project_template(message, history, image_analysis)
         
         # Créer une session de chat avec l'IA
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         chat = LlmChat(
             api_key=api_key,
             session_id=f"assistant_{datetime.utcnow().timestamp()}",
@@ -699,7 +699,7 @@ async def _generate_project_template(
     """Génère un template de projet formaté pour copier-coller"""
     try:
         # Utiliser l'IA pour analyser la demande et créer le template
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         chat = LlmChat(api_key=api_key, session_id=f"template_{datetime.utcnow().timestamp()}")
         chat.with_model("openai", "gpt-5.1")
         

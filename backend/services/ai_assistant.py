@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class AIAssistant:
     def __init__(self):
-        self.api_key = os.environ.get('EMERGENT_LLM_KEY')
+        self.api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         # On initialise LlmChat à la demande avec session_id unique
     
     def _get_llm_client(self, session_id: str = None):

@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/whisper", tags=["whisper"])
 
-# Initialiser Whisper avec l'Emergent Universal Key
-stt = OpenAISpeechToText(api_key=os.getenv("EMERGENT_LLM_KEY"))
+# Initialiser Whisper avec la clé OpenAI perso ou Emergent
+stt = OpenAISpeechToText(api_key=os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY"))
 
 
 @router.post("/transcribe")

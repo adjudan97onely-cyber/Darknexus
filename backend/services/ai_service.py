@@ -27,9 +27,10 @@ class AICodeGenerator:
     FALLBACK_ORDER = ['gpt-5.1', 'claude-4-sonnet', 'gemini-2.5-pro', 'gpt-5.2', 'claude-sonnet-4-6']
     
     def __init__(self):
-        self.api_key = os.environ.get('EMERGENT_LLM_KEY')
+        # Prioriser la clé OpenAI perso de l'utilisateur
+        self.api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         if not self.api_key:
-            raise ValueError("EMERGENT_LLM_KEY not found in environment")
+            raise ValueError("OPENAI_API_KEY or EMERGENT_LLM_KEY not found in environment")
     
     async def generate_code(self, project_data: Dict[str, Any], preferred_model: Optional[str] = None, max_retries: int = 3) -> Dict[str, Any]:
         """
