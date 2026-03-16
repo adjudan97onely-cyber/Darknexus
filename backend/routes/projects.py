@@ -556,6 +556,88 @@ async def get_deployment_instructions(project_id: str):
         
         instructions = vercel_deployer.generate_deployment_instructions(
             project_name=project['name'],
+
+
+@router.get("/{project_id}/analytics")
+async def get_project_analytics(project_id: str):
+    """
+    Récupère les analytics d'un projet (NIVEAU E5)
+    """
+    try:
+        from services.analytics_service import analytics_service
+        
+        # Vérifier que le projet existe
+        project = await projects_collection.find_one({"id": project_id}, {"_id": 0})
+        if not project:
+            raise HTTPException(status_code=404, detail="Projet non trouvé")
+        
+        # Récupérer les stats
+        stats = await analytics_service.get_project_stats(project_id)
+        
+        return {
+            "project_id": project_id,
+            "project_name": project['name'],
+            **stats
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting analytics: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/analytics/global")
+async def get_global_analytics():
+    """
+    Récupère les analytics globales de la plateforme (NIVEAU E5)
+    """
+    try:
+        from services.analytics_service import analytics_service
+        
+        stats = await analytics_service.get_global_stats()
+        return stats
+    
+    except Exception as e:
+        logger.error(f"Error getting global analytics: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/templates/stripe")
+async def get_stripe_templates():
+    """
+    Liste les templates Stripe disponibles (NIVEAU E5)
+    """
+    try:
+        from services.stripe_templates import stripe_template_generator
+        
+        templates = stripe_template_generator.list_templates()
+        return {"templates": templates}
+    
+    except Exception as e:
+        logger.error(f"Error getting stripe templates: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/templates/stripe/{template_id}")
+async def get_stripe_template_code(template_id: str):
+    """
+    Récupère le code d'un template Stripe (NIVEAU E5)
+    """
+    try:
+        from services.stripe_templates import stripe_template_generator
+        
+        code = stripe_template_generator.get_stripe_integration_code(template_id)
+        
+        return {
+            "template_id": template_id,
+            **code
+        }
+    
+    except Exception as e:
+        logger.error(f"Error getting stripe template code: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
             files=project.get('code_files', [])
         )
         

@@ -1,7 +1,7 @@
 """
 SERVICE DE GÉNÉRATION EN ARRIÈRE-PLAN (NIVEAU E5)
 Permet de lancer des générations IA sans bloquer le endpoint HTTP
-Inclut validation automatique et retry intelligent
+Inclut validation automatique, retry intelligent, auto-healing et SEO
 """
 
 import asyncio
@@ -11,6 +11,9 @@ from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from services.code_validator import code_validator
+from services.auto_healer import auto_healer
+from services.seo_generator import seo_generator
+from services.analytics_service import analytics_service
 
 logger = logging.getLogger(__name__)
 
@@ -88,6 +91,22 @@ async def generate_code_background(
                 else:
                     raise  # Dernière tentative, propager l'erreur
         
+        # NIVEAU E5: Auto-healing sur le code généré
+        logger.info("🩹 Auto-healing du code généré...")
+        healing_result = await auto_healer.heal_project(
+            files=ai_result['files'],
+            project_type=project_data.get('type', 'unknown')
+        )
+        
+        healed_files = healing_result['files']
+        
+        # NIVEAU E5: Ajouter SEO automatique
+        logger.info("🔍 Ajout du SEO automatique...")
+        final_files = seo_generator.enhance_project_with_seo(
+            files=healed_files,
+            project_data=project_data
+        )
+        
         # Convertir les fichiers
         from models.project import CodeFile
         code_files = [
@@ -96,7 +115,7 @@ async def generate_code_background(
                 language=f['language'],
                 content=f['content']
             )
-            for f in ai_result['files']
+            for f in final_files
         ]
         
         # Préparer les données de mise à jour
@@ -106,17 +125,33 @@ async def generate_code_background(
             "ai_model_used": ai_result.get('model_used', 'unknown'),
             "status": "completed",
             "updated_at": datetime.utcnow(),
-            "validation_passed": is_valid
+            "validation_passed": is_valid,
+            "auto_fixes_applied": healing_result.get('auto_fixes_applied', 0),
+            "seo_enabled": True
         }
         
         # Ajouter les erreurs de validation si présentes
         if not is_valid and validation_errors:
             update_data["validation_warnings"] = validation_errors
         
+        if healing_result.get('applied_fixes'):
+            update_data["auto_healing_notes"] = healing_result['applied_fixes']
+        
         # Mettre à jour le projet avec le code généré
         await db_collection.update_one(
             {"id": project_id},
             {"$set": update_data}
+        )
+        
+        # NIVEAU E5: Track analytics
+        await analytics_service.track_event(
+            event_type='project_created',
+            project_id=project_id,
+            metadata={
+                'type': project_data.get('type'),
+                'model_used': ai_result.get('model_used'),
+                'auto_fixes': healing_result.get('auto_fixes_applied', 0)
+            }
         )
         
         logger.info(f"✅ Background generation completed for project: {project_id}")
