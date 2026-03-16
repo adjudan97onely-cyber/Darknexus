@@ -1,0 +1,66 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║            DARK NEXUS AI 2042 - COMMENCE ICI !                ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+
+PROBLEME: Le script se fermait tout seul ?
+
+SOLUTION: Nouveau script v3 qui NE SE FERME JAMAIS !
+
+
+═══════════════════════════════════════════════════════════════════
+
+QUE FAIRE MAINTENANT ?
+
+1. Ouvre ce fichier: README_FINAL_WINDOWS.txt
+   (Double-clic dessus, il s'ouvre avec le Bloc-notes)
+
+2. Suis les instructions dedans
+
+3. Lance: INSTALLATION_AUTOMATIQUE_v3.bat
+
+═══════════════════════════════════════════════════════════════════
+
+
+SCRIPTS DISPONIBLES:
+
+INSTALLATION_AUTOMATIQUE_v3.bat
+  --> Script d'installation (ne se ferme plus !)
+  --> Lance-le EN PREMIER
+
+VERIFIER_INSTALLATION.bat
+  --> Verifie que tout est OK
+  --> Lance-le APRES l'installation
+
+LANCER_DARK_NEXUS.bat
+  --> Lance ton application
+  --> Lance-le apres MongoDB
+
+
+═══════════════════════════════════════════════════════════════════
+
+
+ORDRE D'UTILISATION:
+
+1. INSTALLATION_AUTOMATIQUE_v3.bat (une fois)
+2. VERIFIER_INSTALLATION.bat (verification)
+3. Lance MongoDB
+4. LANCER_DARK_NEXUS.bat (a chaque utilisation)
+
+
+═══════════════════════════════════════════════════════════════════
+
+
+POUR PLUS D'INFOS:
+
+README_FINAL_WINDOWS.txt : Guide complet
+AIDE_SCRIPT_SE_FERME.txt : Si probleme
+
+
+═══════════════════════════════════════════════════════════════════
+
+C'est parti ! Lance INSTALLATION_AUTOMATIQUE_v3.bat !
+
+═══════════════════════════════════════════════════════════════════
