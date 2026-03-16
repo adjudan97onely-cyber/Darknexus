@@ -160,7 +160,7 @@ const QuickCreatePage = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   disabled={isGenerating}
-                  className="bg-slate-800 border-slate-700 text-white"
+                  className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-400"
                 />
               </div>
 
@@ -210,7 +210,7 @@ const QuickCreatePage = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   disabled={isGenerating}
                   rows={4}
-                  className="bg-slate-800 border-slate-700 text-white"
+                  className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-400"
                 />
               </div>
 
