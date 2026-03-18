@@ -1,175 +1,98 @@
-"""
-AUTHENTICATION SERVICE
-Gestion de l'authentification sécurisée
-"""
+import hashlib
+import secrets
+from datetime import datetime, timedelta
 
-import os
-import jwt
-import bcrypt
-from datetime import datetime, timedelta, timezone
-from typing import Optional, Dict
-from motor.motor_asyncio import AsyncIOMotorClient
-from models.user import User, UserCreate, UserLogin, UserResponse, Token
-import logging
-from uuid import uuid4
+from db import (
+    create_user,
+    get_subscription,
+    get_user_by_email,
+    get_user_by_id,
+    get_user_by_token,
+    revoke_token,
+    save_auth_token,
+    upsert_subscription,
+)
 
-logger = logging.getLogger(__name__)
 
-# Configuration JWT
-SECRET_KEY = os.environ['JWT_SECRET_KEY']
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_DAYS = 30  # Token valide 30 jours
-
-# MongoDB
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-users_collection = db.users
+PLANS = {
+    "starter": {
+        "name": "Starter",
+        "price_month": 0,
+        "features": ["Dashboard", "Historique limité", "Auto-select basic"],
+    },
+    "pro": {
+        "name": "Pro",
+        "price_month": 29,
+        "features": ["Toutes analyses", "Auto-select avancé", "Notifications premium"],
+    },
+    "elite": {
+        "name": "Elite",
+        "price_month": 79,
+        "features": ["API prioritaire", "Monitoring en temps réel", "Scoring avancé"],
+    },
+}
 
 
 class AuthService:
-    """Service d'authentification"""
-    
-    @staticmethod
-    def hash_password(password: str) -> str:
-        """Hash un mot de passe avec bcrypt"""
-        salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed.decode('utf-8')
-    
-    @staticmethod
-    def verify_password(plain_password: str, hashed_password: str) -> bool:
-        """Vérifie un mot de passe"""
-        return bcrypt.checkpw(
-            plain_password.encode('utf-8'),
-            hashed_password.encode('utf-8')
-        )
-    
-    @staticmethod
-    def create_access_token(user_id: str, email: str) -> str:
-        """Crée un token JWT"""
-        expire = datetime.now(timezone.utc) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
-        to_encode = {
-            "sub": user_id,
-            "email": email,
-            "exp": expire
-        }
-        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-        return encoded_jwt
-    
-    @staticmethod
-    def verify_token(token: str) -> Optional[Dict]:
-        """Vérifie et décode un token JWT"""
-        try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            return payload
-        except jwt.ExpiredSignatureError:
-            logger.error("Token expired")
-            return None
-        except jwt.JWTError as e:
-            logger.error(f"JWT Error: {str(e)}")
-            return None
-    
-    @staticmethod
-    async def create_user(user_data: UserCreate) -> User:
-        """Crée un nouvel utilisateur"""
-        # Vérifier si l'email existe déjà
-        existing_user = await users_collection.find_one(
-            {"email": user_data.email},
-            {"_id": 0}
-        )
-        
-        if existing_user:
-            raise ValueError("Cet email est déjà utilisé")
-        
-        # Créer l'utilisateur
-        user_id = str(uuid4())
-        password_hash = AuthService.hash_password(user_data.password)
-        
-        user = User(
-            id=user_id,
-            email=user_data.email,
-            password_hash=password_hash,
-            created_at=datetime.now(timezone.utc)
-        )
-        
-        # Sauvegarder dans MongoDB
-        await users_collection.insert_one(user.dict())
-        
-        logger.info(f"User created: {user.email}")
-        return user
-    
-    @staticmethod
-    async def authenticate_user(login_data: UserLogin) -> Optional[Token]:
-        """Authentifie un utilisateur et retourne un token"""
-        # Trouver l'utilisateur
-        user = await users_collection.find_one(
-            {"email": login_data.email},
-            {"_id": 0}
-        )
-        
+    def hash_password(self, password: str) -> str:
+        return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+    def verify_password(self, password: str, password_hash: str) -> bool:
+        return self.hash_password(password) == password_hash
+
+    def register(self, email: str, password: str):
+        existing = get_user_by_email(email)
+        if existing:
+            raise ValueError("Utilisateur déjà existant")
+        user_id = create_user(email=email, password_hash=self.hash_password(password), role="user")
+        token = self._issue_token(user_id)
+        user = get_user_by_id(user_id)
+        return self._public_user(user), token
+
+    def login(self, email: str, password: str):
+        user = get_user_by_email(email)
+        if not user or not self.verify_password(password, user["password_hash"]):
+            raise ValueError("Email ou mot de passe invalide")
+        token = self._issue_token(user["id"])
+        return self._public_user(user), token
+
+    def me(self, token: str):
+        user = get_user_by_token(token)
         if not user:
-            logger.warning(f"Login failed: User not found - {login_data.email}")
             return None
-        
-        # Vérifier le mot de passe
-        if not AuthService.verify_password(login_data.password, user['password_hash']):
-            logger.warning(f"Login failed: Wrong password - {login_data.email}")
-            return None
-        
-        # Mettre à jour last_login
-        await users_collection.update_one(
-            {"id": user['id']},
-            {"$set": {"last_login": datetime.now(timezone.utc)}}
-        )
-        
-        # Créer le token
-        access_token = AuthService.create_access_token(user['id'], user['email'])
-        
-        # Préparer la réponse
-        user_response = UserResponse(
-            id=user['id'],
-            email=user['email'],
-            created_at=user['created_at'],
-            last_login=datetime.now(timezone.utc)
-        )
-        
-        token = Token(
-            access_token=access_token,
-            user=user_response
-        )
-        
-        logger.info(f"User logged in: {user['email']}")
+        profile = self._public_user(user)
+        profile["subscription"] = get_subscription(user["id"])
+        return profile
+
+    def logout(self, token: str):
+        revoke_token(token)
+
+    def plans(self):
+        return [{"code": code, **data} for code, data in PLANS.items()]
+
+    def current_subscription(self, user_id: int):
+        return get_subscription(user_id)
+
+    def upgrade(self, user_id: int, plan: str):
+        if plan not in PLANS:
+            raise ValueError("Plan invalide")
+        expires_at = (datetime.utcnow() + timedelta(days=30)).isoformat()
+        upsert_subscription(user_id, plan=plan, status="active", expires_at=expires_at)
+        return get_subscription(user_id)
+
+    def _issue_token(self, user_id: int):
+        token = secrets.token_urlsafe(32)
+        expires_at = (datetime.utcnow() + timedelta(days=15)).isoformat()
+        save_auth_token(user_id, token, expires_at)
         return token
-    
-    @staticmethod
-    async def get_current_user(token: str) -> Optional[UserResponse]:
-        """Récupère l'utilisateur actuel depuis le token"""
-        payload = AuthService.verify_token(token)
-        
-        if not payload:
-            return None
-        
-        user_id = payload.get("sub")
-        if not user_id:
-            return None
-        
-        # Récupérer l'utilisateur
-        user = await users_collection.find_one(
-            {"id": user_id},
-            {"_id": 0}
-        )
-        
-        if not user:
-            return None
-        
-        return UserResponse(
-            id=user['id'],
-            email=user['email'],
-            created_at=user['created_at'],
-            last_login=user.get('last_login')
-        )
+
+    def _public_user(self, user):
+        return {
+            "id": user["id"],
+            "email": user["email"],
+            "role": user["role"],
+            "created_at": user["created_at"],
+        }
 
 
-# Instance globale
 auth_service = AuthService()
