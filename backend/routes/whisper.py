@@ -4,7 +4,7 @@ Route pour la transcription audio avec OpenAI Whisper (ultra fluide)
 """
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from emergentintegrations.llm.openai import OpenAISpeechToText
+from openai import AsyncOpenAI
 import os
 from dotenv import load_dotenv
 import logging
@@ -16,8 +16,11 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/whisper", tags=["whisper"])
 
-# Initialiser Whisper avec la clé OpenAI perso ou Emergent
-stt = OpenAISpeechToText(api_key=os.getenv("OPENAI_API_KEY") or os.getenv("EMERGENT_LLM_KEY"))
+# Initialiser le client OpenAI
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY not found in environment variables")
+client = AsyncOpenAI(api_key=api_key)
 
 
 @router.post("/transcribe")
@@ -55,11 +58,11 @@ async def transcribe_audio(audio: UploadFile = File(...)):
         try:
             # Transcrire avec Whisper
             with open(tmp_file_path, "rb") as audio_file:
-                response = await stt.transcribe(
-                    file=audio_file,
+                response = await client.audio.transcriptions.create(
                     model="whisper-1",
-                    response_format="json",
+                    file=audio_file,
                     language="fr",  # Français par défaut
+                    response_format="json",
                     temperature=0.0  # Déterministe
                 )
             

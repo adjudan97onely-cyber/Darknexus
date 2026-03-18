@@ -2,6 +2,8 @@
 echo ========================================
 echo   DEMARRAGE BACKEND
 echo ========================================
-cd backend
-call venv\Scripts\activate
-uvicorn server:app --host 0.0.0.0 --port 8001 --reload
+setlocal
+set BACKEND_DIR=C:\Darknexus-main\analytics-lottery\backend
+set PYTHON=%BACKEND_DIR%\venv\Scripts\python.exe
+cd /d %BACKEND_DIR%
+"%PYTHON%" start_simple.py

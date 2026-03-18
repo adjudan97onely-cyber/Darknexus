@@ -37,7 +37,7 @@ class WebSearchService:
             # On va utiliser GPT pour "simuler" une recherche en demandant des connaissances
             # Dans un environnement de production, il faudrait une vraie API de recherche
             
-            from emergentintegrations.llm.chat import LlmChat, UserMessage
+            from openai import AsyncOpenAI
             
             chat = LlmChat(
                 api_key=self.search_api_key,

@@ -8,7 +8,7 @@ import os
 import json
 import logging
 from typing import Dict, Any, List, Optional
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from openai import AsyncOpenAI
 from datetime import datetime
 
 logger = logging.getLogger(__name__)

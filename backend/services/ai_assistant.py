@@ -3,28 +3,20 @@ SERVICE ASSISTANT IA INTELLIGENT
 Aide à la création de projets avec guidage intelligent
 """
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from openai import AsyncOpenAI
 import os
 import logging
+import json
+import asyncio
 
 logger = logging.getLogger(__name__)
 
 class AIAssistant:
     def __init__(self):
-        self.api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
-        # On initialise LlmChat à la demande avec session_id unique
-    
-    def _get_llm_client(self, session_id: str = None):
-        """Crée un client LLM avec les bons paramètres"""
-        if session_id is None:
-            import uuid
-            session_id = str(uuid.uuid4())
-        
-        return LlmChat(
-            api_key=self.api_key,
-            session_id=session_id,
-            system_message="Tu es un assistant IA expert en développement."
-        )
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY not found in environment")
+        self.client = AsyncOpenAI(api_key=api_key)
     
     async def analyze_project_idea(self, user_input: str) -> dict:
         """
@@ -64,24 +56,17 @@ Réponds en JSON avec cette structure:
 Si l'idée est claire, mets needs_clarification=false et génère directement l'analyse complète."""
 
         try:
-            # Créer le prompt complet avec system + user
-            full_prompt = f"{system_prompt}\n\n{user_input}"
-            
-            # Créer un client LLM pour cette requête
-            llm = self._get_llm_client()
-            
-            messages = [UserMessage(content=full_prompt)]
-            
-            response = await llm.chat(
-                messages=messages,
-                model="gemini-3-flash",
+            response = await self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_input}
+                ],
                 temperature=0.7
             )
             
             # Parser la réponse JSON
-            import json
-            result = json.loads(response.content)
-            
+            result = json.loads(response.choices[0].message.content)
             return result
             
         except Exception as e:
@@ -104,57 +89,33 @@ Si l'idée est claire, mets needs_clarification=false et génère directement l'
         """
         system_prompt = """Tu es un expert en spécifications de projets.
 
-Génère une description COMPLÈTE et PROFESSIONNELLE pour le projet.
+Génère une description PROFESSIONNELLE pour le projet.
 
-La description doit inclure:
-1. Vue d'ensemble du projet
-2. Fonctionnalités principales détaillées
-3. Interface utilisateur / UX
-4. Technologies recommandées
-5. Caractéristiques spéciales
-
-Types de projets que tu peux créer:
-- Web App: Applications web modernes React/Vue/Next.js
-- PWA: Applications mobiles web installables
-- Jeux Mobile: Jeux pour téléphone (HTML5, Canvas, WebGL)
-- Logiciels PC: Applications desktop (Electron, PyQt, etc.)
-- Applications IA: Chatbots, analyse de données, ML, vision
-- Automatisation: Scripts, bots, workflows, scraping
-- Scripts: Python, Node.js, Bash pour diverses tâches
-- APIs: REST, GraphQL, WebSocket
-
-Réponds en JSON:
+Réponds UNIQUEMENT en JSON valide:
 {
   "name": "Nom du projet",
   "type": "web-app|pwa|mobile-game|desktop-app|ai-app|automation|python-script|api",
-  "description": "Description complète et détaillée (300-500 caractères minimum)",
+  "description": "Description complète (300+ caractères)",
   "tech_stack": "Technologies recommandées",
-  "is_pwa": true/false,
+  "is_pwa": true ou false,
   "estimated_complexity": "simple|medium|complex"
 }"""
 
         user_message = f"Projet: {user_input}"
         if answers:
-            user_message += f"\n\nRéponses aux questions: {answers}"
+            user_message += f"\n\nRéponses: {json.dumps(answers, ensure_ascii=False)}"
         
         try:
-            # Créer le prompt complet
-            full_prompt = f"{system_prompt}\n\n{user_message}"
-            
-            # Créer un client LLM pour cette requête
-            llm = self._get_llm_client()
-            
-            messages = [UserMessage(content=full_prompt)]
-            
-            response = await llm.chat(
-                messages=messages,
-                model="gemini-3-flash",
+            response = await self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
                 temperature=0.7
             )
             
-            import json
-            result = json.loads(response.content)
-            
+            result = json.loads(response.choices[0].message.content)
             return result
             
         except Exception as e:

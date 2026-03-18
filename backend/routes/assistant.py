@@ -13,7 +13,7 @@ from services.intelligent_agent import get_intelligent_agent
 from services.web_search_service import web_search_service
 from services.n8n_generator import n8n_generator
 from services.user_memory import user_memory
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from services.llm_service import llm_service
 import os
 from datetime import datetime
 from uuid import uuid4
@@ -314,15 +314,6 @@ def _detect_intention(message: str, current_project_id: str = None) -> str:
 async def _analyze_images(images: List[str], context: str) -> Dict[str, Any]:
     """Analyse des images avec Vision AI"""
     try:
-        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
-        
-        # Utiliser GPT-5.1 avec Vision
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"vision_{datetime.utcnow().timestamp()}"
-        )
-        chat.with_model("openai", "gpt-5.1-vision")
-        
         # Préparer les images pour l'API
         image_messages = []
         for img_base64 in images[:3]:  # Max 3 images
@@ -343,12 +334,16 @@ Décris :
 
 Sois précis et technique si c'est du code ou une interface."""
 
-        # Envoyer à l'API
-        response = await chat.send_message(UserMessage(text=prompt, images=image_messages))
+        # Envoyer à l'API avec vision
+        analysis = await llm_service.chat_with_vision(
+            text=prompt,
+            images=images[:3],
+            model="gpt-4o"
+        )
         
         return {
             'success': True,
-            'analysis': response,
+            'analysis': analysis,
             'image_count': len(images)
         }
         
@@ -396,10 +391,6 @@ DEMANDE DE L'UTILISATEUR:
             context += f"\n\nANALYSE D'IMAGE:\n{image_analysis['analysis']}"
         
         # Utiliser l'IA pour générer les modifications
-        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
-        chat = LlmChat(api_key=api_key, session_id=f"modify_{project_id}")
-        chat.with_model("openai", "gpt-5.1")
-        
         prompt = f"""{context}
 
 Basé sur la demande de l'utilisateur, génère les fichiers MODIFIÉS ou NOUVEAUX.
@@ -414,7 +405,8 @@ Réponds en JSON avec cette structure:
     ]
 }}"""
         
-        response = await chat.send_message(UserMessage(text=prompt))
+        messages = [{"role": "user", "content": prompt}]
+        response = await llm_service.chat(messages=messages, model="gpt-4o")
         
         # Parser la réponse (simplifiée pour l'instant)
         # En production, il faudrait parser le JSON correctement
@@ -616,32 +608,33 @@ async def _handle_conversation(
             # L'utilisateur décrit un projet - on lui donne un guide formaté
             return await _generate_project_template(message, history, image_analysis)
         
-        # Créer une session de chat avec l'IA
-        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"assistant_{datetime.utcnow().timestamp()}",
-            system_message=_get_system_prompt()
-        )
-        chat.with_model("openai", "gpt-5.1")
+        # Créer les messages pour l'API OpenAI
+        messages = []
         
-        # Construire le contexte avec l'historique
-        context_messages = []
+        # Ajouter le system prompt
+        messages.append({
+            "role": "system",
+            "content": _get_system_prompt()
+        })
+        
+        # Ajouter l'historique
         for msg in history[-5:]:  # Derniers 5 messages
             if msg.role == 'user':
-                context_messages.append(f"Utilisateur : {msg.content}")
+                messages.append({"role": "user", "content": msg.content})
             else:
-                context_messages.append(f"Assistant : {msg.content}")
+                messages.append({"role": "assistant", "content": msg.content})
         
         # Ajouter l'analyse d'image si disponible
         if image_analysis and image_analysis.get('success'):
-            context_messages.append(f"\n[IMAGE ANALYSÉE] : {image_analysis['analysis']}")
+            message_content = message + f"\n\n[IMAGE ANALYSÉE] : {image_analysis['analysis']}"
+        else:
+            message_content = message
         
         # Ajouter le message actuel
-        full_prompt = "\n".join(context_messages) + f"\nUtilisateur : {message}\nAssistant :"
+        messages.append({"role": "user", "content": message_content})
         
         # Obtenir la réponse
-        response = await chat.send_message(UserMessage(text=full_prompt))
+        response = await llm_service.chat(messages=messages, model="gpt-4o")
         
         return {
             'response': response,
@@ -699,10 +692,6 @@ async def _generate_project_template(
     """Génère un template de projet formaté pour copier-coller"""
     try:
         # Utiliser l'IA pour analyser la demande et créer le template
-        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
-        chat = LlmChat(api_key=api_key, session_id=f"template_{datetime.utcnow().timestamp()}")
-        chat.with_model("openai", "gpt-5.1")
-        
         context = message
         if image_analysis and image_analysis.get('success'):
             context += f"\n\nInformations depuis l'image : {image_analysis['analysis']}"
@@ -757,7 +746,8 @@ Format EXACT à suivre :
 
 Sois précis, structuré et fais en sorte que ce soit facile à copier-coller !"""
 
-        response = await chat.send_message(UserMessage(text=prompt))
+        messages = [{"role": "user", "content": prompt}]
+        response = await llm_service.chat(messages=messages, model="gpt-4o")
         
         return {
             'response': response,

@@ -5,7 +5,7 @@ Permet à l'assistant de créer des automatisations n8n
 
 import logging
 from typing import Dict, Any, List
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from openai import AsyncOpenAI
 import os
 import json
 

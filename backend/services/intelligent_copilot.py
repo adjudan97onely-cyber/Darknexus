@@ -7,7 +7,7 @@ Assistant contextualisé qui connaît parfaitement l'application et aide l'utili
 import os
 import json
 from typing import Dict, Any, Optional, List
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from openai import AsyncOpenAI
 import logging
 
 logger = logging.getLogger(__name__)

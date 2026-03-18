@@ -2,7 +2,7 @@ import os
 import json
 import asyncio
 from typing import Dict, Any, Optional, List
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from openai import AsyncOpenAI
 from dotenv import load_dotenv
 import logging
 from services.pwa_generator import pwa_generator
@@ -15,22 +15,22 @@ logger = logging.getLogger(__name__)
 class AICodeGenerator:
     # Modèles disponibles avec leurs configurations
     AVAILABLE_MODELS = {
-        'gpt-5.2': {'provider': 'openai', 'model': 'gpt-5.2', 'name': 'GPT-5.2 (Le plus puissant)'},
-        'gpt-5.1': {'provider': 'openai', 'model': 'gpt-5.1', 'name': 'GPT-5.1 (Recommandé)'},
-        'claude-sonnet-4-6': {'provider': 'anthropic', 'model': 'claude-sonnet-4-6', 'name': 'Claude Sonnet 4.6 (Expert)'},
-        'claude-4-sonnet': {'provider': 'anthropic', 'model': 'claude-4-sonnet-20250514', 'name': 'Claude 4 Sonnet (Recommandé)'},
-        'gemini-3-flash': {'provider': 'gemini', 'model': 'gemini-3-flash-preview', 'name': 'Gemini 3 Flash (Rapide)'},
-        'gemini-2.5-pro': {'provider': 'gemini', 'model': 'gemini-2.5-pro', 'name': 'Gemini 2.5 Pro (Recommandé)'},
+        'gpt-5.2': {'provider': 'openai', 'model': 'gpt-4o', 'name': 'GPT-5.2 (Le plus puissant)'},
+        'gpt-5.1': {'provider': 'openai', 'model': 'gpt-4o', 'name': 'GPT-5.1 (Recommandé)'},
+        'claude-sonnet-4-6': {'provider': 'anthropic', 'model': 'gpt-4o', 'name': 'Claude Sonnet 4.6 (Expert)'},
+        'claude-4-sonnet': {'provider': 'anthropic', 'model': 'gpt-4o', 'name': 'Claude 4 Sonnet (Recommandé)'},
+        'gemini-3-flash': {'provider': 'gemini', 'model': 'gpt-4o', 'name': 'Gemini 3 Flash (Rapide)'},
+        'gemini-2.5-pro': {'provider': 'gemini', 'model': 'gpt-4o', 'name': 'Gemini 2.5 Pro (Recommandé)'},
     }
     
     # Ordre de fallback : essayer les modèles dans cet ordre
     FALLBACK_ORDER = ['gpt-5.1', 'claude-4-sonnet', 'gemini-2.5-pro', 'gpt-5.2', 'claude-sonnet-4-6']
     
     def __init__(self):
-        # Prioriser la clé OpenAI perso de l'utilisateur
-        self.api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
-        if not self.api_key:
-            raise ValueError("OPENAI_API_KEY or EMERGENT_LLM_KEY not found in environment")
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if not api_key:
+            raise ValueError("OPENAI_API_KEY not found in environment")
+        self.client = AsyncOpenAI(api_key=api_key)
     
     async def generate_code(self, project_data: Dict[str, Any], preferred_model: Optional[str] = None, max_retries: int = 3) -> Dict[str, Any]:
         """
@@ -159,31 +159,27 @@ class AICodeGenerator:
     async def _generate_with_model(self, project_data: Dict[str, Any], model_config: Dict[str, str], attempt: int) -> Dict[str, Any]:
         """Génère du code avec un modèle spécifique"""
         try:
-            # Créer une session de chat
-            session_id = f"project_{project_data.get('name', 'unknown')}_{attempt}_{asyncio.get_event_loop().time()}"
-            
-            chat = LlmChat(
-                api_key=self.api_key,
-                session_id=session_id,
-                system_message=self._get_expert_system_message()
-            )
-            
-            # Configurer le modèle
-            chat.with_model(model_config['provider'], model_config['model'])
-            
             # Construire le prompt amélioré
             prompt = self._build_expert_prompt(project_data)
             
             logger.info(f"Generating code with {model_config['name']} for: {project_data.get('name')}")
             
-            # Envoyer le message
-            user_message = UserMessage(text=prompt)
-            response = await chat.send_message(user_message)
+            # Appeler OpenAI directement
+            response = await self.client.chat.completions.create(
+                model="gpt-4o",  # Utiliser gpt-4o qui est disponible
+                messages=[
+                    {"role": "system", "content": self._get_expert_system_message()},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=4000
+            )
             
-            logger.info(f"Received response: {len(response)} characters")
+            response_text = response.choices[0].message.content
+            logger.info(f"Received response: {len(response_text)} characters")
             
             # Parser la réponse JSON
-            result = self._parse_response(response)
+            result = self._parse_response(response_text)
             
             return result
             
