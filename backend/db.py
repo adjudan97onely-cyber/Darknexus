@@ -1,172 +1,172 @@
 """
-Couche de données SQLite – prédictions, résultats, poids IA
+Couche de données – SQLite local ou Turso cloud (TURSO_DB_URL + TURSO_AUTH_TOKEN).
+En production Vercel, si les variables Turso sont définies, toutes les données
+sont stockées dans la base cloud persistante au lieu du /tmp éphémère.
 """
 import sqlite3
 import json
 import os
 from datetime import datetime
 
+# ── Chemin SQLite local (dev ou Vercel sans Turso) ────────────────
 if os.environ.get("VERCEL") == "1":
     DB_PATH = "/tmp/lottery_analytics.db"
 else:
     DB_PATH = os.path.join(os.path.dirname(__file__), "lottery_analytics.db")
 
+# ── Credentials Turso (base persistante cloud) ────────────────────
+_TURSO_DB_URL = os.environ.get("TURSO_DB_URL", "").strip()
+_TURSO_AUTH_TOKEN = os.environ.get("TURSO_AUTH_TOKEN", "").strip()
+
 
 def get_conn():
+    """Connexion à Turso (cloud) si vars définies, sinon SQLite local."""
+    if _TURSO_DB_URL and _TURSO_AUTH_TOKEN:
+        from db_turso import TursoConnection
+        return TursoConnection(_TURSO_DB_URL, _TURSO_AUTH_TOKEN)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 
+_DDL_STATEMENTS = [
+    """CREATE TABLE IF NOT EXISTS users (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        email         TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        role          TEXT DEFAULT 'user',
+        created_at    TEXT NOT NULL,
+        updated_at    TEXT NOT NULL
+    )""",
+    """CREATE TABLE IF NOT EXISTS subscriptions (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id       INTEGER NOT NULL,
+        plan          TEXT NOT NULL,
+        status        TEXT NOT NULL,
+        started_at    TEXT NOT NULL,
+        expires_at    TEXT,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )""",
+    """CREATE TABLE IF NOT EXISTS auth_tokens (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id       INTEGER NOT NULL,
+        token         TEXT UNIQUE NOT NULL,
+        created_at    TEXT NOT NULL,
+        expires_at    TEXT NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )""",
+    """CREATE TABLE IF NOT EXISTS lottery_draws (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        lottery_type  TEXT NOT NULL,
+        draw_date     TEXT NOT NULL,
+        numbers       TEXT NOT NULL,
+        bonus         INTEGER,
+        source        TEXT DEFAULT 'seed',
+        created_at    TEXT NOT NULL
+    )""",
+    """CREATE TABLE IF NOT EXISTS sports_matches (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        country       TEXT NOT NULL,
+        league        TEXT NOT NULL,
+        match_date    TEXT NOT NULL,
+        home_team     TEXT NOT NULL,
+        away_team     TEXT NOT NULL,
+        home_score    INTEGER,
+        away_score    INTEGER,
+        status        TEXT DEFAULT 'scheduled',
+        source        TEXT DEFAULT 'seed',
+        created_at    TEXT NOT NULL
+    )""",
+    """CREATE TABLE IF NOT EXISTS sync_state (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        domain        TEXT UNIQUE NOT NULL,
+        last_sync_at  TEXT,
+        source        TEXT,
+        status        TEXT,
+        message       TEXT
+    )""",
+    """CREATE TABLE IF NOT EXISTS scheduler_logs (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        job_name      TEXT NOT NULL,
+        run_at        TEXT NOT NULL,
+        status        TEXT NOT NULL,
+        details       TEXT
+    )""",
+    """CREATE TABLE IF NOT EXISTS predictions (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        type        TEXT    NOT NULL,
+        subtype     TEXT,
+        data        TEXT,
+        prediction  TEXT    NOT NULL,
+        confidence  REAL    NOT NULL,
+        score       REAL    DEFAULT 0,
+        status      TEXT    DEFAULT 'pending',
+        created_at  TEXT    NOT NULL
+    )""",
+    """CREATE TABLE IF NOT EXISTS results (
+        id            INTEGER PRIMARY KEY AUTOINCREMENT,
+        type          TEXT NOT NULL,
+        actual_result TEXT NOT NULL,
+        draw_date     TEXT NOT NULL,
+        source        TEXT DEFAULT 'manual',
+        created_at    TEXT NOT NULL
+    )""",
+    """CREATE TABLE IF NOT EXISTS ai_models (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        name       TEXT UNIQUE NOT NULL,
+        weight     REAL DEFAULT 1.0,
+        accuracy   REAL DEFAULT 0.5,
+        total_runs INTEGER DEFAULT 0,
+        wins       INTEGER DEFAULT 0,
+        updated_at TEXT NOT NULL
+    )""",
+    """CREATE TABLE IF NOT EXISTS notifications (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        type       TEXT NOT NULL,
+        message    TEXT NOT NULL,
+        is_read    INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL
+    )""",
+]
+
+_INITIAL_MODELS = [
+    ("frequency_analysis", 1.0),
+    ("chi_square",         0.85),
+    ("hot_cold_balance",   0.90),
+    ("recency_bias",       0.80),
+    ("cycle_detection",    0.75),
+    ("variance_filter",    0.88),
+]
+
+
 def init_db():
     conn = get_conn()
+
+    # ── Turso : toutes les DDL + inserts en UN seul appel HTTP ────
+    if hasattr(conn, "batch_execute"):
+        now = datetime.utcnow().isoformat()
+        batch = [(sql, ()) for sql in _DDL_STATEMENTS]
+        batch += [
+            (
+                "INSERT OR IGNORE INTO ai_models(name,weight,accuracy,updated_at) VALUES(?,?,0.5,?)",
+                (name, weight, now),
+            )
+            for name, weight in _INITIAL_MODELS
+        ]
+        conn.batch_execute(batch)
+        conn.close()
+        return
+
+    # ── SQLite local : mode classique ─────────────────────────────
     c = conn.cursor()
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            email         TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            role          TEXT DEFAULT 'user',
-            created_at    TEXT NOT NULL,
-            updated_at    TEXT NOT NULL
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS subscriptions (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id       INTEGER NOT NULL,
-            plan          TEXT NOT NULL,
-            status        TEXT NOT NULL,
-            started_at    TEXT NOT NULL,
-            expires_at    TEXT,
-            FOREIGN KEY(user_id) REFERENCES users(id)
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS auth_tokens (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id       INTEGER NOT NULL,
-            token         TEXT UNIQUE NOT NULL,
-            created_at    TEXT NOT NULL,
-            expires_at    TEXT NOT NULL,
-            FOREIGN KEY(user_id) REFERENCES users(id)
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS lottery_draws (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            lottery_type  TEXT NOT NULL,
-            draw_date     TEXT NOT NULL,
-            numbers       TEXT NOT NULL,
-            bonus         INTEGER,
-            source        TEXT DEFAULT 'seed',
-            created_at    TEXT NOT NULL
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS sports_matches (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            country       TEXT NOT NULL,
-            league        TEXT NOT NULL,
-            match_date    TEXT NOT NULL,
-            home_team     TEXT NOT NULL,
-            away_team     TEXT NOT NULL,
-            home_score    INTEGER,
-            away_score    INTEGER,
-            status        TEXT DEFAULT 'scheduled',
-            source        TEXT DEFAULT 'seed',
-            created_at    TEXT NOT NULL
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS sync_state (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            domain        TEXT UNIQUE NOT NULL,
-            last_sync_at  TEXT,
-            source        TEXT,
-            status        TEXT,
-            message       TEXT
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS scheduler_logs (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            job_name      TEXT NOT NULL,
-            run_at        TEXT NOT NULL,
-            status        TEXT NOT NULL,
-            details       TEXT
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS predictions (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            type        TEXT    NOT NULL,
-            subtype     TEXT,
-            data        TEXT,
-            prediction  TEXT    NOT NULL,
-            confidence  REAL    NOT NULL,
-            score       REAL    DEFAULT 0,
-            status      TEXT    DEFAULT 'pending',
-            created_at  TEXT    NOT NULL
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS results (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            type          TEXT NOT NULL,
-            actual_result TEXT NOT NULL,
-            draw_date     TEXT NOT NULL,
-            source        TEXT DEFAULT 'manual',
-            created_at    TEXT NOT NULL
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS ai_models (
-            id         INTEGER PRIMARY KEY AUTOINCREMENT,
-            name       TEXT UNIQUE NOT NULL,
-            weight     REAL DEFAULT 1.0,
-            accuracy   REAL DEFAULT 0.5,
-            total_runs INTEGER DEFAULT 0,
-            wins       INTEGER DEFAULT 0,
-            updated_at TEXT NOT NULL
-        )
-    """)
-
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS notifications (
-            id         INTEGER PRIMARY KEY AUTOINCREMENT,
-            type       TEXT NOT NULL,
-            message    TEXT NOT NULL,
-            is_read    INTEGER DEFAULT 0,
-            created_at TEXT NOT NULL
-        )
-    """)
-
-    # Modèles IA initiaux
-    models = [
-        ("frequency_analysis", 1.0),
-        ("chi_square",         0.85),
-        ("hot_cold_balance",   0.90),
-        ("recency_bias",       0.80),
-        ("cycle_detection",    0.75),
-        ("variance_filter",    0.88),
-    ]
-    for name, weight in models:
+    for ddl in _DDL_STATEMENTS:
+        c.execute(ddl)
+    now = datetime.utcnow().isoformat()
+    for name, weight in _INITIAL_MODELS:
         c.execute(
-            "INSERT OR IGNORE INTO ai_models(name, weight, accuracy, updated_at) VALUES(?,?,0.5,?)",
-            (name, weight, datetime.utcnow().isoformat()),
+            "INSERT OR IGNORE INTO ai_models(name,weight,accuracy,updated_at) VALUES(?,?,0.5,?)",
+            (name, weight, now),
         )
-
     conn.commit()
     conn.close()
 

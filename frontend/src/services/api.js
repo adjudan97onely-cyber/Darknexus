@@ -148,6 +148,12 @@ export const dashboardAPI = {
   getSchedulerStatus: (limit = 20) => api.get('/api/system/scheduler', { params: { limit } }),
 };
 
+// ── Bilan IA : comparatif prédictions vs réalité ──────────────────
+export const bilanAPI = {
+  getLotteryBilan: (subtype, limit = 20) =>
+    api.get(`/api/rapport/lottery/${subtype}`, { params: { limit } }),
+};
+
 export const authAPI = {
   register: (email, password) => api.post('/api/auth/register', { email, password }),
   login: (email, password) => api.post('/api/auth/login', { email, password }),

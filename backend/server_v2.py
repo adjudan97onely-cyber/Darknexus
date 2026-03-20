@@ -15,6 +15,7 @@ from db import (
     get_results_paginated,
     get_scheduler_logs,
     get_sync_state,
+    get_lottery_draws,
     init_db,
     mark_notifications_read,
     push_notification,
@@ -392,4 +393,121 @@ def scheduler_status(limit: int = Query(20, ge=1, le=100)):
     return {
         "status": scheduler_service.status(),
         "logs": get_scheduler_logs(limit=limit),
+    }
+
+
+# ─────────────────────── BILAN IA ────────────────────────────────
+
+@app.get("/api/rapport/lottery/{subtype}")
+def rapport_lottery(subtype: str, limit: int = Query(20, ge=5, le=100)):
+    """
+    Retourne le bilan comparatif IA pour une loterie donnée.
+    Chaque entrée montre : prédiction IA vs tirage réel, numéros trouvés, score.
+    Inclut un verdict : l'IA fait-elle mieux que le hasard ?
+    """
+    # ── Config par loterie ─────────────────────────────────────────
+    lottery_config = {
+        "keno":         {"total_numbers": 70, "pick_count": 20, "draw_count": 20},
+        "euromillions": {"total_numbers": 50, "pick_count": 5,  "draw_count": 5},
+        "loto":         {"total_numbers": 49, "pick_count": 6,  "draw_count": 6},
+    }
+    cfg = lottery_config.get(subtype, {"total_numbers": 70, "pick_count": 20, "draw_count": 20})
+
+    # ── Prédictions et tirages réels ───────────────────────────────
+    all_preds = get_predictions("lottery", limit=500)
+    sub_preds = [
+        p for p in all_preds
+        if (p.get("subtype") or "").lower() == subtype.lower()
+        and p.get("status") in ("won", "lost")
+    ][:limit]
+
+    draws = get_lottery_draws(subtype, limit=50)
+    draws_by_date = {}
+    for d in draws:
+        key = d["draw_date"][:10]
+        if key not in draws_by_date:
+            draws_by_date[key] = d["numbers"]
+
+    # ── Construire les lignes du bilan ─────────────────────────────
+    rows = []
+    for pred in sub_preds:
+        prediction_data = pred.get("prediction") or {}
+        predicted_numbers = sorted(prediction_data.get("numbers", []))
+        created_day = (pred.get("created_at") or "")[:10]
+
+        # Trouve le tirage le plus proche (même jour ou jour suivant)
+        actual_numbers = []
+        draw_date_used = None
+        for offset in range(0, 4):
+            from datetime import timedelta
+            try:
+                from datetime import date as _date
+                target = (_date.fromisoformat(created_day) + timedelta(days=offset)).isoformat()
+            except Exception:
+                target = created_day
+            if target in draws_by_date:
+                actual_numbers = sorted(draws_by_date[target])
+                draw_date_used = target
+                break
+
+        matched = sorted(set(predicted_numbers) & set(actual_numbers)) if actual_numbers else []
+        score = pred.get("score") or 0
+        if not score and predicted_numbers and actual_numbers:
+            score = round(len(matched) / max(1, len(predicted_numbers)) * 100, 1)
+
+        rows.append({
+            "id": pred["id"],
+            "prediction_date": created_day,
+            "draw_date": draw_date_used,
+            "predicted": predicted_numbers,
+            "actual": actual_numbers,
+            "matched": matched,
+            "matched_count": len(matched),
+            "predicted_count": len(predicted_numbers),
+            "score": score,
+            "status": pred.get("status"),
+            "confidence": pred.get("confidence", 0),
+        })
+
+    # ── Statistiques globales ──────────────────────────────────────
+    scored_rows = [r for r in rows if r["actual"]]
+    avg_score = round(sum(r["score"] for r in scored_rows) / max(1, len(scored_rows)), 1)
+    avg_matched = round(sum(r["matched_count"] for r in scored_rows) / max(1, len(scored_rows)), 2)
+
+    # Baseline hasard pur : si on tire pick_count numéros parmi total_numbers
+    # probabilité d'en trouver X parmi draw_count sortis = hypergéométrique
+    # Valeur attendue = pick_count * draw_count / total_numbers
+    random_expected_matches = round(
+        cfg["pick_count"] * cfg["draw_count"] / cfg["total_numbers"], 2
+    )
+    random_score_pct = round(random_expected_matches / max(1, cfg["pick_count"]) * 100, 1)
+
+    if scored_rows:
+        ai_better = avg_score > random_score_pct
+        gain_vs_random = round(avg_score - random_score_pct, 1)
+        verdict = (
+            f"L'IA trouve en moyenne {avg_matched} numéros (score {avg_score}%). "
+            f"Le hasard pur donnerait {random_expected_matches} numéros ({random_score_pct}%). "
+            + (
+                f"✅ L'IA fait +{gain_vs_random}% mieux que le hasard."
+                if ai_better
+                else f"⚠️ L'IA est en dessous du hasard de {abs(gain_vs_random)}% — modèles en apprentissage."
+            )
+        )
+    else:
+        ai_better = None
+        gain_vs_random = 0
+        verdict = "Pas encore assez de prédictions validées pour établir un verdict."
+
+    return {
+        "subtype": subtype,
+        "total_evaluated": len(scored_rows),
+        "avg_score_pct": avg_score,
+        "avg_matched": avg_matched,
+        "random_baseline_pct": random_score_pct,
+        "random_baseline_matches": random_expected_matches,
+        "ai_better_than_random": ai_better,
+        "gain_vs_random_pct": gain_vs_random,
+        "verdict": verdict,
+        "rows": rows,
     }

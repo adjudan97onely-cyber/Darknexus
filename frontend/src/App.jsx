@@ -11,9 +11,11 @@ const PredictionHistory = lazy(() => import('./pages/PredictionHistory'));
 const Performance = lazy(() => import('./pages/Performance'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const BillingPage = lazy(() => import('./pages/BillingPage'));
+const BilanIA = lazy(() => import('./pages/BilanIA'));
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: '◫' },
+  { to: '/bilan', label: '🏆 Bilan IA', icon: '🏆' },
   { to: '/results', label: 'Résultats', icon: '◎' },
   { to: '/history', label: 'Historique', icon: '◌' },
   { to: '/performance', label: 'Performance', icon: '△' },
@@ -78,6 +80,7 @@ export default function App() {
                 <Route path="/performance" element={<Performance />} />
                 <Route path="/auth" element={<AuthPage />} />
                 <Route path="/billing" element={<BillingPage />} />
+                <Route path="/bilan" element={<BilanIA />} />
                 <Route path="/keno" element={<KenoAnalyzer />} />
                 <Route path="/euromillions" element={<EuroMillionsAnalyzer />} />
                 <Route path="/loto" element={<LotoAnalyzer />} />
