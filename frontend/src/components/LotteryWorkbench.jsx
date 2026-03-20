@@ -20,6 +20,18 @@ export default function LotteryWorkbench({ lottery, title, description, accent }
   const [take, setTake] = useState(5);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const media = window.matchMedia('(max-width: 768px)');
+    const update = () => setIsMobile(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -62,6 +74,15 @@ export default function LotteryWorkbench({ lottery, title, description, accent }
     .sort((left, right) => right.score - left.score)
     .slice(0, 12);
 
+  const latestNumbers = latest?.numbers || [];
+  const referenceGrid = (autoSelected && autoSelected[0]) || (grids && grids[0]) || null;
+  const referenceNumbers = referenceGrid?.numbers || [];
+  const matchedNumbers = referenceNumbers.filter((number) => latestNumbers.includes(number));
+
+  const scorePercent = referenceNumbers.length > 0
+    ? Math.round((matchedNumbers.length / referenceNumbers.length) * 100)
+    : 0;
+
   if (loading) {
     return <div className="premium-shell"><div className="premium-panel p-10 text-slate-300">Chargement {title}...</div></div>;
   }
@@ -95,30 +116,42 @@ export default function LotteryWorkbench({ lottery, title, description, accent }
             </div>
             <span className="premium-badge">Chi² {analysis?.chi_square}</span>
           </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.12)" />
-                <XAxis dataKey="number" stroke="#94a3b8" />
-                <YAxis stroke="#94a3b8" />
-                <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 16 }} />
-                <Bar dataKey="score" fill="url(#lotteryBar)" radius={[10, 10, 0, 0]} />
-                <defs>
-                  <linearGradient id="lotteryBar" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#38bdf8" />
-                    <stop offset="100%" stopColor="#6366f1" />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {isMobile ? (
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {chartData.slice(0, 10).map((item) => (
+                <div key={item.number} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
+                  <div className="text-xs text-slate-400">Numéro</div>
+                  <div className="text-lg font-bold text-white">#{item.number}</div>
+                  <div className="text-xs text-cyan-300">Score {Math.round(item.score)}</div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.12)" />
+                  <XAxis dataKey="number" stroke="#94a3b8" />
+                  <YAxis stroke="#94a3b8" />
+                  <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid rgba(148,163,184,0.2)', borderRadius: 16 }} />
+                  <Bar dataKey="score" fill="url(#lotteryBar)" radius={[10, 10, 0, 0]} />
+                  <defs>
+                    <linearGradient id="lotteryBar" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#38bdf8" />
+                      <stop offset="100%" stopColor="#6366f1" />
+                    </linearGradient>
+                  </defs>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         <div className="premium-panel p-6">
           <p className="premium-kicker">Latest official result</p>
           <h2 className="text-2xl font-bold text-white">Dernier tirage</h2>
           <div className="mt-6 flex flex-wrap gap-3">
-            {(latest?.numbers || []).map((number) => (
+            {latestNumbers.map((number) => (
               <div key={number} className="premium-number-chip">{number}</div>
             ))}
           </div>
@@ -195,6 +228,48 @@ export default function LotteryWorkbench({ lottery, title, description, accent }
         </div>
       </section>
 
+      <section className="premium-panel p-6">
+        <p className="premium-kicker">Comprendre facilement</p>
+        <h2 className="text-2xl font-bold text-white">Sortis vs Prédiction IA</h2>
+        <p className="mt-2 text-sm text-slate-400">
+          Numéros sortis = résultat officiel du tirage. Prédiction IA = grille proposée avant tirage. Bons numéros = intersection entre les deux.
+        </p>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Numéros sortis</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {latestNumbers.length === 0 ? <span className="text-sm text-slate-500">Aucun résultat</span> : latestNumbers.map((n) => <span key={`out-${n}`} className="premium-number-chip premium-number-chip-sm">{n}</span>)}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Prédiction IA</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {referenceNumbers.length === 0 ? <span className="text-sm text-slate-500">Pas de grille disponible</span> : referenceNumbers.map((n) => <span key={`pred-${n}`} className="premium-number-chip premium-number-chip-sm">{n}</span>)}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Bons numéros</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {matchedNumbers.length === 0 ? <span className="text-sm text-slate-500">Aucun pour l'instant</span> : matchedNumbers.map((n) => <span key={`hit-${n}`} className="premium-tag premium-tag-hot">{n}</span>)}
+            </div>
+            <div className="mt-4 text-sm text-slate-300">
+              Score de la grille: <span className="font-bold text-cyan-300">{matchedNumbers.length}/{referenceNumbers.length || 0}</span> ({scorePercent}%)
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Résumé simple</div>
+          <div className="mt-3 space-y-2 text-sm text-slate-200">
+            <div><span className="text-slate-400">Date du tirage:</span> <span className="font-semibold">{latest?.draw_date || 'N/A'}</span></div>
+            <div><span className="text-slate-400">Numéros sortis:</span> <span>{latestNumbers.length ? latestNumbers.join(', ') : 'N/A'}</span></div>
+            <div><span className="text-slate-400">Proposition IA:</span> <span>{referenceNumbers.length ? referenceNumbers.join(', ') : 'N/A'}</span></div>
+            <div><span className="text-slate-400">Numéros trouvés:</span> <span className="font-semibold text-amber-300">{matchedNumbers.length ? matchedNumbers.join(', ') : 'Aucun'}</span></div>
+            <div><span className="text-slate-400">Score:</span> <span className="font-bold text-cyan-300">{matchedNumbers.length}/{referenceNumbers.length || 0} ({scorePercent}%)</span></div>
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="premium-panel p-6">
           <p className="premium-kicker">Recommendations</p>
@@ -205,6 +280,7 @@ export default function LotteryWorkbench({ lottery, title, description, accent }
                 <div>
                   <div className="text-lg font-semibold text-white">#{item.numbers[0]}</div>
                   <div className="text-xs text-slate-400">{item.reason}</div>
+                  {item.target_draw_label ? <div className="text-[11px] text-slate-500">Cible: {item.target_draw_label}</div> : null}
                 </div>
                 <div className="text-right">
                   <div className="text-base font-bold text-cyan-300">{item.confidence}%</div>

@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from db import (
     compute_performance,
+    compute_performance_by_subtype,
     get_notifications,
     get_predictions,
     get_predictions_paginated,
@@ -91,6 +92,7 @@ async def lifespan(app: FastAPI):
                 source="seed",
             )
     prediction_service.reconcile_predictions()
+    prediction_service.ensure_next_draw_predictions()
     await scheduler_service.start()
     push_notification("system", "Plateforme Analytics Lottery & Sports Predictor prête")
     yield
@@ -303,8 +305,14 @@ def recent_results_paginated(
 def performance_overview():
     return {
         "by_type": compute_performance(),
+        "by_subtype": compute_performance_by_subtype(),
         "overview": prediction_service.dashboard_overview(),
     }
+
+
+@app.get("/api/performance/by-subtype")
+def performance_by_subtype():
+    return compute_performance_by_subtype()
 
 
 @app.get("/api/notifications")
@@ -340,6 +348,37 @@ def auto_select_sports(
 async def reconcile_predictions():
     updates = await scheduler_service.run_reconcile_now()
     return {"updated": updates, "count": len(updates)}
+
+
+@app.post("/api/system/prepare-next-draw")
+async def prepare_next_draw_predictions():
+    created = await scheduler_service.run_cycle_predictions_now()
+    return {"prepared": created, "count": len(created)}
+
+
+@app.get("/api/system/cron/refresh")
+async def cron_refresh_all():
+    refreshed = await scheduler_service.run_sync_now()
+    reconciled = await scheduler_service.run_reconcile_now()
+    prepared = await scheduler_service.run_cycle_predictions_now()
+    return {
+        "status": "ok",
+        "refresh_count": len(refreshed),
+        "reconciled_count": len(reconciled),
+        "prepared_count": len(prepared),
+    }
+
+
+@app.get("/api/system/cron/reconcile")
+async def cron_reconcile_only():
+    reconciled = await scheduler_service.run_reconcile_now()
+    return {"status": "ok", "reconciled_count": len(reconciled)}
+
+
+@app.get("/api/system/cron/prepare-next-draw")
+async def cron_prepare_next_draw_only():
+    prepared = await scheduler_service.run_cycle_predictions_now()
+    return {"status": "ok", "prepared_count": len(prepared)}
 
 
 @app.post("/api/system/refresh")

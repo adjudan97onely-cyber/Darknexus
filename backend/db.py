@@ -6,7 +6,10 @@ import json
 import os
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "lottery_analytics.db")
+if os.environ.get("VERCEL") == "1":
+    DB_PATH = "/tmp/lottery_analytics.db"
+else:
+    DB_PATH = os.path.join(os.path.dirname(__file__), "lottery_analytics.db")
 
 
 def get_conn():
@@ -456,6 +459,20 @@ def get_sports_matches(league=None, country=None, status=None, limit=100):
     return [dict(r) for r in rows]
 
 
+def update_sports_match_result(match_id, home_score, away_score, status="finished", source="simulated"):
+    conn = get_conn()
+    conn.execute(
+        """
+        UPDATE sports_matches
+        SET home_score=?, away_score=?, status=?, source=?
+        WHERE id=?
+        """,
+        (home_score, away_score, status, source, match_id),
+    )
+    conn.commit()
+    conn.close()
+
+
 def update_sync_state(domain, source, status, message=None):
     conn = get_conn()
     conn.execute(
@@ -654,6 +671,58 @@ def compute_performance():
             "accuracy": round(s["won"] / closed * 100, 1) if closed > 0 else 0,
             "avg_confidence": round(sum(s["confidences"]) / len(s["confidences"]), 1) if s["confidences"] else 0,
         }
+    return result
+
+
+def compute_performance_by_subtype():
+    conn = get_conn()
+    rows = conn.execute(
+        "SELECT type, subtype, status, confidence, score FROM predictions"
+    ).fetchall()
+    conn.close()
+
+    stats = {}
+    for r in rows:
+        group = f"{r['type']}:{r['subtype'] or 'global'}"
+        if group not in stats:
+            stats[group] = {
+                "type": r["type"],
+                "subtype": r["subtype"],
+                "total": 0,
+                "won": 0,
+                "pending": 0,
+                "confidences": [],
+                "scores": [],
+            }
+
+        item = stats[group]
+        item["total"] += 1
+        item["confidences"].append(r["confidence"])
+        if r["score"] is not None:
+            item["scores"].append(r["score"])
+
+        if r["status"] == "won":
+            item["won"] += 1
+        elif r["status"] == "pending":
+            item["pending"] += 1
+
+    result = []
+    for _, s in stats.items():
+        closed = s["total"] - s["pending"]
+        result.append(
+            {
+                "type": s["type"],
+                "subtype": s["subtype"],
+                "total": s["total"],
+                "pending": s["pending"],
+                "won": s["won"],
+                "accuracy": round(s["won"] / closed * 100, 1) if closed > 0 else 0,
+                "avg_confidence": round(sum(s["confidences"]) / len(s["confidences"]), 1) if s["confidences"] else 0,
+                "avg_score": round(sum(s["scores"]) / len(s["scores"]), 1) if s["scores"] else 0,
+            }
+        )
+
+    result.sort(key=lambda x: (x["type"], x["subtype"] or ""))
     return result
 
 

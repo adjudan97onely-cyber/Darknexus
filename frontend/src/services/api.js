@@ -1,13 +1,43 @@
 import axios from 'axios';
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  (typeof process !== 'undefined' ? process.env.REACT_APP_API_URL : undefined) ||
-  'http://localhost:5001';
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0']);
+const PRIVATE_IP_REGEX = /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/;
+const LOCAL_URL_REGEX = /localhost|127\.0\.0\.1|0\.0\.0\.0/i;
+
+const trimTrailingSlash = (value) => value.replace(/\/+$/, '');
+
+const isLocalHost = (host) => {
+  if (!host) return false;
+  return LOCAL_HOSTS.has(host) || PRIVATE_IP_REGEX.test(host);
+};
+
+const resolveApiBaseUrl = () => {
+  const envUrl = trimTrailingSlash((import.meta.env.VITE_API_URL || '').trim());
+
+  if (typeof window === 'undefined') {
+    return envUrl || 'http://localhost:5001';
+  }
+
+  const { protocol, hostname, origin } = window.location;
+  const localClient = isLocalHost(hostname);
+
+  if (localClient) {
+    const envLooksLocal = LOCAL_URL_REGEX.test(envUrl);
+    if (envUrl && envLooksLocal) {
+      return envUrl;
+    }
+    return `${protocol}//${hostname}:5001`;
+  }
+
+  // En production, on force même origine pour passer par /api rewrite (évite CORS).
+  return trimTrailingSlash(origin);
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,6 +50,41 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+const RETRYABLE_METHODS = new Set(['get', 'head', 'options']);
+
+// Retry léger pour les démarrages à froid backend et réseaux mobiles instables.
+api.interceptors.response.use(undefined, async (error) => {
+  const config = error.config || {};
+  const method = String(config.method || 'get').toLowerCase();
+  const isRetryableMethod = RETRYABLE_METHODS.has(method);
+  const isNetworkError = !error.response;
+  const isTimeout = error.code === 'ECONNABORTED';
+
+  if (isRetryableMethod && (isNetworkError || isTimeout) && !config.__retried) {
+    config.__retried = true;
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    return api(config);
+  }
+
+  throw error;
+});
+
+export const getApiErrorMessage = (error, fallback = 'Erreur de connexion au service.') => {
+  if (error?.response?.data?.detail) {
+    return error.response.data.detail;
+  }
+  if (error?.code === 'ECONNABORTED') {
+    return 'Le serveur met trop de temps à répondre. Réessaie dans quelques secondes.';
+  }
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return 'Aucune connexion internet détectée sur ton appareil.';
+  }
+  if (!error?.response) {
+    return 'Connexion réseau instable. Vérifie internet puis réessaie.';
+  }
+  return fallback;
+};
 
 // Interceptor pour les erreurs
 api.interceptors.response.use(

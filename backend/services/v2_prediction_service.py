@@ -1,10 +1,16 @@
 from collections import Counter
+from datetime import datetime, timedelta
 from statistics import mean
+
+try:
+    from zoneinfo import ZoneInfo
+except Exception:  # pragma: no cover
+    ZoneInfo = None
 
 from ai_engine import engine
 from db import (
     compute_performance,
-    get_latest_result,
+    get_results,
     get_model_stats,
     get_pending_predictions,
     get_predictions,
@@ -18,6 +24,38 @@ from services.v2_data_service import LOTTERY_CONFIG
 class V2PredictionService:
     def __init__(self, data_service):
         self.data_service = data_service
+        self._tz = None
+        if ZoneInfo:
+            try:
+                self._tz = ZoneInfo("Europe/Paris")
+            except Exception:
+                self._tz = None
+
+    def _now_local(self):
+        if self._tz is not None:
+            return datetime.now(self._tz)
+        return datetime.utcnow()
+
+    def _next_draw_context(self):
+        now = self._now_local()
+        date_part = now.date()
+        if now.hour < 12:
+            slot = "midi"
+            time_label = "12:30"
+        elif now.hour < 20:
+            slot = "soir"
+            time_label = "20:30"
+        else:
+            slot = "midi"
+            time_label = "12:30"
+            date_part = date_part + timedelta(days=1)
+
+        date_iso = date_part.isoformat()
+        return {
+            "draw_key": f"{date_iso}:{slot}",
+            "draw_slot": slot,
+            "draw_label": f"{date_iso} {time_label} ({slot})",
+        }
 
     def build_lottery_analysis(self, lottery_type):
         history = self.data_service.lottery_history(lottery_type, limit=180)
@@ -71,6 +109,7 @@ class V2PredictionService:
         analysis = self.build_lottery_analysis(lottery_type)
         if not analysis:
             return []
+        draw_context = self._next_draw_context()
         sorted_scores = sorted(analysis["scores"].items(), key=lambda item: item[1], reverse=True)
         items = []
         for index, (number, score) in enumerate(sorted_scores[:top_n], start=1):
@@ -83,8 +122,21 @@ class V2PredictionService:
                 "reason": f"Top {index} par score composite et stabilité.",
                 "reliability": engine.reliability_score(confidence, self._type_reliability(lottery_type) / 100),
                 "volatility": round(engine.volatility_score([int(number)], analysis["frequency"]), 1),
+                "target_draw_key": draw_context["draw_key"],
+                "target_draw_slot": draw_context["draw_slot"],
+                "target_draw_label": draw_context["draw_label"],
             }
-            pred_id = save_prediction("lottery", lottery_type, {"mode": "single_number"}, payload, confidence)
+            pred_id = save_prediction(
+                "lottery",
+                lottery_type,
+                {
+                    "mode": "single_number",
+                    "target_draw_key": draw_context["draw_key"],
+                    "target_draw_slot": draw_context["draw_slot"],
+                },
+                payload,
+                confidence,
+            )
             payload["prediction_id"] = pred_id
             items.append(payload)
         return items
@@ -93,6 +145,7 @@ class V2PredictionService:
         analysis = self.build_lottery_analysis(lottery_type)
         if not analysis:
             return []
+        draw_context = self._next_draw_context()
         config = LOTTERY_CONFIG[lottery_type]
         ordered_numbers = [int(number) for number, _ in sorted(analysis["scores"].items(), key=lambda item: item[1], reverse=True)]
         grids = []
@@ -108,8 +161,21 @@ class V2PredictionService:
                 "reasoning": "Grille optimisée par pondération dynamique, stabilité et historique récent.",
                 "reliability": engine.reliability_score(confidence, self._type_reliability(lottery_type) / 100),
                 "volatility": round(engine.volatility_score(numbers, analysis["frequency"]), 1),
+                "target_draw_key": draw_context["draw_key"],
+                "target_draw_slot": draw_context["draw_slot"],
+                "target_draw_label": draw_context["draw_label"],
             }
-            pred_id = save_prediction("lottery", lottery_type, {"mode": "grid"}, grid, confidence)
+            pred_id = save_prediction(
+                "lottery",
+                lottery_type,
+                {
+                    "mode": "grid",
+                    "target_draw_key": draw_context["draw_key"],
+                    "target_draw_slot": draw_context["draw_slot"],
+                },
+                grid,
+                confidence,
+            )
             grid["prediction_id"] = pred_id
             grids.append(grid)
         return grids
@@ -142,6 +208,7 @@ class V2PredictionService:
                 "match": f"{match['home_team']} vs {match['away_team']}",
                 "country": match["country"],
                 "league": match["league"],
+                "match_key": f"{match['league']}-{match['home_team']}-{match['away_team']}-{match['match_date']}",
                 "best_bet": prediction["best_bet"],
                 "probability": prediction["probability"],
                 "confidence": prediction["confidence"],
@@ -151,7 +218,19 @@ class V2PredictionService:
                 "reliability": prediction["reliability_score"],
                 "volatility": prediction["volatility_score"],
             }
-            pred_id = save_prediction("sport", match["league"], match, payload, payload["confidence"])
+            pred_id = save_prediction(
+                "sport",
+                match["league"],
+                {
+                    "home_team": match["home_team"],
+                    "away_team": match["away_team"],
+                    "league": match["league"],
+                    "match_date": match["match_date"],
+                    "match_key": payload["match_key"],
+                },
+                payload,
+                payload["confidence"],
+            )
             payload["prediction_id"] = pred_id
             recommendations.append(payload)
         selected = engine.auto_select(recommendations, min_confidence=min_confidence, take=take)
@@ -195,31 +274,91 @@ class V2PredictionService:
         grids = self.lottery_grids(subtype or "keno", num_grids=max(take * 2, 6))
         return engine.auto_select(grids, min_confidence=min_confidence, take=take)
 
+    def ensure_next_draw_predictions(self):
+        pending = get_pending_predictions("lottery")
+        draw_context = self._next_draw_context()
+        created = []
+
+        for lottery_type in LOTTERY_CONFIG:
+            already_exists = any(
+                item.get("subtype") == lottery_type
+                and ((item.get("data") or {}).get("target_draw_key") == draw_context["draw_key"])
+                for item in pending
+            )
+            if already_exists:
+                continue
+
+            grids = self.lottery_grids(lottery_type, num_grids=3)
+            created.append({
+                "lottery": lottery_type,
+                "target_draw": draw_context["draw_label"],
+                "generated": len(grids),
+            })
+
+        return created
+
+    @staticmethod
+    def _find_lottery_result(results, target_draw_key):
+        if not target_draw_key:
+            return results[0] if results else None
+        for item in results:
+            actual = item.get("actual_result") or {}
+            if actual.get("draw_key") == target_draw_key:
+                return item
+        return None
+
+    @staticmethod
+    def _find_sport_result(results, match_key):
+        if not match_key:
+            return None
+        for item in results:
+            actual = item.get("actual_result") or {}
+            if actual.get("match_key") == match_key:
+                return item
+        return None
+
     def reconcile_predictions(self):
         pending = get_pending_predictions()
         updated = []
         for item in pending:
-            latest_result = get_latest_result(item["subtype"] if item["type"] == "lottery" else item["type"])
-            if not latest_result:
-                continue
             prediction = item["prediction"] or {}
+            data = item.get("data") or {}
             was_correct = False
             score = 0
+
             if item["type"] == "lottery":
+                results = get_results(item["subtype"], limit=120)
+                target_draw_key = data.get("target_draw_key") or prediction.get("target_draw_key")
+                latest_result = self._find_lottery_result(results, target_draw_key)
+                if not latest_result:
+                    continue
                 predicted_numbers = prediction.get("numbers", [])
                 actual_numbers = latest_result["actual_result"].get("numbers", [])
                 overlap = len(set(predicted_numbers) & set(actual_numbers))
                 score = round((overlap / max(1, len(predicted_numbers))) * 100, 1)
                 was_correct = overlap >= max(1, len(predicted_numbers) // 2)
+                details = f"{overlap}/{len(predicted_numbers)} numéro(s) trouvés"
             else:
+                results = get_results("sport", limit=800)
+                match_key = prediction.get("match_key") or data.get("match_key")
+                latest_result = self._find_sport_result(results, match_key)
+                if not latest_result:
+                    continue
                 actual = latest_result["actual_result"]
                 if "winner" in actual:
                     was_correct = prediction.get("best_bet") == actual["winner"]
                     score = 100 if was_correct else 0
+                    details = "issue correcte" if was_correct else "issue incorrecte"
+                else:
+                    details = "résultat non exploitable"
+
             update_prediction_status(item["id"], "won" if was_correct else "lost", score=score)
             engine.record_outcome(["frequency_analysis", "recency_bias", "variance_filter"], was_correct)
             updated.append({"prediction_id": item["id"], "status": "won" if was_correct else "lost", "score": score})
-            push_notification("prediction_update", f"Prédiction #{item['id']} {'validée' if was_correct else 'invalidée'}")
+            push_notification(
+                "prediction_update",
+                f"Prédiction #{item['id']} {'validée' if was_correct else 'invalidée'} - score {score}% ({details})",
+            )
         return updated
 
     def dashboard_overview(self):

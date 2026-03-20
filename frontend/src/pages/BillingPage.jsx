@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { subscriptionAPI } from '../services/api';
+import { subscriptionAPI, getApiErrorMessage } from '../services/api';
 
 export default function BillingPage() {
   const [plans, setPlans] = useState([]);
@@ -26,7 +26,7 @@ export default function BillingPage() {
       setCurrent(response.data);
       setMessage(`Plan mis à jour: ${plan}`);
     } catch (error) {
-      setMessage(error.response?.data?.detail || 'Connexion requise pour upgrader');
+      setMessage(getApiErrorMessage(error, 'Connexion requise pour upgrader'));
     }
   }
 

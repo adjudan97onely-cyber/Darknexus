@@ -14,6 +14,7 @@ class SchedulerService:
         self._last_runs = {
             "sync": None,
             "reconcile": None,
+            "cycle_predictions": None,
         }
 
     async def start(self):
@@ -51,6 +52,16 @@ class SchedulerService:
             save_scheduler_log("reconcile_predictions", "error", str(exc))
             return []
 
+    async def run_cycle_predictions_now(self):
+        try:
+            result = self.prediction_service.ensure_next_draw_predictions()
+            self._last_runs["cycle_predictions"] = datetime.utcnow().isoformat()
+            save_scheduler_log("cycle_predictions", "ok", f"{len(result)} lottery types prepared")
+            return result
+        except Exception as exc:
+            save_scheduler_log("cycle_predictions", "error", str(exc))
+            return []
+
     def status(self):
         return {
             "running": self._running,
@@ -60,8 +71,10 @@ class SchedulerService:
     async def _loop(self):
         sync_interval_sec = 60 * 15
         reconcile_interval_sec = 60 * 10
+        cycle_interval_sec = 60 * 10
         last_sync_tick = 0
         last_reconcile_tick = 0
+        last_cycle_tick = 0
         tick = 0
 
         while self._running:
@@ -73,6 +86,10 @@ class SchedulerService:
                 if tick - last_reconcile_tick >= reconcile_interval_sec:
                     await self.run_reconcile_now()
                     last_reconcile_tick = tick
+
+                if tick - last_cycle_tick >= cycle_interval_sec:
+                    await self.run_cycle_predictions_now()
+                    last_cycle_tick = tick
 
                 await asyncio.sleep(5)
                 tick += 5

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, getApiErrorMessage } from '../services/api';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
@@ -26,7 +26,7 @@ export default function AuthPage() {
       setMe(response.data.user);
       setMessage('Compte créé et connecté.');
     } catch (error) {
-      setMessage(error.response?.data?.detail || 'Échec création compte');
+      setMessage(getApiErrorMessage(error, 'Échec création compte'));
     }
   }
 
@@ -37,7 +37,7 @@ export default function AuthPage() {
       setMe(response.data.user);
       setMessage('Connexion réussie.');
     } catch (error) {
-      setMessage(error.response?.data?.detail || 'Échec connexion');
+      setMessage(getApiErrorMessage(error, 'Échec connexion'));
     }
   }
 
