@@ -26,6 +26,7 @@ function toIngredients(input) {
 
 function inferCuisine(query) {
   const q = normalize(query);
+  if (q.includes("boulanger") || q.includes("patis")) return "francaise";
   if (q.includes("antill")) return "antillaise";
   if (q.includes("healthy") || q.includes("leger")) return "healthy";
   if (q.includes("rapide") || q.includes("express")) return "rapide";
@@ -36,6 +37,7 @@ function inferCuisine(query) {
 
 function inferSlot(query) {
   const q = normalize(query);
+  if (q.includes("croissant") || q.includes("brioche") || q.includes("gateau") || q.includes("patis") || q.includes("boulanger") || q.includes("dessert")) return "snack";
   if (q.includes("soir") || q.includes("diner")) return "dinner";
   if (q.includes("matin") || q.includes("petit")) return "breakfast";
   if (q.includes("collation") || q.includes("snack")) return "snack";
@@ -186,7 +188,7 @@ export function generateDynamicRecipesFromIngredients(ingredients, options = {})
   const generated = personalizeRecipes(diversify(
     generateRecipeCandidates(toIngredients(ingredients), {
       cuisine: options.cuisine || "all",
-      mode: options.mode || "normal",
+      mode: options.mode || "chef",
       slot: options.slot || "lunch",
       servings: options.servings || 2,
       limit: options.limit || 12,
@@ -204,7 +206,7 @@ export function generateDynamicRecipesFromIngredients(ingredients, options = {})
 export function recommendRecipesFromIngredients(ingredients, limit = 12, options = {}) {
   return generateDynamicRecipesFromIngredients(ingredients, {
     cuisine: options.cuisine || "all",
-    mode: options.mode || "normal",
+    mode: options.mode || "chef",
     slot: options.slot || "lunch",
     servings: options.servings || 2,
     limit: Math.max(8, Number(limit) || 12),
@@ -272,7 +274,7 @@ export async function askCookingAssistant(question, context = {}) {
   const slot = inferSlot(lower);
   const rankedBase = personalizeRecipes(generateRecipeCandidates(ingredients.length ? ingredients : lower.split(/\s+/), {
     cuisine,
-    mode: lower.includes("chef") || lower.includes("expert") ? "chef" : "normal",
+    mode: "chef",
     slot,
     servings: inferServings(lower),
     limit: 6,

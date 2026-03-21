@@ -114,6 +114,20 @@ function findFirst(ingredients: string[], predicate: (name: string) => boolean):
 }
 
 export function buildTechniqueDrivenSteps(context: TechniqueContext): string[] {
+  const bakeryFamily = ["brioche", "gateau", "viennoiserie"].includes(context.blueprintFamily);
+  if (bakeryFamily) {
+    return [
+      "Sortir le materiel: un saladier, un fouet, une balance/verre doseur, un moule et du papier cuisson. Prechauffer le four a 180C pendant 10 minutes.",
+      "Peser tous les ingredients avant de commencer, puis les poser dans l'ordre d'utilisation pour ne rien oublier.",
+      "Melanger d'abord les ingredients secs (farine, sucre, levure) pour repartir la levure uniformement.",
+      "Ajouter ensuite les ingredients humides (lait, oeuf, beurre fondu) et fouetter doucement jusqu'a obtenir une pate lisse sans gros grumeaux.",
+      "Verser la pate dans le moule, lisser le dessus avec une cuillere et tapoter legerement le moule sur le plan de travail pour enlever les bulles.",
+      "Enfourner au milieu du four. Ne pas ouvrir la porte avant 15 minutes pour eviter que la pate retombe.",
+      "Verifier la cuisson: planter la pointe d'un couteau au centre. Si elle ressort seche, c'est cuit; sinon prolonger 3 a 5 minutes.",
+      "Laisser tiedir 10 minutes hors du four avant de demouler pour eviter de casser la preparation.",
+    ];
+  }
+
   const protein = context.primaryProtein || findFirst(context.ingredients, (name) => getIngredientProfile(name).roles.includes("protein")) || "la proteine";
   const aromatic = findFirst(context.ingredients, (name) => getIngredientProfile(name).roles.includes("aromatic")) || "l'oignon";
   const secondAromatic = findFirst(context.ingredients.filter((item) => normalize(item) !== normalize(aromatic)), (name) => getIngredientProfile(name).roles.includes("aromatic"));
@@ -125,42 +139,45 @@ export function buildTechniqueDrivenSteps(context: TechniqueContext): string[] {
   const steps: string[] = [];
   const plans = planCookingTechniques(context);
 
+  steps.push("Sortir une planche, un couteau, une poele/casserole et une spatule. Preparer tous les ingredients devant toi avant d'allumer le feu.");
+
   if (plans.some((item) => item.key === "mariner")) {
-    steps.push(`Assaisonner ${protein} avec sel, poivre${acid ? ` et ${acid}` : ""}, puis laisser mariner 10 minutes pour imprimer les saveurs.`);
+    steps.push(`Mettre ${protein} dans un bol avec sel, poivre${acid ? ` et ${acid}` : ""}. Melanger puis laisser 10 minutes au repos.`);
   }
 
-  steps.push(`Faire revenir ${aromatic}${secondAromatic ? ` et ${secondAromatic}` : ""} a feu moyen 2 a 3 minutes, juste assez pour les attendrir sans coloration excessive.`);
+  steps.push(`Faire chauffer la poele a feu moyen, ajouter un filet d'huile puis ${aromatic}${secondAromatic ? ` et ${secondAromatic}` : ""}. Cuire 2 a 3 minutes jusqu'a ce que ca devienne brillant et tendre.`);
 
   if (plans.some((item) => item.key === "saisir")) {
-    steps.push(`Ajouter ${protein} et saisir 3 a 5 minutes jusqu'a une belle coloration, en gardant le coeur juteux.`);
+    steps.push(`Ajouter ${protein} et cuire 3 a 5 minutes sans trop remuer au debut. Repere debutant: quand la surface devient doree, tu peux retourner.`);
   }
 
   if (plans.some((item) => item.key === "deglacer")) {
-    steps.push(`Deglacer avec ${acid || "un trait de citron"} pour recuperer les sucs et construire une sauce courte.`);
+    steps.push(`Ajouter ${acid || "un trait de citron"} hors feu 10 secondes puis remettre sur feu doux pour recuperer les sucs colles au fond.`);
   }
 
   if (vegetables.length) {
-    steps.push(`Incorporer ${vegetables.join(" et ")} progressivement pour conserver un contraste entre fondant et croquant.`);
+    steps.push(`Ajouter ${vegetables.join(" et ")} en dernier. Cuire doucement pour garder des legumes tendres mais encore legerement fermes.`);
   }
 
   if (plans.some((item) => item.key === "mijoter")) {
-    steps.push(`Baisser le feu puis laisser mijoter 8 a 15 minutes afin de lier les saveurs et obtenir une texture ${context.desiredResult}.`);
+    steps.push(`Baisser le feu et couvrir partiellement. Laisser mijoter 8 a 15 minutes. Repere debutant: de petites bulles regulieres, pas une grosse ebullition.`);
   } else if (plans.some((item) => item.key === "rotir")) {
-    steps.push(`Transferer dans un four chaud et rotir jusqu'a cuisson reguliere, avec une surface doree mais non sechee.`);
+    steps.push(`Transferer dans un four deja chaud et cuire jusqu'a surface doree. Si ca colore trop vite, couvrir legerement avec une feuille de cuisson.`);
   } else if (plans.some((item) => item.key === "griller")) {
-    steps.push(`Finir par une cuisson grillee courte pour apporter une note torrefiee et une texture plus appetissante.`);
+    steps.push("Finir par une cuisson grillee courte 1 a 2 minutes. Surveiller en continu pour eviter de bruler.");
   } else if (plans.some((item) => item.key === "vapeur")) {
-    steps.push(`Cuire a la vapeur douce pour garder une sensation legere et une tenue propre des ingredients fragiles.`);
+    steps.push("Cuire a la vapeur douce jusqu'a texture tendre. Ne pas trop cuire pour garder de la tenue.");
   }
 
   if (base) {
-    steps.push(`Cuire ${base} separement puis assembler au dernier moment pour garder la structure du plat.`);
+    steps.push(`Cuire ${base} a part selon le paquet/recette, puis assembler a la fin pour eviter que tout se transforme en bouillie.`);
   }
 
   if (sauce) {
-    steps.push(`Ajuster la liaison avec ${sauce} en petite quantite, juste pour napper sans alourdir.`);
+    steps.push(`Ajouter ${sauce} petit a petit en melangeant. Arreter des que la sauce enrobe juste les ingredients.`);
   }
 
-  steps.push("Gouter, corriger l'assaisonnement, puis dresser proprement avec une finition fraiche avant service.");
+  steps.push("Gouter une cuillere: ajuster sel/poivre si besoin. Si le poulet est utilise, verifier qu'il n'est plus rose au centre avant de servir.");
+  steps.push("Servir chaud. Si c'est trop sec, ajouter 1 a 2 cuilleres d'eau chaude et melanger 30 secondes sur feu doux.");
   return steps;
 }

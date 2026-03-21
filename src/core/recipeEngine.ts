@@ -203,6 +203,12 @@ const SERVING_SPECS: Record<string, IngredientSpec> = {
   pates: { quantity: 100, unit: "g" },
   pain: { quantity: 90, unit: "g" },
   farine: { quantity: 70, unit: "g" },
+  sucre: { quantity: 22, unit: "g" },
+  lait: { quantity: 90, unit: "ml" },
+  "levure boulangere": { quantity: 3, unit: "g" },
+  "levure chimique": { quantity: 2, unit: "g" },
+  chocolat: { quantity: 25, unit: "g" },
+  banane: { quantity: 80, unit: "g" },
   tomate: { quantity: 120, unit: "g" },
   oignon: { quantity: 60, unit: "g" },
   ail: { quantity: 1, unit: "gousse" },
@@ -235,6 +241,9 @@ const DISH_BLUEPRINTS: DishBlueprint[] = [
   { key: "soupe", family: "soupe", slotHints: ["dinner", "lunch", "snack"], cuisines: ["healthy", "francaise", "antillaise", "all"], method: "broth", difficulty: "Facile", prepMinutes: 12, cookMinutes: 25, restMinutes: 0, baseRoles: [{ role: "protein", min: 0, max: 1, required: false }, { role: "vegetable", min: 2, max: 3, required: true }, { role: "aromatic", min: 1, max: 2, required: true }, { role: "base", min: 0, max: 1, required: false }, { role: "sauce", min: 0, max: 1, required: false }] },
   { key: "blaff", family: "blaff", slotHints: ["dinner", "lunch"], cuisines: ["antillaise", "all"], method: "broth", difficulty: "Intermediaire", prepMinutes: 14, cookMinutes: 16, restMinutes: 6, baseRoles: [{ role: "protein", min: 1, max: 1, required: true }, { role: "acid", min: 1, max: 1, required: true }, { role: "aromatic", min: 1, max: 2, required: true }, { role: "vegetable", min: 1, max: 2, required: false }] },
   { key: "curry", family: "curry", slotHints: ["lunch"], cuisines: ["monde", "antillaise", "all"], method: "boil", difficulty: "Intermediaire", prepMinutes: 15, cookMinutes: 22, restMinutes: 0, baseRoles: [{ role: "protein", min: 1, max: 1, required: true }, { role: "sauce", min: 1, max: 1, required: true }, { role: "aromatic", min: 1, max: 2, required: true }, { role: "vegetable", min: 1, max: 2, required: false }, { role: "base", min: 1, max: 1, required: true }] },
+  { key: "brioche", family: "brioche", slotHints: ["breakfast", "snack"], cuisines: ["francaise", "all"], method: "bake", difficulty: "Facile", prepMinutes: 15, cookMinutes: 22, restMinutes: 40, baseRoles: [{ role: "base", min: 2, max: 3, required: true }, { role: "dairy", min: 1, max: 1, required: true }, { role: "fat", min: 1, max: 1, required: true }] },
+  { key: "gateau", family: "gateau", slotHints: ["snack", "breakfast"], cuisines: ["francaise", "all"], method: "bake", difficulty: "Facile", prepMinutes: 12, cookMinutes: 28, restMinutes: 10, baseRoles: [{ role: "base", min: 2, max: 3, required: true }, { role: "dairy", min: 1, max: 1, required: true }, { role: "fat", min: 1, max: 1, required: true }, { role: "fruit", min: 0, max: 1, required: false }, { role: "topping", min: 0, max: 1, required: false }] },
+  { key: "viennoiserie", family: "viennoiserie", slotHints: ["breakfast", "snack"], cuisines: ["francaise", "all"], method: "bake", difficulty: "Intermediaire", prepMinutes: 18, cookMinutes: 20, restMinutes: 35, baseRoles: [{ role: "base", min: 2, max: 3, required: true }, { role: "fat", min: 1, max: 1, required: true }, { role: "dairy", min: 1, max: 1, required: true }] },
 ];
 
 export const CUISINE_MODES: CuisineMode[] = ["all", "francaise", "antillaise", "healthy", "rapide", "monde"];
@@ -285,11 +294,11 @@ function getPoolByRole(ingredients: string[], cuisine: CuisineMode, method: Cook
 
 function fillMissingRoles(pool: Record<IngredientRole, string[]>, cuisine: CuisineMode, blueprint: DishBlueprint): Record<IngredientRole, string[]> {
   const defaults: Record<CuisineMode, string[]> = {
-    all: ["oeuf", "tomate", "oignon", "riz", "brocoli", "herbes"],
-    francaise: ["oeuf", "oignon", "courgette", "fromage", "herbes"],
+    all: ["oeuf", "tomate", "oignon", "riz", "brocoli", "herbes", "farine", "sucre", "lait", "beurre", "levure chimique"],
+    francaise: ["oeuf", "oignon", "courgette", "fromage", "herbes", "farine", "sucre", "lait", "beurre", "levure boulangere", "chocolat"],
     antillaise: ["poisson", "citron", "oignon", "tomate", "riz", "thym"],
     healthy: ["poulet", "brocoli", "quinoa", "citron", "herbes"],
-    rapide: ["thon", "tomate", "pain", "yaourt", "poivre"],
+    rapide: ["thon", "tomate", "pain", "yaourt", "poivre", "farine", "sucre", "lait"],
     monde: ["crevette", "riz", "lait de coco", "oignon", "citron"],
   };
 
@@ -350,6 +359,7 @@ function choosePrimaryProtein(ingredients: string[]): { name?: string; family: P
 
 function determineStyle(cuisine: CuisineMode, slot: MealSlot, blueprint: DishBlueprint, mode: EngineMode): string {
   if (mode === "chef") return `${cuisine} gastro`;
+  if (["brioche", "gateau", "viennoiserie"].includes(blueprint.family)) return "debutant pas-a-pas";
   if (slot === "dinner") return cuisine === "healthy" ? "healthy refine" : `${cuisine} bistrot leger`;
   if (blueprint.family === "bowl") return cuisine === "rapide" ? "street food propre" : `${cuisine} healthy bowl`;
   if (blueprint.family === "quiche") return "bistrot dore";
@@ -378,7 +388,10 @@ function buildDetailedIngredients(selected: string[], cuisine: CuisineMode, serv
   return [...lines, ...pantry].filter((item, index, all) => all.findIndex((other) => normalize(other.name) === normalize(item.name)) === index);
 }
 
-function buildRecipeName(ingredients: string[], method: CookingMethod, slot: MealSlot): string {
+function buildRecipeName(ingredients: string[], method: CookingMethod, slot: MealSlot, family?: string): string {
+  if (family === "brioche") return "Brioche maison moelleuse (mode debutant)";
+  if (family === "gateau") return "Gateau facile du quotidien (mode debutant)";
+  if (family === "viennoiserie") return "Viennoiserie maison style croissant (mode debutant)";
   const protein = choosePrimaryProtein(ingredients).name;
   const vegetables = ingredients.filter((ingredient) => getIngredientProfile(ingredient).roles.includes("vegetable")).slice(0, 2);
   const acid = ingredients.find((ingredient) => getIngredientProfile(ingredient).roles.includes("acid"));
@@ -425,7 +438,7 @@ function recipeFromSelection(blueprint: DishBlueprint, selectedRaw: string[], in
   const dishFamily = [protein.name || protein.family, cookingMethod, blueprint.family].filter(Boolean).join(":");
   const selected = enrichWithFlavorBalance(selectedRaw, options.cuisine);
   const style = determineStyle(options.cuisine, options.slot, blueprint, options.mode);
-  const name = buildRecipeName(selected, cookingMethod, options.slot);
+  const name = buildRecipeName(selected, cookingMethod, options.slot, blueprint.family);
   const ingredientsDetailed = buildDetailedIngredients(selected, options.cuisine, options.servings);
   const flavorBalance = analyzeFlavorBalance(ingredientsDetailed.map((item) => item.name));
   const steps = buildTechniqueDrivenSteps({
@@ -457,7 +470,7 @@ function recipeFromSelection(blueprint: DishBlueprint, selectedRaw: string[], in
     mode: options.mode,
     style,
     dishType: blueprint.family,
-    difficulty: options.mode === "chef" ? "Intermediaire" : blueprint.difficulty,
+    difficulty: blueprint.difficulty,
     prepMinutes: blueprint.prepMinutes,
     cookMinutes: blueprint.cookMinutes,
     restMinutes: blueprint.restMinutes,
@@ -553,8 +566,8 @@ export function generateRecipeCandidates(inputIngredients: Array<string | Ingred
   for (const blueprint of DISH_BLUEPRINTS) {
     if (!cuisineMatches(blueprint, normalizedOptions.cuisine)) continue;
     if (!blueprintFitsSlot(blueprint, normalizedOptions.slot)) continue;
-    if (normalizedOptions.slot === "breakfast" && !["omelette", "bowl"].includes(blueprint.family)) continue;
-    if (normalizedOptions.slot === "snack" && !["omelette", "bowl", "soupe"].includes(blueprint.family)) continue;
+    if (normalizedOptions.slot === "breakfast" && !["omelette", "bowl", "brioche", "viennoiserie", "gateau"].includes(blueprint.family)) continue;
+    if (normalizedOptions.slot === "snack" && !["omelette", "bowl", "soupe", "brioche", "viennoiserie", "gateau"].includes(blueprint.family)) continue;
     if (normalizedOptions.slot === "dinner" && blueprint.family === "quiche") continue;
 
     const rawPool = getPoolByRole(safeIngredients, normalizedOptions.cuisine, blueprint.method);
@@ -564,6 +577,9 @@ export function generateRecipeCandidates(inputIngredients: Array<string | Ingred
     if (blueprint.family === "quiche" && !pool.base.includes("farine")) continue;
     if (blueprint.family === "blaff" && !pool.acid.length) continue;
     if (blueprint.family === "curry" && !pool.sauce.length) continue;
+    if (blueprint.family === "brioche" && !pool.base.includes("farine")) continue;
+    if (blueprint.family === "gateau" && !pool.base.includes("farine")) continue;
+    if (blueprint.family === "viennoiserie" && !pool.base.includes("farine")) continue;
 
     const sets = selectRoleSets(pool, blueprint);
     for (const [index, selected] of sets.entries()) {
