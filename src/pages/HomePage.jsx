@@ -1,13 +1,25 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
 import { CreatorSection } from "../components/CreatorSection";
+import { PersonalizedFeed } from "../components/PersonalizedFeed";
+import { UserProfilePanel } from "../components/UserProfilePanel";
+import { recordRecipeSeen } from "../services/userMemoryService";
 
-export function HomePage() {
+export function HomePage({ favoriteIds, onToggleFavorite, detectedIngredients }) {
   const navigate = useNavigate();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  function handleOpenRecipe(recipe) {
+    recordRecipeSeen(recipe);
+    navigate(`/recettes/${recipe.id}`, { state: { recipe } });
+  }
 
   return (
     <div className="space-y-5">
       <Header />
+
+      <UserProfilePanel onSaved={() => setRefreshKey((value) => value + 1)} />
 
       <section className="grid gap-3 md:grid-cols-3">
         {[
@@ -25,6 +37,17 @@ export function HomePage() {
           </button>
         ))}
       </section>
+
+      <PersonalizedFeed
+        detectedIngredients={detectedIngredients}
+        favoriteIds={favoriteIds}
+        onToggleFavorite={(recipe) => {
+          onToggleFavorite(recipe);
+          setRefreshKey((value) => value + 1);
+        }}
+        onOpenRecipe={handleOpenRecipe}
+        refreshKey={refreshKey}
+      />
 
       <CreatorSection />
     </div>

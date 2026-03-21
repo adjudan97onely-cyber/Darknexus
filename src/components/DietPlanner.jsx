@@ -9,6 +9,8 @@ export function DietPlanner({ ingredients }) {
   const [sex, setSex] = useState("male");
   const [activity, setActivity] = useState("moderate");
   const [goal, setGoal] = useState("lose");
+  const [servings, setServings] = useState(2);
+  const [cuisine, setCuisine] = useState("all");
   const [program, setProgram] = useState(null);
   const [coachQuestion, setCoachQuestion] = useState("A 16h si j'ai soif, je peux boire un coca ?");
   const [coachAnswer, setCoachAnswer] = useState("");
@@ -29,6 +31,8 @@ export function DietPlanner({ ingredients }) {
       age,
       sex,
       activity,
+        servings,
+        cuisine,
       today: new Date(),
     });
     setProgram(result);
@@ -151,6 +155,36 @@ export function DietPlanner({ ingredients }) {
         </label>
       </div>
 
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <label className="text-sm font-semibold text-white/90">
+          Portions par repas
+          <select
+            value={servings}
+            onChange={(event) => setServings(Number(event.target.value))}
+            className="mt-1 w-full rounded-lg border border-white/20 bg-slate-900/80 px-3 py-3 text-lg text-white"
+          >
+            {[1, 2, 3, 4, 5, 6, 8, 10, 12].map((value) => (
+              <option key={value} value={value}>{value} personne{value > 1 ? "s" : ""}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm font-semibold text-white/90">
+          Dominante cuisine
+          <select
+            value={cuisine}
+            onChange={(event) => setCuisine(event.target.value)}
+            className="mt-1 w-full rounded-lg border border-white/20 bg-slate-900/80 px-3 py-3 text-lg text-white"
+          >
+            <option value="all">Cuisine intelligente</option>
+            <option value="francaise">Francaise</option>
+            <option value="antillaise">Antillaise</option>
+            <option value="healthy">Healthy</option>
+            <option value="rapide">Rapide</option>
+            <option value="monde">Cuisine du monde</option>
+          </select>
+        </label>
+      </div>
+
       <button onClick={generate} className="mt-4 w-full rounded-xl bg-amber-300 px-4 py-3 text-lg font-black text-slate-900 md:w-auto">
         Generer le programme semaine
       </button>
@@ -220,6 +254,7 @@ export function DietPlanner({ ingredients }) {
 
                 <div className="mt-3 rounded-xl border border-white/20 bg-white/5 p-3 text-sm text-white/90">
                   <p><strong>Alternative soir:</strong> {day.meals.backup?.name}</p>
+                  <p><strong>Portions:</strong> {day.meals.lunch?.servings || servings} personnes</p>
                   <p>
                     <strong>Total jour:</strong> {day.dailyTotals.kcal} kcal | P {day.dailyTotals.protein} g | G {day.dailyTotals.carbs} g | L {day.dailyTotals.fat} g
                   </p>

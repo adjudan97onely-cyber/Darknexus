@@ -1,12 +1,6 @@
-const STORAGE_KEY = "killagain-food:recipe-images";
+import { buildRecipeImageUrl, resolveRecipeImage as resolveCoreRecipeImage } from "../core/imageService";
 
-function normalizeQuery(value) {
-  return String(value || "food")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+const STORAGE_KEY = "killagain-food:recipe-images";
 
 function readMap() {
   try {
@@ -27,15 +21,11 @@ export function getRecipeImage(recipeId, defaultImage) {
 }
 
 export function buildRealisticRecipeImageUrl(recipe) {
-  const rawQuery = recipe?.imagePrompt || recipe?.name || "healthy food plate";
-  const query = normalizeQuery(rawQuery);
-  const encoded = encodeURIComponent(`${query},food,meal,realistic,plated`);
-  return `https://source.unsplash.com/960x720/?${encoded}`;
+  return buildRecipeImageUrl(recipe);
 }
 
 export function resolveRecipeImage(recipe) {
-  const fallback = recipe?.image || buildRealisticRecipeImageUrl(recipe);
-  return getRecipeImage(recipe?.id, fallback);
+  return resolveCoreRecipeImage(recipe, (recipeId) => getRecipeImage(recipeId, ""));
 }
 
 export function setRecipeImage(recipeId, dataUrl) {

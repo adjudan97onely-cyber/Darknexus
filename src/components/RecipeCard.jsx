@@ -1,12 +1,28 @@
 import { motion } from "framer-motion";
 import { Clock3, Flame, Heart, Star } from "lucide-react";
+import { getCurrentRole, hasAccess } from "../services/roleService";
 import { resolveRecipeImage } from "../services/recipeImageService";
+import { UpgradeBadge } from "./FeatureGate";
+
+const MotionArticle = motion.article;
+
+function CoachHint({ lines }) {
+  if (!lines?.length) return null;
+  return (
+    <div className="space-y-1 rounded-lg border border-cyan-300/30 bg-cyan-300/10 p-2 text-xs text-cyan-50">
+      {lines.map((line) => (
+        <p key={line}>{line}</p>
+      ))}
+    </div>
+  );
+}
 
 export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite }) {
   const imageSrc = resolveRecipeImage(recipe);
+  const totalTime = (recipe.prepMinutes || 0) + (recipe.cookMinutes || 0) + (recipe.restMinutes || 0);
 
   return (
-    <motion.article
+    <MotionArticle
       layout
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
@@ -40,15 +56,27 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite }) {
           </span>
           <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1">
             <Clock3 className="h-3 w-3" />
-            {recipe.prepMinutes + recipe.cookMinutes} min
+            {totalTime} min
           </span>
           <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1">
             <Flame className="h-3 w-3" />
             {recipe.nutrition.kcal} kcal
           </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1">
+            {recipe.servings || 2} pers
+          </span>
+          {recipe.cuisine ? <span className="inline-flex items-center gap-1 rounded-full bg-amber-300/15 px-2 py-1 text-amber-100">{recipe.cuisine}</span> : null}
         </div>
 
         <p className="text-sm text-white/80">{recipe.matchReason || "Recette detaillee generee intelligemment selon tes ingredients."}</p>
+        {recipe.coachExplanations?.length && hasAccess("coach_explanations", getCurrentRole()) ? (
+          <CoachHint lines={recipe.coachExplanations} />
+        ) : recipe.coachExplanations?.length ? (
+          <UpgradeBadge feature="coach_explanations" />
+        ) : null}
+        <p className="text-xs text-white/60">
+          {recipe.difficulty} • P {recipe.nutrition.protein} g • G {recipe.nutrition.carbs} g • L {recipe.nutrition.fat} g
+        </p>
 
         <div className="flex gap-2">
           <button
@@ -65,6 +93,6 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite }) {
           </button>
         </div>
       </div>
-    </motion.article>
+    </MotionArticle>
   );
 }

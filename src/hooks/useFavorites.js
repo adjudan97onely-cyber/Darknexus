@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useLocalStorage } from "./useLocalStorage";
+import { recordRecipeLiked } from "../services/userMemoryService";
 
 export function useFavorites() {
   const [favorites, setFavorites] = useLocalStorage("killagain-food:favorites", []);
@@ -9,6 +10,7 @@ export function useFavorites() {
   function toggleFavorite(recipe) {
     setFavorites((prev) => {
       const exists = prev.some((item) => item.id === recipe.id);
+      recordRecipeLiked(recipe, !exists);
       if (exists) return prev.filter((item) => item.id !== recipe.id);
       return [recipe, ...prev].slice(0, 30);
     });
