@@ -1,20 +1,33 @@
-# Analytics Lottery - Version mobile sans PC
+# Killagain Food - Version mobile sans PC
 
-Objectif: utiliser l'application sur telephone en mode application.
+Objectif: utiliser l'application sur telephone meme quand le PC est eteint.
 
-## Option recommandee: PWA depuis production
+## Option recommandee (rapide): PWA installee depuis le web
 
-1. Deployer le frontend sur Vercel.
-2. Ouvrir l'URL sur mobile.
-3. Installer depuis le navigateur sur l'ecran d'accueil.
+1. Deployer l'application sur Vercel depuis GitHub.
+2. Ouvrir l'URL Vercel sur le telephone (Chrome Android ou Safari iOS).
+3. Ajouter a l'ecran d'accueil:
+   - Android: menu navigateur > Installer l'application
+   - iPhone: Partager > Sur l'ecran d'accueil
 
-## Option Android APK
+Resultat:
+- Icône comme une vraie application
+- Ouverture plein ecran
+- Cache offline de base deja actif (service worker)
 
-1. Prendre l'URL de production.
-2. Utiliser https://www.pwabuilder.com/ pour generer un APK.
-3. Installer l'APK sur Android.
+## Option "APK Android" (vraie app installable)
 
-## Pourquoi pas ZIP mobile
+1. Prendre l'URL de production (Vercel)
+2. Aller sur PWABuilder: https://www.pwabuilder.com/
+3. Coller l'URL et generer le package Android
+4. Telecharger le fichier APK
+5. Installer l'APK sur ton telephone
 
-Le ZIP de code n'installe pas une app.
-Il faut soit une PWA installee, soit un paquet APK/IPA.
+Avantage:
+- Installation comme une app Android classique
+- Partage simple de l'APK
+
+## Important
+
+Telecharger un ZIP GitHub directement sur mobile ne donne pas une app installable.
+Le ZIP est utile pour le code, pas pour l'installation utilisateur finale.

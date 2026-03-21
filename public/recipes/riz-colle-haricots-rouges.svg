@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#43A047"/>
+      <stop offset="1" stop-color="#66BB6A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  <circle cx="330" cy="340" r="190" fill="#fff" fill-opacity="0.92"/>
+  <circle cx="330" cy="340" r="130" fill="#FAFAFA"/>
+  <g fill="#8E24AA">
+    <circle cx="280" cy="305" r="16"/>
+    <circle cx="330" cy="300" r="16"/>
+    <circle cx="375" cy="325" r="16"/>
+    <circle cx="300" cy="365" r="16"/>
+    <circle cx="355" cy="375" r="16"/>
+    <circle cx="260" cy="345" r="16"/>
+  </g>
+  <text x="560" y="300" fill="#ffffff" font-family="Segoe UI, sans-serif" font-size="58" font-weight="700">Riz colle haricots rouges</text>
+  <text x="560" y="385" fill="#f1f8e9" font-family="Segoe UI, sans-serif" font-size="34">Coco, epices, cuisson douce</text>
+</svg>
