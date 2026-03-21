@@ -1,16 +1,18 @@
 import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { ALL_RECIPES } from "../data/recipes";
-import { clearRecipeImage, getRecipeImage, setRecipeImage } from "../services/recipeImageService";
+import { clearRecipeImage, resolveRecipeImage, setRecipeImage } from "../services/recipeImageService";
 
 export function RecipeDetailPage() {
   const { recipeId } = useParams();
+  const location = useLocation();
   const [imageVersion, setImageVersion] = useState(0);
 
-  const recipe = useMemo(
-    () => ALL_RECIPES.find((item) => item.id === recipeId),
-    [recipeId]
-  );
+  const recipe = useMemo(() => {
+    const fromState = location.state?.recipe;
+    if (fromState?.id === recipeId) return fromState;
+    return ALL_RECIPES.find((item) => item.id === recipeId);
+  }, [recipeId, location.state]);
 
   if (!recipe) {
     return (
@@ -20,7 +22,7 @@ export function RecipeDetailPage() {
     );
   }
 
-  const imageSrc = getRecipeImage(recipe.id, recipe.image);
+  const imageSrc = resolveRecipeImage(recipe);
 
   function onUploadFile(event) {
     const file = event.target.files?.[0];

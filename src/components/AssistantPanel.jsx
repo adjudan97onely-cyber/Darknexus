@@ -18,6 +18,17 @@ export function AssistantPanel({ ingredients }) {
     }
   }
 
+  async function quickAsk(value) {
+    setQuestion(value);
+    setLoading(true);
+    try {
+      const result = await askCookingAssistant(value, { ingredients });
+      setResponse(result);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <section className="rounded-2xl border border-white/20 bg-slate-950/70 p-4">
       <h2 className="flex items-center gap-2 text-xl font-bold text-white">
@@ -40,6 +51,21 @@ export function AssistantPanel({ ingredients }) {
         >
           <MessageCircleMore className="h-4 w-4" />
           {loading ? "..." : "Demander"}
+        </button>
+      </div>
+
+      <div className="mt-2 flex flex-wrap gap-2">
+        <button
+          onClick={() => quickAsk("active le mode chef ia")}
+          className="rounded-lg border border-cyan-300/40 bg-cyan-400/10 px-3 py-2 text-xs font-semibold text-cyan-100"
+        >
+          Mode Chef IA
+        </button>
+        <button
+          onClick={() => quickAsk("surprends moi")}
+          className="rounded-lg border border-amber-300/40 bg-amber-300/10 px-3 py-2 text-xs font-semibold text-amber-100"
+        >
+          Surprendre
         </button>
       </div>
 

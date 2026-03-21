@@ -11,9 +11,9 @@ export function HomePage() {
 
       <section className="grid gap-3 md:grid-cols-3">
         {[
-          { title: "Scanner IA", path: "/scanner", text: "Photo frigo -> ingredients detectes -> recettes" },
-          { title: "Recettes creoles", path: "/recettes", text: "Bokit, accras, colombo, blaff et plus" },
-          { title: "Regime intelligent", path: "/regime", text: "Plan midi/soir/collation selon ton objectif" },
+          { title: "Scanner IA", path: "/scanner", text: "Photo frigo -> ingredients detectes -> recettes illimitees" },
+          { title: "Recettes intelligentes", path: "/recettes", text: "Francaise, healthy, rapide, cuisine du monde" },
+          { title: "Regime intelligent", path: "/regime", text: "Calories, macros, planning semaine selon ton objectif" },
         ].map((item) => (
           <button
             key={item.path}

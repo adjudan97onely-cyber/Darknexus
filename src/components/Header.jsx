@@ -14,10 +14,10 @@ export function Header() {
         Killagain Food
       </div>
       <h1 className="mt-4 text-3xl font-black leading-tight text-white md:text-5xl">
-        Cuisine antillaise + nutrition intelligente, avec ce que tu as deja
+        Coach nutrition IA + recettes illimitees, avec ce que tu as deja
       </h1>
       <p className="mt-3 max-w-3xl text-sm text-white/90 md:text-base">
-        Scanner ingredients, recettes detaillees debutant, assistant IA pedagogique et plan alimentaire adapte a ton objectif.
+        Scanner ingredients, generation dynamique francaise/healthy/rapide/monde, calcul calories-macros et planning intelligent.
       </p>
     </motion.header>
   );

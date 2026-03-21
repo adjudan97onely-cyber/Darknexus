@@ -18,7 +18,7 @@ export function RecipesPage({ search, setSearch, favoriteIds, onToggleFavorite }
             recipe={recipe}
             isFavorite={favoriteIds.has(recipe.id)}
             onToggleFavorite={onToggleFavorite}
-            onOpen={(id) => navigate(`/recettes/${id}`)}
+            onOpen={(item) => navigate(`/recettes/${item.id}`, { state: { recipe: item } })}
           />
         ))}
       </section>
