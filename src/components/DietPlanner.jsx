@@ -5,6 +5,9 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 export function DietPlanner({ ingredients }) {
   const [weightKg, setWeightKg] = useState(78);
   const [heightCm, setHeightCm] = useState(176);
+  const [age, setAge] = useState(30);
+  const [sex, setSex] = useState("male");
+  const [activity, setActivity] = useState("moderate");
   const [goal, setGoal] = useState("lose");
   const [program, setProgram] = useState(null);
   const [coachQuestion, setCoachQuestion] = useState("A 16h si j'ai soif, je peux boire un coca ?");
@@ -18,7 +21,16 @@ export function DietPlanner({ ingredients }) {
   }, []);
 
   function generate() {
-    const result = buildWeeklyNutritionProgram({ ingredients, goal, weightKg, heightCm, today: new Date() });
+    const result = buildWeeklyNutritionProgram({
+      ingredients,
+      goal,
+      weightKg,
+      heightCm,
+      age,
+      sex,
+      activity,
+      today: new Date(),
+    });
     setProgram(result);
     setCoachAnswer(answerHydrationQuestion(coachQuestion, goal));
   }
@@ -91,6 +103,41 @@ export function DietPlanner({ ingredients }) {
           />
         </label>
         <label className="text-sm font-semibold text-white/90">
+          Age
+          <input
+            type="number"
+            value={age}
+            onChange={(event) => setAge(event.target.value)}
+            className="mt-1 w-full rounded-lg border border-white/20 bg-slate-900/80 px-3 py-3 text-lg text-white"
+          />
+        </label>
+      </div>
+
+      <div className="mt-3 grid gap-3 md:grid-cols-3">
+        <label className="text-sm font-semibold text-white/90">
+          Sexe
+          <select
+            value={sex}
+            onChange={(event) => setSex(event.target.value)}
+            className="mt-1 w-full rounded-lg border border-white/20 bg-slate-900/80 px-3 py-3 text-lg text-white"
+          >
+            <option value="male">Homme</option>
+            <option value="female">Femme</option>
+          </select>
+        </label>
+        <label className="text-sm font-semibold text-white/90">
+          Activite
+          <select
+            value={activity}
+            onChange={(event) => setActivity(event.target.value)}
+            className="mt-1 w-full rounded-lg border border-white/20 bg-slate-900/80 px-3 py-3 text-lg text-white"
+          >
+            <option value="low">Faible</option>
+            <option value="moderate">Moderee</option>
+            <option value="high">Elevee</option>
+          </select>
+        </label>
+        <label className="text-sm font-semibold text-white/90">
           Objectif
           <select
             value={goal}
@@ -128,6 +175,10 @@ export function DietPlanner({ ingredients }) {
         <div className="mt-4 space-y-3 rounded-xl border border-white/20 bg-white/5 p-3 text-sm text-white/90">
           <p>
             <strong>Objectif calorique journalier:</strong> {program.targetCalories} kcal
+          </p>
+          <p><strong>Maintenance:</strong> {program.maintenanceCalories} kcal | <strong>BMR:</strong> {program.bmr} kcal</p>
+          <p>
+            <strong>Macros cibles:</strong> P {program.macroTargets.protein} g | G {program.macroTargets.carbs} g | L {program.macroTargets.fat} g
           </p>
           <p><strong>Semaine commence le:</strong> {program.weekStart}</p>
         </div>
@@ -169,6 +220,9 @@ export function DietPlanner({ ingredients }) {
 
                 <div className="mt-3 rounded-xl border border-white/20 bg-white/5 p-3 text-sm text-white/90">
                   <p><strong>Alternative soir:</strong> {day.meals.backup?.name}</p>
+                  <p>
+                    <strong>Total jour:</strong> {day.dailyTotals.kcal} kcal | P {day.dailyTotals.protein} g | G {day.dailyTotals.carbs} g | L {day.dailyTotals.fat} g
+                  </p>
                   <p><strong>Boissons:</strong> Matin {day.beverage.morning} | 16h {day.beverage.afternoon} | Soir {day.beverage.evening}</p>
                   <div className="mt-2 flex items-center gap-2">
                     <button onClick={() => addWater(day.dateKey)} className="rounded-lg bg-cyan-300 px-3 py-2 font-semibold text-slate-900">

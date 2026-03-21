@@ -1,14 +1,13 @@
 import { recommendRecipesFromIngredients } from "./aiService";
+import {
+  calculateDailyNeeds,
+  calculateMacroTargets,
+  sumDayNutrition,
+} from "./nutritionEngineService";
 
-export function calculateCalories({ weightKg, heightCm, goal }) {
-  const safeWeight = Number(weightKg) || 70;
-  const safeHeight = Number(heightCm) || 170;
-  const base = 10 * safeWeight + 6.25 * safeHeight - 5 * 30 + 5;
-  const maintenance = Math.round(base * 1.35);
-
-  if (goal === "lose") return maintenance - 350;
-  if (goal === "gain") return maintenance + 250;
-  return maintenance;
+export function calculateCalories({ weightKg, heightCm, goal, age = 30, sex = "male", activity = "moderate" }) {
+  const needs = calculateDailyNeeds({ weightKg, heightCm, goal, age, sex, activity });
+  return needs.targetCalories;
 }
 
 const DAILY_COACH_THEMES = [
@@ -89,9 +88,19 @@ export function answerHydrationQuestion(question, goal = "maintain") {
   return "Hydrate-toi par petites gorgées toute la journee: eau au reveil, eau avant repas, et boisson sans sucre a 16h.";
 }
 
-export function buildWeeklyNutritionProgram({ ingredients, goal, weightKg, heightCm, today = new Date() }) {
-  const targetCalories = calculateCalories({ weightKg, heightCm, goal });
-  const picks = recommendRecipesFromIngredients(ingredients, 30);
+export function buildWeeklyNutritionProgram({
+  ingredients,
+  goal,
+  weightKg,
+  heightCm,
+  age = 30,
+  sex = "male",
+  activity = "moderate",
+  today = new Date(),
+}) {
+  const needs = calculateDailyNeeds({ weightKg, heightCm, goal, age, sex, activity });
+  const macroTargets = calculateMacroTargets(needs.targetCalories, goal);
+  const picks = recommendRecipesFromIngredients(ingredients, 40, { cuisine: "all" });
   const weekStart = getWeekStart(today);
 
   const days = Array.from({ length: 7 }).map((_, idx) => {
@@ -101,19 +110,24 @@ export function buildWeeklyNutritionProgram({ ingredients, goal, weightKg, heigh
     const selected = selectDiverse(picks, offset);
     const dayTheme = DAILY_COACH_THEMES[idx % DAILY_COACH_THEMES.length];
 
+    const meals = {
+      breakfast: selected.breakfast,
+      lunch: selected.lunch,
+      snack: selected.snack1,
+      dinner: selected.dinner,
+      backup: selected.altDinner,
+    };
+
+    const totals = sumDayNutrition([meals.breakfast, meals.lunch, meals.snack, meals.dinner]);
+
     return {
       dateKey: formatDateKey(date),
       dayName: DAY_NAMES[date.getDay()],
       dateLabel: date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }),
       theme: dayTheme,
-      calories: targetCalories,
-      meals: {
-        breakfast: selected.breakfast,
-        lunch: selected.lunch,
-        snack: selected.snack1,
-        dinner: selected.dinner,
-        backup: selected.altDinner,
-      },
+      calories: needs.targetCalories,
+      meals,
+      dailyTotals: totals,
       beverage: {
         morning: "Eau + boisson chaude sans sucre",
         afternoon: goal === "lose" ? "Eau petillante citron / infusion froide" : "Eau coco nature ou the glace sans sucre",
@@ -123,7 +137,10 @@ export function buildWeeklyNutritionProgram({ ingredients, goal, weightKg, heigh
   });
 
   return {
-    targetCalories,
+    targetCalories: needs.targetCalories,
+    maintenanceCalories: needs.maintenanceCalories,
+    bmr: needs.bmr,
+    macroTargets,
     weekStart: formatDateKey(weekStart),
     days,
   };
@@ -163,13 +180,16 @@ export function getRealtimeCoach(programDay, now = new Date()) {
 
 export function buildDietPlan({ ingredients, goal, weightKg, heightCm }) {
   const targetCalories = calculateCalories({ weightKg, heightCm, goal });
-  const picks = recommendRecipesFromIngredients(ingredients, 14);
+  const picks = recommendRecipesFromIngredients(ingredients, 14, { cuisine: "all" });
   const offset = new Date().getDay();
   const meals = selectDiverse(picks, offset);
   const theme = DAILY_COACH_THEMES[offset];
+  const dailyTotals = sumDayNutrition([meals.breakfast, meals.lunch, meals.snack1, meals.dinner]);
+  const macroTargets = calculateMacroTargets(targetCalories, goal);
 
   return {
     targetCalories,
+    macroTargets,
     dailyTheme: theme,
     advice:
       goal === "lose"
@@ -192,6 +212,7 @@ export function buildDietPlan({ ingredients, goal, weightKg, heightCm }) {
       sodaRule: "Soda classique exceptionnel; prefere soda zero occasionnel et eau majoritaire.",
     },
     meals,
+    dailyTotals,
     coachMessage: answerHydrationQuestion("j'ai soif a 16h, je peux boire un coca ?", goal),
   };
 }
