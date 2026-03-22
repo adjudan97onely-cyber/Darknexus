@@ -789,6 +789,12 @@ function recipesFromDishKnowledge(ingredientQuery, limit = 12, options = {}) {
     // Convertir DishProfile en EngineRecipe format
     const recipes = filtered.slice(0, limit).map((dish, idx) => {
       if (!dish || !dish.id) return null;
+      
+      // Calculer valeurs nutritionnelles par défaut selon la difficulté et plaisir
+      const difficulty = dish.difficulty || 2;
+      const plaisir = dish.plaisir || { gourmandise: 3 };
+      const baseCal = 400 + (difficulty * 100) + (plaisir.gourmandise * 50);
+      
       return {
         id: dish.id,
         name: dish.name || "",
@@ -796,7 +802,7 @@ function recipesFromDishKnowledge(ingredientQuery, limit = 12, options = {}) {
         blueprintKey: dish.family || "plat",
         cuisine: dish.cuisine || "all",
         slot: dish.slot || "lunch",
-        difficulty: dish.difficulty || 2,
+        difficulty: difficulty,
         minChefLevel: dish.minChefLevel || 2,
         family: dish.family || "plat",
         cookingMethod: dish.technique || "braise",
@@ -809,6 +815,12 @@ function recipesFromDishKnowledge(ingredientQuery, limit = 12, options = {}) {
         mistakes: Array.isArray(dish.mistakes) ? dish.mistakes : [],
         signature: dish.signature || "",
         category: dish.category || "plat",
+        nutrition: {
+          kcal: Math.round(baseCal),
+          protein: Math.round(15 + difficulty * 5),
+          carbs: Math.round(35 + difficulty * 8),
+          fat: Math.round(20 + difficulty * 3)
+        },
         dishProfile: dish,
         rank: idx + 1,
       };
