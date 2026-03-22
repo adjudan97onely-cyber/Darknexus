@@ -392,9 +392,21 @@ function buildPedagogicDishAnswer(recipe, dish, servings) {
 }
 
 function buildChefStarAnswer(recipe) {
+  const ctx = recipe.contextValidation;
+  const intentBlock = ctx
+    ? [
+        `📊 Analyse d'intention: ${ctx.intentSummary}`,
+        `✅ Pourquoi ce plat: ${ctx.whyMatch}`,
+        `📈 Score cohérence: ${ctx.scoreDisplay} | ${ctx.coherenceLabel}`,
+        `🕐 ${ctx.timeLabel} | 💰 ${ctx.budgetLabel} | 🥩 ${ctx.nutritionLabel}`,
+        ``,
+      ]
+    : [];
+
   return [
     `✦ ${recipe.name} (${recipe.portionRatio || 1}x portions)`,
     ``,
+    ...intentBlock,
     `Signature culinaire: ${recipe.signature || ""}`,
     ``,
     `Fondamentaux essentiels:`,
@@ -634,11 +646,11 @@ export async function askCookingAssistant(question, context = {}) {
   const servings = inferServings(lower);
   const chefLevel = GLOBAL_CHEF_LEVEL;
 
-  // MODE CHEF ÉTOILÉ PRIORITAIRE (niveau 10): vrais plats avant fallback
+  // MODE CHEF ÉTOILÉ PRIORITAIRE (niveau 10): Context Intelligence Engine
   if (chefLevel === 10) {
     const chefStarDishes = generateChefStarRecipes({
       chefLevel,
-      query: lower, // NOUVEAU: passer la requête pour matching direct!
+      query: lower,
       slot: inferSlot(lower),
       cuisine: inferCuisine(lower),
       servings,
@@ -646,10 +658,9 @@ export async function askCookingAssistant(question, context = {}) {
     });
 
     if (chefStarDishes.length > 0) {
-      // DIVERSIFICATION: Randomiser entre les options disponibles
-      // Utilise vraiment du hasard pour éviter répétitions
-      const randomIndex = Math.floor(Math.random() * chefStarDishes.length);
-      const topRecipe = chefStarDishes[randomIndex];
+      // Le moteur retourne déjà trié par context score — prendre le #1
+      const topRecipe = chefStarDishes[0];
+      const ctx = topRecipe.contextValidation;
       return {
         title: `CHEF ÉTOILÉ - ${topRecipe.name}`,
         answer: buildChefStarAnswer(topRecipe),
@@ -659,6 +670,21 @@ export async function askCookingAssistant(question, context = {}) {
           "Erreurs à éviter",
         ],
         recipe: topRecipe,
+        alternatives: chefStarDishes.slice(1).map((r) => ({
+          name: r.name,
+          score: r.contextValidation?.contextScore?.total || r.score,
+          whyMatch: r.contextValidation?.whyMatch || "",
+        })),
+        contextValidation: ctx
+          ? {
+              intent: ctx.intent.goal,
+              intentSummary: ctx.intentSummary,
+              confidence: ctx.intent.confidence,
+              score: ctx.contextScore.total,
+              whyMatch: ctx.whyMatch,
+              rejected: ctx.contextScore.rejected,
+            }
+          : undefined,
         suggestions: {
           fundamentals: topRecipe.fundamentals || [],
           techniques: topRecipe.techniques?.map((t) => t.name) || [],

@@ -27,6 +27,9 @@ import {
 } from "./professionalTechniques";
 import { EngineRecipe, MealSlot } from "./foodRules";
 import { normalize } from "./foodRules";
+import { parseIntent, ParsedIntent, intentSummary } from "./intentParser";
+import { filterByIntent, FilterResult, buildValidationMeta } from "./contextFilter";
+import { scoreDish, ContextScore } from "./contextScorer";
 
 interface ChefStarOptions {
   chefLevel?: ChefLevel;
@@ -35,7 +38,20 @@ interface ChefStarOptions {
   servings?: number;
   preferredDishes?: string[]; // IDs de plats préférés
   availableIngredients?: string[];
-  query?: string; // NOUVEAU: requête textuelle pour matching direct
+  query?: string; // requête textuelle pour matching direct + intent parsing
+}
+
+/** Recette avec métadonnées de validation contextuelle */
+export interface ContextValidation {
+  intent: ParsedIntent;
+  contextScore: ContextScore;
+  whyMatch: string;
+  coherenceLabel: string;
+  nutritionLabel: string;
+  timeLabel: string;
+  budgetLabel: string;
+  scoreDisplay: string;
+  intentSummary: string;
 }
 
 interface AdaptedDish extends EngineRecipe {
@@ -57,6 +73,7 @@ interface AdaptedDish extends EngineRecipe {
   }[];
   fundamentals: string[];
   signature: string;
+  contextValidation?: ContextValidation;
 }
 
 /**
@@ -277,130 +294,102 @@ export function buildAdaptedRecipe(
 
 /**
  * Interface principale: générer recettes chef étoilé
- * AMÉLIORATION: Matching INTELLIGENT sur textuelle + diversification
+ * CONTEXT INTELLIGENCE ENGINE: sélection basée sur l'intention utilisateur
+ * 
+ * Flux:
+ * 1. Parse intent de la query ("repas muscu" → protein)
+ * 2. Si query matche un plat exact → le retourner (priorité)
+ * 3. Sinon: filtrer TOUS les plats par intent + scorer
+ * 4. Rejeter les incohérents (score < seuil)
+ * 5. Retourner les meilleurs avec métadonnées de validation
  */
 export function generateChefStarRecipes(
   options: ChefStarOptions = {}
 ): AdaptedDish[] {
   const chefLevel = options.chefLevel || DEFAULT_CHEF_LEVEL;
   const servings = Math.max(1, options.servings || 2);
-  const recipes: AdaptedDish[] = [];
+  const query = options.query || "";
 
-  let candidates = findDishesByChefLevel(1, chefLevel);
+  // ═══════════ ÉTAPE 1: PARSER L'INTENTION ═══════════
+  const intent = parseIntent(query);
 
-  // OPTIMALISATION #1: Search par query directe (si fournie)
-  // Ceci PRIORISE les matches textuels directs (bokit→bokit, colombo→colombo, etc)
-  if (options.query && options.query.trim().length > 0) {
-    const directMatches = searchDishes(options.query);
+  // ═══════════ ÉTAPE 2: MATCH EXACT PAR NOM ═══════════
+  // Si l'user demande "bokit" ou "colombo" → on le sert directement
+  if (query.trim().length > 0) {
+    const directMatches = searchDishes(query);
     if (directMatches.length > 0) {
-      // On a trouvé des plats qui matchent la requête directement
-      candidates = directMatches.filter((d) => canCookRecipe(d.id, chefLevel));
-      if (candidates.length > 0) {
-        // Construire adaptedRecipes depuis searchResults
-        for (const dish of candidates.slice(0, 3)) {
-          recipes.push(buildAdaptedRecipe(dish, chefLevel, servings));
-        }
-        return recipes.length > 0 ? recipes : [buildAdaptedRecipe(candidates[0], chefLevel, servings)];
+      const validMatches = directMatches.filter((d) => canCookRecipe(d.id, chefLevel));
+      if (validMatches.length > 0) {
+        // Même pour un match direct, on calcule le context score
+        return validMatches.slice(0, 3).map((dish) => {
+          const recipe = buildAdaptedRecipe(dish, chefLevel, servings);
+          const ctxScore = scoreDish(dish, intent);
+          const meta = buildValidationMeta(dish, intent, ctxScore);
+          recipe.contextValidation = {
+            intent,
+            contextScore: ctxScore,
+            ...meta,
+            intentSummary: intentSummary(intent),
+          };
+          return recipe;
+        });
       }
     }
   }
 
-  // OPTIMALISATION #2: Fallback sur slot + cuisine inference
+  // ═══════════ ÉTAPE 3: FILTRAGE PAR INTENTION ═══════════
+  // C'est ici que la magie opère: on filtre TOUTE la base
+  // par cohérence avec l'intention détectée
+  const filterResult = filterByIntent(intent, {
+    maxResults: 5,
+    chefLevel,
+  });
+
+  if (filterResult.accepted.length > 0) {
+    return filterResult.accepted.map((filtered) => {
+      const recipe = buildAdaptedRecipe(filtered.dish, chefLevel, servings);
+      const meta = buildValidationMeta(filtered.dish, intent, filtered.score);
+      recipe.contextValidation = {
+        intent,
+        contextScore: filtered.score,
+        ...meta,
+        intentSummary: intentSummary(intent),
+      };
+      // Override le score de base avec le context score
+      recipe.score = filtered.score.total;
+      recipe.matchReason = `[${intentSummary(intent)}] ${meta.whyMatch}`;
+      return recipe;
+    });
+  }
+
+  // ═══════════ ÉTAPE 4: FALLBACK LEGACY ═══════════
+  // Si aucun plat ne passe le filtre intent, fallback slot+cuisine
+  let candidates = findDishesByChefLevel(1, chefLevel);
   const slot = options.slot || "lunch";
   let slotMatches = candidates.filter((dish) => dish.slot === slot);
 
-  // Filtrer par cuisine (avec fallback)
   if (options.cuisine && options.cuisine !== "all") {
     const cuisineMatches = slotMatches.filter(
-      (dish) => normalize(dish.cuisine) === normalize(options.cuisine)
+      (dish) => normalize(dish.cuisine) === normalize(options.cuisine!)
     );
-    if (cuisineMatches.length > 0) {
-      slotMatches = cuisineMatches;
-    }
+    if (cuisineMatches.length > 0) slotMatches = cuisineMatches;
   }
 
-  // Filtrer par ingrédients disponibles (si fournis)
-  if (options.availableIngredients && options.availableIngredients.length > 0) {
-    const scoredByIngredients = slotMatches.map((dish) => {
-      const matches = dish.baseFamilies.filter((family) =>
-        options.availableIngredients!.some(
-          (ingredient) =>
-            normalize(ingredient).includes(normalize(family)) ||
-            normalize(family).includes(normalize(ingredient))
-        )
-      ).length;
-      return { dish, score: matches };
-    });
+  if (slotMatches.length === 0) slotMatches = candidates;
 
-    // Gardez seulement les meilleurs matchs ingrédients
-    const maxScore = Math.max(...scoredByIngredients.map((s) => s.score));
-    const bestByIngredients = scoredByIngredients
-      .filter((s) => s.score >= maxScore * 0.7)
-      .map((s) => s.dish);
-
-    if (bestByIngredients.length > 0) {
-      slotMatches = bestByIngredients;
-    }
-  }
-
-  // Appliquer préférences utilisateur
-  if (options.preferredDishes && options.preferredDishes.length > 0) {
-    const preferred = slotMatches.filter((dish) =>
-      options.preferredDishes!.includes(dish.id)
-    );
-    if (preferred.length > 0) {
-      slotMatches = preferred;
-    }
-  }
-
-  // DIVERSIFIER: retourner jusqu'à 3 plats différents par difficulté
-  const byDifficulty = {
-    easy: slotMatches.filter((d) => d.difficulty <= 2),
-    medium: slotMatches.filter((d) => d.difficulty > 2 && d.difficulty <= 4),
-    hard: slotMatches.filter((d) => d.difficulty > 4),
-  };
-
-  const selected: DishProfile[] = [];
-
-  // Ajouter 1 plat medium (préféré)
-  if (byDifficulty.medium.length > 0) {
-    selected.push(byDifficulty.medium[0]);
-  } else if (byDifficulty.easy.length > 0) {
-    selected.push(byDifficulty.easy[0]);
-  } else if (byDifficulty.hard.length > 0) {
-    selected.push(byDifficulty.hard[0]);
-  }
-
-  // Ajouter 1 plat easy si disponible et distinct
-  if (byDifficulty.easy.length > 0 && !selected.includes(byDifficulty.easy[0])) {
-    selected.push(byDifficulty.easy[0]);
-  }
-
-  // Ajouter 1 plat hard si disponible et distinct
-  if (byDifficulty.hard.length > 0 && !selected.includes(byDifficulty.hard[0])) {
-    selected.push(byDifficulty.hard[0]);
-  }
-
-  // Fallback: si trop peu, prendre candidats distincts
-  if (selected.length < 2 && slotMatches.length > 1) {
-    for (const candidate of slotMatches) {
-      if (!selected.includes(candidate)) {
-        selected.push(candidate);
-        if (selected.length >= 3) break;
-      }
-    }
-  }
-
-  // Construire recettes
-  for (const dish of selected) {
-    recipes.push(buildAdaptedRecipe(dish, chefLevel, servings));
-  }
-
-  return recipes.length > 0
-    ? recipes
-    : candidates.length > 0
-      ? [buildAdaptedRecipe(candidates[0], chefLevel, servings)]
-      : [];
+  // Prendre les 3 premiers avec validation context minimale
+  return slotMatches.slice(0, 3).map((dish) => {
+    const recipe = buildAdaptedRecipe(dish, chefLevel, servings);
+    const ctxScore = scoreDish(dish, intent);
+    const meta = buildValidationMeta(dish, intent, ctxScore);
+    recipe.contextValidation = {
+      intent,
+      contextScore: ctxScore,
+      ...meta,
+      intentSummary: intentSummary(intent),
+    };
+    return recipe;
+  });
 }
 
 /**
