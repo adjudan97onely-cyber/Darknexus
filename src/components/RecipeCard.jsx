@@ -28,13 +28,13 @@ export function RecipeCard({ recipe, onOpen, onToggleFavorite, isFavorite }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="group overflow-hidden rounded-[28px] border border-white/10 bg-[#10131a] shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-2xl"
+      className="recipe-card overflow-hidden rounded-[28px] border border-white/10 bg-[#10131a] shadow-xl transition-all duration-300"
     >
       <div className="relative h-52 overflow-hidden bg-slate-800">
         <img
           src={imageSrc}
           alt={recipe.name}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
           loading="lazy"
           onError={(event) => {
             event.currentTarget.src = "/recipes/default.svg";
