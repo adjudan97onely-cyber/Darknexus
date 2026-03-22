@@ -1,8 +1,12 @@
 /**
- * Base de connaissance culinaire complète (200+)
+ * Base de connaissance culinaire complète
  * Structurée par vraies logiques professionnelles
+ * Fichiers séparés par cuisine: dishes/antillais.ts, dishes/francais.ts
  * Pas de génération aléatoire - selection de plats réels
  */
+
+import { PLATS_ANTILLAIS } from "./dishes/antillais";
+import { PLATS_FRANCAIS } from "./dishes/francais";
 
 export interface DishProfile {
   id: string;
@@ -35,519 +39,60 @@ export interface DishProfile {
     visuel: 1 | 2 | 3 | 4 | 5;
     arome: 1 | 2 | 3 | 4 | 5;
   };
+  // === KNOWLEDGE LAYER (optionnel, enrichi progressivement) ===
+  ingredients?: { name: string; quantity?: string; optional?: boolean }[];
+  steps?: string[];
+  techniques?: string[];
+  tags?: string[];
+  baseIngredients?: string[];
+  category?: "plat" | "street_food" | "pâte" | "riz" | "poisson" | "viande" | "dessert" | "sauce";
+}
+
+/**
+ * Type strict pour recette complète (Knowledge Layer)
+ * Chaque champ est obligatoire — utilisé pour les plats enrichis
+ */
+export type Dish = {
+  name: string;
+  cuisine: "antillaise" | "française";
+  category: "plat" | "street_food" | "pâte" | "riz" | "poisson" | "viande" | "dessert" | "sauce";
+  ingredients: { name: string; quantity?: string; optional?: boolean }[];
+  steps: string[];
+  techniques: string[];
+  cookingTime: number;
+  difficulty: "easy" | "medium" | "hard";
+  tags: string[];
+  baseIngredients: string[];
+};
+
+/** Convertit un DishProfile enrichi en Dish strict */
+export function toDish(profile: DishProfile): Dish | null {
+  if (!profile.ingredients || !profile.steps) return null;
+  return {
+    name: profile.name,
+    cuisine: profile.cuisine as "antillaise" | "française",
+    category: profile.category || "plat",
+    ingredients: profile.ingredients,
+    steps: profile.steps,
+    techniques: profile.techniques || [profile.technique],
+    cookingTime: profile.timings.cook,
+    difficulty: profile.difficulty <= 2 ? "easy" : profile.difficulty <= 3 ? "medium" : "hard",
+    tags: profile.tags || [],
+    baseIngredients: profile.baseIngredients || profile.baseFamilies,
+  };
 }
 
 // ============================================
-// PLATS ANTILLAIS (15)
+// PLATS ANTILLAIS — importés depuis dishes/antillais.ts
 // ============================================
-const ANTILLAIS: DishProfile[] = [
-  {
-    id: "bokit-classique",
-    name: "Bokit traditionnel",
-    desireName: "Bokit doré croustillant, garni poulet épicé",
-    aliases: ["bokit", "bokits"],
-    cuisine: "antillaise",
-    region: "Guadeloupe",
-    slot: "snack",
-    difficulty: 2,
-    minChefLevel: 2,
-    family: "friture",
-    technique: "fry",
-    baseFamilies: ["farine", "levure"],
-    fundamentals: ["pate levee legere", "friture exact 165C", "repos essentiellement"],
-    timings: { prep: 15, cook: 20, rest: 30 },
-    servings: 2,
-    portionAdaptation: "linear",
-    signature: "Poche gonflée dorée avec intérieur moelleux, garnie après",
-    profTips: [
-      "Mesurer huile a 165C exactement pour texture croustillante",
-      "Laisser reposer la pate 30+ minutes bound vraiment aux trous",
-      "Garnir APRES friture quand bokit est encore chaud",
-    ],
-    mistakes: [
-      "Huile trop chaude = bokit compact et sec intérieur",
-      "Pas de repos = poche mal gonflée",
-      "Garnir AVANT = garniture degouline",
-    ],
-    premiumTier: "classique",
-    plaisir: { gourmandise: 4, texture: 5, visuel: 3, arome: 4 },
-  },
-  {
-    id: "colombo-poulet",
-    name: "Colombo de poulet",
-    desireName: "Colombo de poulet fondant aux épices créoles",
-    aliases: ["colombo", "colombo poulet", "colombo de poulet antillais"],
-    cuisine: "antillaise",
-    region: "Guadeloupe",
-    slot: "lunch",
-    difficulty: 3,
-    minChefLevel: 3,
-    family: "curry-arom",
-    technique: "braise",
-    baseFamilies: ["poulet", "oignon", "ail", "tomate", "epices"],
-    fundamentals: ["marinade 30min avant", "epices colombo toastees", "mijotage 45min min"],
-    timings: { prep: 20, cook: 50, rest: 5 },
-    servings: 4,
-    portionAdaptation: "linear",
-    signature: "Poulet tendre dans sauce riche epices colombo, légumes fondants",
-    profTips: [
-      "Toaster les epices colombo 2 min avant pour reveler aromes",
-      "Laisser poulet mariner minimum 30 min avec epices, ail, citron",
-      "Mijoter basse temperature pour viande tendre, pas coriace",
-    ],
-    mistakes: [
-      "Pas toaster epices = gout plat",
-      "Cuisson trop rapide = poulet sec",
-      "Trop eau = sauce diluee, pas onctueuse",
-    ],
-    premiumTier: "signature",
-    plaisir: { gourmandise: 5, texture: 4, visuel: 4, arome: 5 },
-  },
-  {
-    id: "blaff-poisson",
-    name: "Blaff de poisson",
-    desireName: "Blaff de poisson frais, bouillon citronné parfumé",
-    aliases: ["blaff", "blaff poisson"],
-    cuisine: "antillaise",
-    region: "Guadeloupe",
-    slot: "dinner",
-    difficulty: 3,
-    minChefLevel: 3,
-    family: "poisson-bouillon",
-    technique: "poach",
-    baseFamilies: ["poisson-blanc", "citron", "oignon", "tomate"],
-    fundamentals: ["bouillon aromatique fort", "pochage doux 6-8 min", "jus citron apres"],
-    timings: { prep: 15, cook: 40, rest: 0 },
-    servings: 2,
-    portionAdaptation: "moderate",
-    signature: "Poisson blanc juste poché dans bouillon tomate-citron, jus vivace",
-    profTips: [
-      "Construire bouillon aromatique fort avant d'ajouter poisson",
-      "Poisson ne doit jamais bouillir = eau juste fremissante",
-      "Finition citron frais pour acidite, pas avant cuisson",
-    ],
-    mistakes: [
-      "Bouillon pas assez aromatise = plat sans saveur",
-      "Poisson bouillie = chair cassante, seche",
-      "Ajouter citron trop tot = perte acidite",
-    ],
-    premiumTier: "signature",
-    plaisir: { gourmandise: 4, texture: 3, visuel: 4, arome: 5 },
-  },
-  {
-    id: "accras-morue",
-    name: "Accras de morue",
-    desireName: "Accras dorés croustillants, cœur moelleux à la morue",
-    aliases: ["accras", "acras", "accras morue"],
-    cuisine: "antillaise",
-    region: "Guadeloupe",
-    slot: "snack",
-    difficulty: 2,
-    minChefLevel: 2,
-    family: "friture",
-    technique: "fry",
-    baseFamilies: ["morue", "farine", "levure"],
-    fundamentals: ["morue dessalee bien drainee", "pate legere", "friture 170C"],
-    timings: { prep: 20, cook: 15, rest: 0 },
-    servings: 4,
-    portionAdaptation: "linear",
-    signature: "Boules dorées croustillantes morue, dedans tendre",
-    profTips: [
-      "Bien essorer morue apres dessalage = aucune eau surplus",
-      "Pate doit etre legere, ailee, pas compacte",
-      "Friture 170C exactement pour dorage maitrise",
-    ],
-    mistakes: [
-      "Morue pas bien essores = accras gras",
-      "Pate trop epaisse = cuit pas au coeur",
-      "Huile trop chaude = brule dehors, cru dedans",
-    ],
-    premiumTier: "classique",
-    plaisir: { gourmandise: 5, texture: 5, visuel: 4, arome: 4 },
-  },
-  {
-    id: "dombre-crevettes",
-    name: "Dombré aux crevettes",
-    desireName: "Dombré fondants aux crevettes, sauce tomate épicée",
-    aliases: ["dombre", "dombré", "dombrés aux crevettes"],
-    cuisine: "antillaise",
-    region: "Guadeloupe",
-    slot: "lunch",
-    difficulty: 3,
-    minChefLevel: 3,
-    family: "pate-epicee",
-    technique: "braise",
-    baseFamilies: ["farine", "crevette", "oignon", "tomate", "ail"],
-    fundamentals: ["petits dombrés reguliers", "sauce tomate simple", "cuisson ensemble"],
-    timings: { prep: 20, cook: 30, rest: 0 },
-    servings: 2,
-    portionAdaptation: "linear",
-    signature: "Petits dombrés pates dans sauce tomate-crevette mijotée",
-    profTips: [
-      "Dombrés reguliers (3-4cm) pour cuisson homogene dans sauce",
-      "Sauce simple: tomate, oignon, ail, crevettes",
-      "Cuire dombrés EN sauce, pas a part",
-    ],
-    mistakes: [
-      "Dombrés trop gros = pas cuit au coeur",
-      "Sauce trop bouillon-e = plat sans corps",
-      "Trop crevettes = deseq vers fruit de mer",
-    ],
-    premiumTier: "signature",
-    plaisir: { gourmandise: 4, texture: 4, visuel: 4, arome: 5 },
-  },
-  {
-    id: "court-bouillon",
-    name: "Court-bouillon antillais",
-    desireName: "Court-bouillon de poisson à la créole, sauce relevée",
-    aliases: ["court-bouillon", "court bouillon"],
-    cuisine: "antillaise",
-    region: "Guadeloupe",
-    slot: "dinner",
-    difficulty: 3,
-    minChefLevel: 3,
-    family: "poisson-sauce",
-    technique: "braise",
-    baseFamilies: ["poisson-blanc", "tomate", "citron", "oignon"],
-    fundamentals: ["base tomate riche", "poisson fin de cuisson", "oignon fondant"],
-    timings: { prep: 15, cook: 40, rest: 0 },
-    servings: 2,
-    portionAdaptation: "moderate",
-    signature: "Poisson blanc dans sauce tomate onctueuse, oignons fondants",
-    profTips: [
-      "Faire fondre oignon 10 min avant d'ajouter poisson",
-      "Sauce tomate doit etre riche, concentree",
-      "Poisson ajoute fin pour juste cuit, pas trop",
-    ],
-    mistakes: [
-      "Sauce trop aqueuse = pas de saveur",
-      "Poisson trop longtemps = flesh cassante",
-      "Oignon pas fondu = texture croustillante desagreeable",
-    ],
-    premiumTier: "signature",
-    plaisir: { gourmandise: 5, texture: 3, visuel: 5, arome: 5 },
-  },
-  {
-    id: "matoutou-crabes",
-    name: "Matoutou crabe",
-    desireName: "Matoutou de crabe royal, riz parfumé aux épices",
-    aliases: ["matoutou", "matoutou crabe", "crabes matoutou"],
-    cuisine: "antillaise",
-    region: "Guadeloupe",
-    slot: "lunch",
-    difficulty: 4,
-    minChefLevel: 4,
-    family: "crustace-riz",
-    technique: "braise",
-    baseFamilies: ["crabe", "riz", "epinard", "oignon", "ail"],
-    fundamentals: ["crabe peut etre amorphe", "riz cuit dans chair crabe", "saveur iodee"],
-    timings: { prep: 25, cook: 40, rest: 5 },
-    servings: 4,
-    portionAdaptation: "moderate",
-    signature: "Riz melange a chair crabe, epinard, cuisine dans carapace",
-    profTips: [
-      "Crabe cuire d'abord, puis extraire chair",
-      "Riz cuit dans jus extraction crabe + epinard",
-      "Farce servie EN carapace crabe pour presentation",
-    ],
-    mistakes: [
-      "Crabe cru = danger food",
-      "Riz pas assez cuit = grain dur",
-      "Trop epinard = gout amer domine",
-    ],
-    premiumTier: "signature",
-    plaisir: { gourmandise: 5, texture: 4, visuel: 5, arome: 5 },
-  },
-];
+const ANTILLAIS: DishProfile[] = PLATS_ANTILLAIS;
 
 // ============================================
-// PLATS FRANÇAIS (20)
+// PLATS FRANÇAIS — importés depuis dishes/francais.ts
 // ============================================
-const FRANCAISE: DishProfile[] = [
-  {
-    id: "quiche-lorraine",
-    name: "Quiche lorraine",
-    desireName: "Quiche lorraine crémeuse, lardons fumés dorés",
-    aliases: ["quiche", "quiche lorraine"],
-    cuisine: "francaise",
-    region: "Lorraine",
-    slot: "lunch",
-    difficulty: 3,
-    minChefLevel: 3,
-    family: "tarte-oeufs",
-    technique: "bake",
-    baseFamilies: ["farine", "oeuf", "creme", "lard"],
-    fundamentals: ["fond pate regulier", "lard cuit d'abord", "creme oeuf bien lie"],
-    timings: { prep: 20, cook: 35, rest: 8 },
-    servings: 6,
-    portionAdaptation: "linear",
-    signature: "Tarte crémeuse lard croustillant, custard doree, texture legere",
-    profTips: [
-      "Pate foncer sans bulles, piquer fond",
-      "Lard cuire 5 min avant pour croustillant",
-      "Creme & oeufs ne JAMAIS bouillir = texture grumeleuse",
-    ],
-    mistakes: [
-      "Pate pas cuite = soupe dessous",
-      "Lard brule = amertume",
-      "Cuisson trop longue = creme seche et caoutchouteuse",
-    ],
-    premiumTier: "classique",
-    plaisir: { gourmandise: 4, texture: 4, visuel: 3, arome: 4 },
-  },
-  {
-    id: "gratin-dauphinois",
-    name: "Gratin dauphinois",
-    desireName: "Gratin dauphinois crémeux, croûte gratinée dorée",
-    aliases: ["gratin", "gratin dauphinois", "gratin pommes de terre"],
-    cuisine: "francaise",
-    region: "Dauphiné",
-    slot: "lunch",
-    difficulty: 2,
-    minChefLevel: 2,
-    family: "gratin",
-    technique: "bake",
-    baseFamilies: ["pomme-terre", "creme", "lait"],
-    fundamentals: ["tranches regulieres 2-3mm", "sauce creme-ail", "cuisson lente 50 min"],
-    timings: { prep: 20, cook: 55, rest: 10 },
-    servings: 4,
-    portionAdaptation: "linear",
-    signature: "Pommes de terre cremeuses fondantes, surface doree et croustillante",
-    profTips: [
-      "Tranches regulieres pour cuisson uniforme",
-      "Sauce creme-ail verser alors que pommes de terre crues",
-      "Cuisson four 180C lente = texture creme, pas gres",
-    ],
-    mistakes: [
-      "Tranches trop epaisses = pommes de terre crues dedans",
-      "Sauce trop peu liquide = gratin sec",
-      "Four trop chaud = surface brulee, dedans cru",
-    ],
-    premiumTier: "classique",
-    plaisir: { gourmandise: 5, texture: 4, visuel: 4, arome: 3 },
-  },
-  {
-    id: "coq-au-vin",
-    name: "Coq au vin",
-    desireName: "Coq au vin mijoté, sauce onctueuse au vin rouge",
-    aliases: ["coq au vin", "poulet au vin rouge"],
-    cuisine: "francaise",
-    region: "Bourgogne",
-    slot: "dinner",
-    difficulty: 4,
-    minChefLevel: 4,
-    family: "braise-rouge",
-    technique: "braise",
-    baseFamilies: ["poulet", "vin-rouge", "lard", "oignon", "champignon"],
-    fundamentals: ["marinede 2-4h avant", "saisir volaille bien", "vin reduce de moitie"],
-    timings: { prep: 30, cook: 90, rest: 10 },
-    servings: 4,
-    portionAdaptation: "moderate",
-    signature: "Poulet tendre vin rouge riche, sauce onctueuse, garnish lard-champignon",
-    profTips: [
-      "Mariner poule dans vin rouge + herbes 2-4 heures",
-      "Saisir poule 3 min cada lado pour croute",
-      "Vin doit etre reduit de moitie avant ajouter poule",
-    ],
-    mistakes: [
-      "Pas mariner = gout plat",
-      "Poule pas bien saisie = pas couleur",
-      "Vin reduit pas = sauce aqueuse et alcool trop fort",
-    ],
-    premiumTier: "signature",
-    plaisir: { gourmandise: 5, texture: 4, visuel: 5, arome: 5 },
-  },
-  {
-    id: "beef-bourguignon",
-    name: "Beef bourguignon",
-    desireName: "Bœuf bourguignon fondant, sauce au vin profonde",
-    aliases: ["beef bourguignon", "boeuf bourguignon"],
-    cuisine: "francaise",
-    region: "Bourgogne",
-    slot: "dinner",
-    difficulty: 4,
-    minChefLevel: 4,
-    family: "braise-rouge",
-    technique: "braise",
-    baseFamilies: ["boeuf", "vin-rouge", "lard", "oignon", "champignon"],
-    fundamentals: ["boeuf marbredé 48h", "saisir cube tres bien", "vin + bouillon reduit"],
-    timings: { prep: 40, cook: 150, rest: 15 },
-    servings: 6,
-    portionAdaptation: "moderate",
-    signature: "Boeuf tendre sauce vin rouge complete, aromatique, garnish classique",
-    profTips: [
-      "Boeuf bien marbredé pour intramuscular fat",
-      "Cubes saisir 4 min par face pour croute",
-      "Vin + bouillon ajout apres saisir, reduce lentement",
-    ],
-    mistakes: [
-      "Boeuf maigre = dur apres cuisson",
-      "Pas bien saisir = pas croute saveur Maillard",
-      "Cuisson trop rapide = boeuf dur",
-    ],
-    premiumTier: "signature",
-    plaisir: { gourmandise: 5, texture: 5, visuel: 5, arome: 5 },
-  },
-  {
-    id: "sole-meuniere",
-    name: "Sole meunière",
-    desireName: "Sole meunière au beurre noisette, citron frais",
-    aliases: ["sole meuniere", "sole a la meuniere"],
-    cuisine: "francaise",
-    region: "Classique",
-    slot: "dinner",
-    difficulty: 3,
-    minChefLevel: 3,
-    family: "poisson-frit",
-    technique: "fry",
-    baseFamilies: ["sole", "beurre", "citron"],
-    fundamentals: ["sole videe impeccable", "beurre clair encore", "saisir 2 min cada lado"],
-    timings: { prep: 10, cook: 8, rest: 0 },
-    servings: 1,
-    portionAdaptation: "linear",
-    signature: "Sole delicate chair blanche, beurre blanc mousseux, citron frais",
-    profTips: [
-      "Sole fraiche essentielle, videe proprement",
-      "Beurre doit etre clair, jamais noir",
-      "Saisir 2 min chaque cote exactement pour delicatesse",
-    ],
-    mistakes: [
-      "Sole pas fraiche = chair molle",
-      "Beurre brule = amertume",
-      "Trop cuire = chair seche et cassante",
-    ],
-    premiumTier: "signature",
-    plaisir: { gourmandise: 4, texture: 4, visuel: 5, arome: 4 },
-  },
-  {
-    id: "sauce-creme-classique",
-    name: "Sauce crème classique",
-    desireName: "Sauce crème onctueuse aux herbes",
-    aliases: ["sauce creme", "sauce creme fraiche", "sauce a la creme"],
-    cuisine: "francaise",
-    region: "Classique",
-    slot: "lunch",
-    difficulty: 2,
-    minChefLevel: 2,
-    family: "sauce",
-    technique: "reduce",
-    baseFamilies: ["creme", "beurre", "oignon"],
-    fundamentals: ["base aromatiqu doux", "reduction lente", "liaison creme"],
-    timings: { prep: 8, cook: 12, rest: 0 },
-    servings: 4,
-    portionAdaptation: "linear",
-    signature: "Sauce creme onctueuse nappante, saveur aromatique doux",
-    profTips: [
-      "Oignon & ail suer 2 min feu doux",
-      "Creme reduction lente 8-10 min for nappante",
-      "Ne JAMAIS bouillir apres creme = cassante",
-    ],
-    mistakes: [
-      "Oignon pas suee = texture croustillante",
-      "Creme bouille = sauce splits et granuleuse",
-      "Pas assez reduction = sauce trop liquide",
-    ],
-    premiumTier: "essentiel",
-    plaisir: { gourmandise: 3, texture: 3, visuel: 2, arome: 3 },
-  },
-  {
-    id: "tarte-salee",
-    name: "Tarte salée maison",
-    desireName: "Tarte salée rustique aux légumes de saison",
-    aliases: ["tarte", "tarte salee", "tarte legumes"],
-    cuisine: "francaise",
-    region: "Classique",
-    slot: "lunch",
-    difficulty: 2,
-    minChefLevel: 2,
-    family: "tarte",
-    technique: "bake",
-    baseFamilies: ["farine", "beurre", "tomate"],
-    fundamentals: ["pate foncer regulier", "garniture equilibree", "cuisson four 180C"],
-    timings: { prep: 20, cook: 30, rest: 5 },
-    servings: 4,
-    portionAdaptation: "linear",
-    signature: "Tarte croustillante pâte, garniture tomate légumes fondants",
-    profTips: [
-      "Pate foncer sans bulles, piquer fond",
-      "Garniture pas trop serrée = cuisson uniforme",
-      "Four 180C regulier 30 min pour pate doree",
-    ],
-    mistakes: [
-      "Pate pas cuite bas = gluante",
-      "Garniture trop serrée = pas cuire",
-      "Trop tomate = sauce imbibe pate",
-    ],
-    premiumTier: "classique",
-    plaisir: { gourmandise: 3, texture: 4, visuel: 3, arome: 3 },
-  },
-  {
-    id: "pain-au-beurre",
-    name: "Pain au beurre français",
-    desireName: "Pain brioché au beurre doré, mie fondante",
-    aliases: ["pain au beurre", "pain-au-beurre"],
-    cuisine: "francaise",
-    region: "Boulangerie",
-    slot: "breakfast",
-    difficulty: 3,
-    minChefLevel: 3,
-    family: "boulangerie",
-    technique: "bake",
-    baseFamilies: ["farine", "beurre", "levure"],
-    fundamentals: ["pate enrichie", "petrissage 10 min", "levage puis dorage"],
-    timings: { prep: 25, cook: 28, rest: 120 },
-    servings: 4,
-    portionAdaptation: "linear",
-    signature: "Pain tendre moelleux, croûte dorée légère, intérieur aéré",
-    profTips: [
-      "Petrir 10 min pour developper gluten",
-      "Levage 120 min till double volume",
-      "Dorer a l'oeuf, saulpoudrer sucre cristal avant cuire",
-    ],
-    mistakes: [
-      "Pas assez petrissage = pain dense",
-      "Levage insuff = pain compact",
-      "Cuisson trop rapide = croute dure, dedans pas cuit",
-    ],
-    premiumTier: "classique",
-    plaisir: { gourmandise: 4, texture: 5, visuel: 3, arome: 4 },
-  },
-  {
-    id: "omelette-persil",
-    name: "Omelette persil",
-    desireName: "Omelette baveuse au persil frais, beurre mousseux",
-    aliases: ["omelette", "omelette persil"],
-    cuisine: "francaise",
-    region: "Classique",
-    slot: "breakfast",
-    difficulty: 2,
-    minChefLevel: 2,
-    family: "oeuf",
-    technique: "sear",
-    baseFamilies: ["oeuf", "beurre", "persil"],
-    fundamentals: ["oeufs battus doux", "beurre frais mousseux", "pliage avant bien cuit"],
-    timings: { prep: 5, cook: 4, rest: 0 },
-    servings: 1,
-    portionAdaptation: "linear",
-    signature: "Omelette tendre creuse dedans, pliée parfaite, garniture simple",
-    profTips: [
-      "Oeufs simplement battus, pas surtravailler",
-      "Beurre doit etre frais et mousseux",
-      "Plier omelette AVANT qu'elle soit tout a fait cuite",
-    ],
-    mistakes: [
-      "Oeufs trop travailles = dense",
-      "Beurre cuit/noir = amertume",
-      "Omelette trop cuite = caoutchouteuse",
-    ],
-    premiumTier: "essentiel",
-    plaisir: { gourmandise: 3, texture: 4, visuel: 2, arome: 3 },
-  },
-];
+const FRANCAISE: DishProfile[] = PLATS_FRANCAIS;
 
-// ============================================
-// PLATS MONDIAUX (25)
-// ============================================
+
 const MONDIAUX: DishProfile[] = [
   {
     id: "pizza-margherita",
@@ -1289,13 +834,58 @@ export function findDishesByCuisine(cuisine: string): DishProfile[] {
 export function searchDishes(query: string): DishProfile[] {
   const q = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   return ALL_DISHES.filter((dish) => {
-    const haystack = [dish.name, ...dish.aliases, dish.family, dish.cuisine]
+    const haystack = [
+      dish.name,
+      ...dish.aliases,
+      dish.family,
+      dish.cuisine,
+      ...(dish.baseIngredients || []),
+      ...(dish.baseFamilies || []),
+    ]
       .join(" ")
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
     return haystack.includes(q);
   });
+}
+
+/**
+ * Matching intelligent par baseIngredients.
+ * Si l'utilisateur tape "pâtes fromage", "omelette", "bokit", "colombo"
+ * → recherche dans baseIngredients + aliases + name
+ * Retourne les plats triés par pertinence (nombre de mots matchés)
+ * Bonus antillais: +1 point de pertinence pour plats antillais (sans forcer)
+ */
+export function matchByIngredients(query: string): DishProfile[] {
+  const norm = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  const words = norm(query).split(/\s+/).filter((w) => w.length >= 2);
+  if (words.length === 0) return [];
+
+  const scored = ALL_DISHES.map((dish) => {
+    const searchable = [
+      dish.name,
+      ...dish.aliases,
+      ...(dish.baseIngredients || []),
+      ...dish.baseFamilies,
+      dish.family,
+    ].map(norm);
+
+    let score = 0;
+    for (const word of words) {
+      if (searchable.some((s) => s.includes(word))) score++;
+    }
+    // Bonus antillais (priorité douce, ne force jamais)
+    if (score > 0 && norm(dish.cuisine) === "antillaise") score += 0.5;
+
+    return { dish, score };
+  });
+
+  return scored
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((s) => s.dish);
 }
 
 export function canCookRecipe(dishId: string, chefLevel: number): boolean {

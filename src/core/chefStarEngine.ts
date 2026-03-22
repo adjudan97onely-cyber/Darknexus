@@ -16,6 +16,7 @@ import {
   findDishesByChefLevel,
   findDishesBySlot,
   searchDishes,
+  matchByIngredients,
 } from "./dishKnowledge";
 import {
   CookingTechnique,
@@ -315,10 +316,15 @@ export function generateChefStarRecipes(
   // ═══════════ ÉTAPE 1: PARSER L'INTENTION ═══════════
   const intent = parseIntent(query);
 
-  // ═══════════ ÉTAPE 2: MATCH EXACT PAR NOM ═══════════
-  // Si l'user demande "bokit" ou "colombo" → on le sert directement
+  // ═══════════ ÉTAPE 2: MATCH EXACT PAR NOM + INGREDIENTS ═══════════
+  // Si l'user demande "bokit", "colombo", "pâtes fromage" → matching intelligent
   if (query.trim().length > 0) {
-    const directMatches = searchDishes(query);
+    // D'abord: match exact par nom/alias
+    let directMatches = searchDishes(query);
+    // Si pas de match exact, essayer par baseIngredients
+    if (directMatches.length === 0) {
+      directMatches = matchByIngredients(query);
+    }
     if (directMatches.length > 0) {
       const validMatches = directMatches.filter((d) => canCookRecipe(d.id, chefLevel));
       if (validMatches.length > 0) {
