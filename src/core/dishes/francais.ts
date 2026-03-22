@@ -5,6 +5,7 @@
  */
 
 import { DishProfile } from "../dishKnowledge";
+import FRANCAIS_LOT4 from "./francais_LOT4";
 
 // ============================================
 // LOT 1 — 9 plats existants (vérifiés phase 2-4)
@@ -1149,4 +1150,4 @@ const LOT_3: DishProfile[] = [
 ];
 
 /** Tous les plats français validés */
-export const PLATS_FRANCAIS: DishProfile[] = [...LOT_1, ...LOT_2, ...LOT_3];
+export const PLATS_FRANCAIS: DishProfile[] = [...LOT_1, ...LOT_2, ...LOT_3, ...FRANCAIS_LOT4];

@@ -5,6 +5,7 @@
  */
 
 import { DishProfile } from "../dishKnowledge";
+import ANTILLAIS_LOT4 from "./antillais_LOT4";
 
 // ============================================
 // LOT 1 — 7 plats existants (vérifiés phase 2-4)
@@ -1153,4 +1154,4 @@ const LOT_3: DishProfile[] = [
 ];
 
 /** Tous les plats antillais validés */
-export const PLATS_ANTILLAIS: DishProfile[] = [...LOT_1, ...LOT_2, ...LOT_3];
+export const PLATS_ANTILLAIS: DishProfile[] = [...LOT_1, ...LOT_2, ...LOT_3, ...ANTILLAIS_LOT4];
