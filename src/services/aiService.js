@@ -4,9 +4,267 @@ import {
   generateRecipeCandidates,
   scaleRecipeForServings,
 } from "../core/recipeEngine";
+import { ALL_RECIPES } from "../data/recipes";
 import { normalizeUserProfile, recipeBlockedByProfile } from "../core/userProfile";
 import { getUserProfile } from "./userProfileService";
 import { applyAdminControls, recordGeneratedRecipes } from "./adminContentService";
+
+const CULINARY_KNOWLEDGE = [
+  {
+    key: "bokit",
+    aliases: ["bokit", "bokits"],
+    cuisine: "antillaise",
+    slot: "snack",
+    fundamentals: ["pate levee", "friture chaude", "garniture apres cuisson"],
+    baseIngredients: ["farine", "levure boulangere", "eau", "sel", "huile"],
+  },
+  {
+    key: "colombo",
+    aliases: ["colombo", "colombo poulet", "colombo de poulet"],
+    cuisine: "antillaise",
+    slot: "lunch",
+    fundamentals: ["marinade", "epices colombo", "mijotage progressif"],
+    baseIngredients: ["poulet", "oignon", "ail", "tomate", "citron", "thym"],
+  },
+  {
+    key: "blaff",
+    aliases: ["blaff", "blaff poisson", "blaff de poisson"],
+    cuisine: "antillaise",
+    slot: "dinner",
+    fundamentals: ["bouillon aromatique", "pochage doux", "finition citron"],
+    baseIngredients: ["poisson", "citron", "oignon", "tomate", "thym"],
+  },
+  {
+    key: "accras",
+    aliases: ["accras", "accras morue", "acras"],
+    cuisine: "antillaise",
+    slot: "snack",
+    fundamentals: ["morue dessalee", "pate epicee", "friture courte"],
+    baseIngredients: ["morue", "farine", "oignon", "ail", "levure chimique"],
+  },
+  {
+    key: "dombre",
+    aliases: ["dombre", "dombré", "dombre crevettes", "dombré crevettes"],
+    cuisine: "antillaise",
+    slot: "lunch",
+    fundamentals: ["pate farinee", "sauce mijotee", "cuisson des dombrés dans la sauce"],
+    baseIngredients: ["farine", "crevette", "oignon", "tomate", "ail"],
+  },
+  {
+    key: "court-bouillon",
+    aliases: ["court-bouillon", "court bouillon", "court-bouillon antillais"],
+    cuisine: "antillaise",
+    slot: "dinner",
+    fundamentals: ["base tomate aromatique", "poisson en fin de cuisson", "mijotage doux"],
+    baseIngredients: ["poisson", "tomate", "oignon", "ail", "citron"],
+  },
+  {
+    key: "gratin",
+    aliases: ["gratin", "gratin dauphinois", "gratin de legumes"],
+    cuisine: "francaise",
+    slot: "lunch",
+    fundamentals: ["base liee creme/lait", "cuisson au four", "surface gratinee"],
+    baseIngredients: ["farine", "lait", "fromage", "beurre", "oignon"],
+  },
+  {
+    key: "omelette",
+    aliases: ["omelette", "omelette fromage", "omelette legumes"],
+    cuisine: "francaise",
+    slot: "breakfast",
+    fundamentals: ["oeufs battus sans excès", "cuisson douce", "pliage en fin"],
+    baseIngredients: ["oeuf", "oignon", "fromage", "tomate"],
+  },
+  {
+    key: "quiche",
+    aliases: ["quiche", "quiche lorraine", "quiche legumes"],
+    cuisine: "francaise",
+    slot: "lunch",
+    fundamentals: ["appareil oeufs-creme", "fond de tarte", "cuisson four reguliere"],
+    baseIngredients: ["farine", "oeuf", "creme", "fromage", "oignon"],
+  },
+  {
+    key: "sauce-creme",
+    aliases: ["sauce creme", "sauce a la creme", "sauce creme fraiche"],
+    cuisine: "francaise",
+    slot: "lunch",
+    fundamentals: ["base aromatique douce", "liaison creme", "reduction controlee"],
+    baseIngredients: ["creme", "oignon", "ail", "beurre", "poivre"],
+  },
+  {
+    key: "tarte",
+    aliases: ["tarte", "tarte salee", "tarte aux legumes", "tarte tomate"],
+    cuisine: "francaise",
+    slot: "lunch",
+    fundamentals: ["fond de pate regulier", "garniture equilibree", "cuisson four stable"],
+    baseIngredients: ["farine", "beurre", "oeuf", "tomate", "oignon"],
+  },
+  {
+    key: "pizza",
+    aliases: ["pizza", "pizza maison", "margherita"],
+    cuisine: "monde",
+    slot: "dinner",
+    fundamentals: ["pate hydratee", "garniture dosee", "four tres chaud"],
+    baseIngredients: ["farine", "levure boulangere", "tomate", "fromage", "huile"],
+  },
+  {
+    key: "burger",
+    aliases: ["burger", "hamburger", "cheeseburger"],
+    cuisine: "monde",
+    slot: "lunch",
+    fundamentals: ["pain moelleux", "steak saisi", "montage minute"],
+    baseIngredients: ["farine", "levure boulangere", "boeuf", "fromage", "oignon"],
+  },
+  {
+    key: "pain-au-beurre",
+    aliases: ["pain au beurre", "pain-au-beurre", "pain beurre antillais"],
+    cuisine: "antillaise",
+    slot: "breakfast",
+    fundamentals: ["pate enrichie", "petrissage progressif", "levage puis cuisson doree"],
+    baseIngredients: ["farine", "beurre", "oeuf", "lait", "levure boulangere"],
+  },
+];
+
+const KNOWLEDGE_RECIPE_FALLBACKS = {
+  gratin: {
+    id: "classic-gratin-expert",
+    name: "Gratin cremeux maison",
+    cuisine: "francaise",
+    style: "classique",
+    difficulty: "Facile",
+    prepMinutes: 15,
+    cookMinutes: 35,
+    restMinutes: 8,
+    servings: 2,
+    ingredients: ["pomme de terre", "creme", "lait", "fromage", "beurre", "sel", "poivre"],
+    steps: [
+      "Prechauffer le four a 180C et beurrer un plat allant au four.",
+      "Emincer finement les pommes de terre pour une cuisson uniforme.",
+      "Melanger creme, lait, sel et poivre puis napper les couches de pommes de terre.",
+      "Ajouter le fromage sur le dessus et enfourner 35 minutes jusqu'a surface doree.",
+      "Laisser reposer 8 minutes avant de servir pour stabiliser la texture.",
+    ],
+    nutrition: { kcal: 560, protein: 18, carbs: 42, fat: 34 },
+  },
+  quiche: {
+    id: "classic-quiche-expert",
+    name: "Quiche maison facile",
+    cuisine: "francaise",
+    style: "bistrot",
+    difficulty: "Facile",
+    prepMinutes: 18,
+    cookMinutes: 30,
+    restMinutes: 8,
+    servings: 2,
+    ingredients: ["farine", "oeuf", "creme", "fromage", "oignon", "beurre", "sel", "poivre"],
+    steps: [
+      "Prechauffer le four a 180C et preparer un moule.",
+      "Foncer une pate dans le moule puis piquer le fond a la fourchette.",
+      "Faire revenir l'oignon 3 minutes a feu doux.",
+      "Battre oeufs et creme, ajouter fromage, oignon, sel et poivre.",
+      "Verser dans le moule et cuire 30 minutes jusqu'a coloration reguliere.",
+    ],
+    nutrition: { kcal: 590, protein: 24, carbs: 36, fat: 38 },
+  },
+  "sauce-creme": {
+    id: "classic-sauce-creme-expert",
+    name: "Sauce creme onctueuse",
+    cuisine: "francaise",
+    style: "classique",
+    difficulty: "Facile",
+    prepMinutes: 8,
+    cookMinutes: 12,
+    restMinutes: 0,
+    servings: 2,
+    ingredients: ["creme", "oignon", "ail", "beurre", "sel", "poivre"],
+    steps: [
+      "Faire fondre une noix de beurre puis suer oignon et ail 2 minutes a feu doux.",
+      "Ajouter la creme et melanger regulierement pour eviter que ca accroche.",
+      "Cuire a petits bouillons 6 a 8 minutes jusqu'a texture nappante.",
+      "Assaisonner en fin de cuisson et servir immediatement.",
+    ],
+    nutrition: { kcal: 320, protein: 4, carbs: 6, fat: 31 },
+  },
+  tarte: {
+    id: "classic-tarte-salee-expert",
+    name: "Tarte salee maison",
+    cuisine: "francaise",
+    style: "classique",
+    difficulty: "Facile",
+    prepMinutes: 20,
+    cookMinutes: 30,
+    restMinutes: 5,
+    servings: 2,
+    ingredients: ["farine", "beurre", "oeuf", "tomate", "oignon", "fromage", "sel", "poivre"],
+    steps: [
+      "Prechauffer le four a 180C et preparer un moule a tarte.",
+      "Etaler la pate, foncer le moule et piquer le fond.",
+      "Faire revenir l'oignon 3 minutes pour concentrer les saveurs.",
+      "Repartir tomate, oignon et fromage de facon homogene.",
+      "Cuire 30 minutes puis laisser reposer 5 minutes avant decoupe.",
+    ],
+    nutrition: { kcal: 520, protein: 18, carbs: 42, fat: 30 },
+  },
+  pizza: {
+    id: "classic-pizza-maison-expert",
+    name: "Pizza maison crousti-moelleuse",
+    cuisine: "monde",
+    style: "street-food",
+    difficulty: "Intermediaire",
+    prepMinutes: 20,
+    cookMinutes: 12,
+    restMinutes: 60,
+    servings: 2,
+    ingredients: ["farine", "levure boulangere", "eau", "tomate", "fromage", "huile", "sel"],
+    steps: [
+      "Petrir farine, eau, levure, huile et sel jusqu'a pate lisse.",
+      "Laisser lever 1 heure couvert pour obtenir une pate souple.",
+      "Etaler sans ecraser les bords, ajouter sauce tomate et fromage.",
+      "Cuire en four tres chaud 10 a 12 minutes.",
+      "Servir immediatement pour garder le contraste croustillant/moelleux.",
+    ],
+    nutrition: { kcal: 640, protein: 24, carbs: 72, fat: 26 },
+  },
+  burger: {
+    id: "classic-burger-maison-expert",
+    name: "Burger maison equilibre",
+    cuisine: "monde",
+    style: "street-food",
+    difficulty: "Facile",
+    prepMinutes: 18,
+    cookMinutes: 12,
+    restMinutes: 2,
+    servings: 2,
+    ingredients: ["pain burger", "boeuf", "fromage", "oignon", "tomate", "salade", "sel", "poivre"],
+    steps: [
+      "Former les steaks sans trop tasser pour conserver le moelleux.",
+      "Saisir les steaks 2 a 3 minutes par face selon cuisson souhaitee.",
+      "Toaster legerement les pains pour eviter qu'ils se ramollissent.",
+      "Monter burger avec fromage, legumes et assaisonnement juste avant service.",
+      "Servir chaud avec accompagnement leger.",
+    ],
+    nutrition: { kcal: 700, protein: 34, carbs: 45, fat: 40 },
+  },
+  "pain-au-beurre": {
+    id: "classic-pain-au-beurre-expert",
+    name: "Pain au beurre antillais",
+    cuisine: "antillaise",
+    style: "boulangerie",
+    difficulty: "Intermediaire",
+    prepMinutes: 25,
+    cookMinutes: 28,
+    restMinutes: 90,
+    servings: 2,
+    ingredients: ["farine", "beurre", "oeuf", "lait", "levure boulangere", "sucre", "sel"],
+    steps: [
+      "Petrir farine, levure, lait, oeuf, sucre et sel jusqu'a debut d'elasticite.",
+      "Incorporer le beurre mou progressivement puis petrir jusqu'a pate brillante.",
+      "Laisser lever 1 heure a temperature ambiante.",
+      "Faconner, dorer a l'oeuf et laisser pousser 30 minutes.",
+      "Cuire 25 a 28 minutes a 175C jusqu'a belle coloration doree.",
+    ],
+    nutrition: { kcal: 560, protein: 13, carbs: 62, fat: 28 },
+  },
+};
 
 function normalize(value) {
   return String(value || "")
@@ -47,6 +305,79 @@ function inferSlot(query) {
 function inferServings(query) {
   const match = String(query || "").match(/(\d+)\s*personne/i);
   return match ? Number(match[1]) : 2;
+}
+
+function findKnowledgeDish(query) {
+  const q = normalize(query);
+  return CULINARY_KNOWLEDGE.find((dish) => dish.aliases.some((alias) => q.includes(normalize(alias)))) || null;
+}
+
+function recipeMatchesDish(recipe, dish) {
+  if (!recipe || !dish) return false;
+  const haystack = [recipe.id, recipe.name]
+    .map((item) => normalize(item))
+    .join(" ");
+  return dish.aliases.some((alias) => haystack.includes(normalize(alias)));
+}
+
+function normalizeKnownRecipe(recipe, dish, servings) {
+  const safeRecipe = recipe || KNOWLEDGE_RECIPE_FALLBACKS[dish?.key];
+  if (!safeRecipe) return null;
+  return {
+    ...safeRecipe,
+    cuisine: safeRecipe.cuisine || dish?.cuisine || "all",
+    servings: Number(safeRecipe.servings || servings || 2),
+    matchReason: "Recette issue de la base culinaire experte.",
+    score: Number(safeRecipe.score || 95),
+    steps: Array.isArray(safeRecipe.steps) ? safeRecipe.steps : [],
+    ingredients: Array.isArray(safeRecipe.ingredients) ? safeRecipe.ingredients : [],
+    nutrition: safeRecipe.nutrition || { kcal: 500, protein: 20, carbs: 40, fat: 25 },
+  };
+}
+
+function findExpertRecipeForDish(dish, servings, userProfile) {
+  const fromCatalog = ALL_RECIPES.find((recipe) => {
+    return recipeMatchesDish(recipe, dish);
+  });
+
+  if (fromCatalog) {
+    return normalizeKnownRecipe({ ...fromCatalog, servings: fromCatalog.servings || servings }, dish, servings);
+  }
+
+  const fallback = normalizeKnownRecipe(null, dish, servings);
+  if (fallback) {
+    return fallback;
+  }
+
+  const generated = generateRecipeCandidates(dish.baseIngredients || [], {
+    cuisine: dish.cuisine || "all",
+    slot: dish.slot || "lunch",
+    servings,
+    mode: "chef",
+    limit: 10,
+  });
+
+  const curated = personalizeRecipes(generated, userProfile)
+    .sort((a, b) => {
+      const aHit = recipeMatchesDish(a, dish) ? 1 : 0;
+      const bHit = recipeMatchesDish(b, dish) ? 1 : 0;
+      if (aHit !== bHit) return bHit - aHit;
+      return (b.score || 0) - (a.score || 0);
+    });
+
+  const strictMatch = curated.find((recipe) => recipeMatchesDish(recipe, dish));
+  return normalizeKnownRecipe(strictMatch || null, dish, servings);
+}
+
+function buildPedagogicDishAnswer(recipe, dish, servings) {
+  const beginnerSteps = (recipe.steps || []).slice(0, 6).map((step, index) => `${index + 1}) ${step}`);
+  const fundamentals = (dish.fundamentals || []).slice(0, 3).join(" • ");
+  return [
+    `${recipe.name} (base experte ${dish.key}) pour ${servings} personne${servings > 1 ? "s" : ""}.`,
+    `Structure pro a respecter: ${fundamentals}.`,
+    "Plan debutant pas-a-pas:",
+    ...beginnerSteps,
+  ].join("\n");
 }
 
 function diversify(recipes) {
@@ -235,6 +566,12 @@ export function smartSearchRecipes(query) {
   const q = normalize(query);
   if (!q) return recommendRecipesFromIngredients(["oeuf", "tomate", "oignon", "poulet"], 20, { cuisine: "all" });
 
+  const askedDish = findKnowledgeDish(q);
+  if (askedDish) {
+    const expertRecipe = findExpertRecipeForDish(askedDish, inferServings(q), getUserProfile());
+    if (expertRecipe) return [expertRecipe];
+  }
+
   const generated = personalizeRecipes(diversify(
     generateRecipeCandidates(q.split(/\s+/).filter(Boolean), {
       cuisine: inferCuisine(q),
@@ -259,6 +596,23 @@ export async function askCookingAssistant(question, context = {}) {
   const lower = normalize(question);
   const ingredients = toIngredients(context.ingredients || []);
   const userProfile = normalizeUserProfile(context.userProfile || getUserProfile());
+  const servings = inferServings(lower);
+
+  const askedDish = findKnowledgeDish(lower);
+  if (askedDish) {
+    const expertRecipe = findExpertRecipeForDish(askedDish, servings, userProfile);
+    if (expertRecipe) {
+      return {
+        title: `Chef expert - ${expertRecipe.name}`,
+        answer: buildPedagogicDishAnswer(expertRecipe, askedDish, servings),
+        actions: ["Voir recette", "Version debutant", "Verifier cuisson"],
+        recipe: expertRecipe,
+        suggestions: {
+          fundamentals: askedDish.fundamentals || [],
+        },
+      };
+    }
+  }
 
   if (lower.includes("surprend") || lower.includes("surprise")) {
     const pick = personalizeRecipes([surpriseBalancedRecipe()], userProfile)[0];
@@ -276,7 +630,7 @@ export async function askCookingAssistant(question, context = {}) {
     cuisine,
     mode: "chef",
     slot,
-    servings: inferServings(lower),
+    servings,
     limit: 6,
   }), userProfile);
   const ranked = applyAdminControls(rankedBase, {
