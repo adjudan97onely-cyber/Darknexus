@@ -764,44 +764,55 @@ export { CUISINE_MODES, formatIngredientLine, scaleRecipeForServings };
 // ===== UTILISER LES 44 PLATS DE dishKnowledge.ts EN PRIORITÉ =====
 function recipesFromDishKnowledge(ingredientQuery, limit = 12, options = {}) {
   try {
+    // Vérifier que on a une requête valide
+    const query = Array.isArray(ingredientQuery) ? ingredientQuery.join(" ").trim() : String(ingredientQuery || "").trim();
+    if (!query) return null; // Pas de requête, fallback à generateRecipeCandidates
+    
     // Utiliser matchByIngredients pour trouver les plats pertinents
-    const matched = matchByIngredients(ingredientQuery.join(" ")) || [];
+    const matched = (matchByIngredients && typeof matchByIngredients === "function") 
+      ? (matchByIngredients(query) || []) 
+      : [];
+    
+    if (!Array.isArray(matched) || matched.length === 0) return null; // Pas de résultats
     
     // Filtrer par cuisine si spécifié
     let filtered = matched;
     if (options.cuisine && options.cuisine !== "all") {
-      filtered = matched.filter(dish => dish.cuisine === options.cuisine);
+      filtered = matched.filter(dish => dish && dish.cuisine === options.cuisine);
     }
     
     // Filtrer par slot si spécifié
     if (options.slot) {
-      filtered = filtered.filter(dish => dish.slot === options.slot);
+      filtered = filtered.filter(dish => dish && dish.slot === options.slot);
     }
     
     // Convertir DishProfile en EngineRecipe format
-    const recipes = filtered.slice(0, limit).map((dish, idx) => ({
-      id: dish.id,
-      name: dish.name,
-      desireName: dish.desireName || dish.name,
-      blueprintKey: dish.family,
-      cuisine: dish.cuisine,
-      slot: dish.slot,
-      difficulty: dish.difficulty,
-      minChefLevel: dish.minChefLevel,
-      family: dish.family,
-      cookingMethod: dish.technique,
-      servings: options.servings || 2,
-      timings: dish.timings,
-      ingredients: (dish.ingredients || []).map(ing => ing.name || ing),
-      baseIngredients: dish.baseIngredients || dish.baseFamilies,
-      steps: dish.steps || [],
-      profTips: dish.profTips || [],
-      mistakes: dish.mistakes || [],
-      signature: dish.signature || "",
-      category: dish.category || "plat",
-      dishProfile: dish,
-      rank: idx + 1,
-    }));
+    const recipes = filtered.slice(0, limit).map((dish, idx) => {
+      if (!dish || !dish.id) return null;
+      return {
+        id: dish.id,
+        name: dish.name || "",
+        desireName: dish.desireName || dish.name || "",
+        blueprintKey: dish.family || "plat",
+        cuisine: dish.cuisine || "all",
+        slot: dish.slot || "lunch",
+        difficulty: dish.difficulty || 2,
+        minChefLevel: dish.minChefLevel || 2,
+        family: dish.family || "plat",
+        cookingMethod: dish.technique || "braise",
+        servings: options.servings || 2,
+        timings: dish.timings || { prep: 15, cook: 30 },
+        ingredients: Array.isArray(dish.ingredients) ? dish.ingredients.map(ing => typeof ing === "string" ? ing : ing?.name || "") : [],
+        baseIngredients: dish.baseIngredients || dish.baseFamilies || [],
+        steps: Array.isArray(dish.steps) ? dish.steps : [],
+        profTips: Array.isArray(dish.profTips) ? dish.profTips : [],
+        mistakes: Array.isArray(dish.mistakes) ? dish.mistakes : [],
+        signature: dish.signature || "",
+        category: dish.category || "plat",
+        dishProfile: dish,
+        rank: idx + 1,
+      };
+    }).filter(Boolean);
     
     return recipes.length > 0 ? recipes : null; // null = fallback à generateRecipeCandidates
   } catch (e) {
