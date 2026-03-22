@@ -7,6 +7,7 @@
 export interface DishProfile {
   id: string;
   name: string;
+  desireName: string; // Nom appétissant qui donne envie
   aliases: string[]; // Variantes de nom
   cuisine: string;
   region?: string;
@@ -27,6 +28,13 @@ export interface DishProfile {
   signature: string; // L'âme du plat
   profTips: string[];
   mistakes: string[];
+  premiumTier: "signature" | "classique" | "essentiel";
+  plaisir: {
+    gourmandise: 1 | 2 | 3 | 4 | 5;
+    texture: 1 | 2 | 3 | 4 | 5;
+    visuel: 1 | 2 | 3 | 4 | 5;
+    arome: 1 | 2 | 3 | 4 | 5;
+  };
 }
 
 // ============================================
@@ -36,6 +44,7 @@ const ANTILLAIS: DishProfile[] = [
   {
     id: "bokit-classique",
     name: "Bokit traditionnel",
+    desireName: "Bokit doré croustillant, garni poulet épicé",
     aliases: ["bokit", "bokits"],
     cuisine: "antillaise",
     region: "Guadeloupe",
@@ -60,10 +69,13 @@ const ANTILLAIS: DishProfile[] = [
       "Pas de repos = poche mal gonflée",
       "Garnir AVANT = garniture degouline",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 4, texture: 5, visuel: 3, arome: 4 },
   },
   {
     id: "colombo-poulet",
     name: "Colombo de poulet",
+    desireName: "Colombo de poulet fondant aux épices créoles",
     aliases: ["colombo", "colombo poulet", "colombo de poulet antillais"],
     cuisine: "antillaise",
     region: "Guadeloupe",
@@ -88,10 +100,13 @@ const ANTILLAIS: DishProfile[] = [
       "Cuisson trop rapide = poulet sec",
       "Trop eau = sauce diluee, pas onctueuse",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 4, visuel: 4, arome: 5 },
   },
   {
     id: "blaff-poisson",
     name: "Blaff de poisson",
+    desireName: "Blaff de poisson frais, bouillon citronné parfumé",
     aliases: ["blaff", "blaff poisson"],
     cuisine: "antillaise",
     region: "Guadeloupe",
@@ -116,10 +131,13 @@ const ANTILLAIS: DishProfile[] = [
       "Poisson bouillie = chair cassante, seche",
       "Ajouter citron trop tot = perte acidite",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 4, texture: 3, visuel: 4, arome: 5 },
   },
   {
     id: "accras-morue",
     name: "Accras de morue",
+    desireName: "Accras dorés croustillants, cœur moelleux à la morue",
     aliases: ["accras", "acras", "accras morue"],
     cuisine: "antillaise",
     region: "Guadeloupe",
@@ -144,10 +162,13 @@ const ANTILLAIS: DishProfile[] = [
       "Pate trop epaisse = cuit pas au coeur",
       "Huile trop chaude = brule dehors, cru dedans",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 4, arome: 4 },
   },
   {
     id: "dombre-crevettes",
     name: "Dombré aux crevettes",
+    desireName: "Dombré fondants aux crevettes, sauce tomate épicée",
     aliases: ["dombre", "dombré", "dombrés aux crevettes"],
     cuisine: "antillaise",
     region: "Guadeloupe",
@@ -172,10 +193,13 @@ const ANTILLAIS: DishProfile[] = [
       "Sauce trop bouillon-e = plat sans corps",
       "Trop crevettes = deseq vers fruit de mer",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 4, texture: 4, visuel: 4, arome: 5 },
   },
   {
     id: "court-bouillon",
     name: "Court-bouillon antillais",
+    desireName: "Court-bouillon de poisson à la créole, sauce relevée",
     aliases: ["court-bouillon", "court bouillon"],
     cuisine: "antillaise",
     region: "Guadeloupe",
@@ -200,10 +224,13 @@ const ANTILLAIS: DishProfile[] = [
       "Poisson trop longtemps = flesh cassante",
       "Oignon pas fondu = texture croustillante desagreeable",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 3, visuel: 5, arome: 5 },
   },
   {
     id: "matoutou-crabes",
     name: "Matoutou crabe",
+    desireName: "Matoutou de crabe royal, riz parfumé aux épices",
     aliases: ["matoutou", "matoutou crabe", "crabes matoutou"],
     cuisine: "antillaise",
     region: "Guadeloupe",
@@ -228,6 +255,8 @@ const ANTILLAIS: DishProfile[] = [
       "Riz pas assez cuit = grain dur",
       "Trop epinard = gout amer domine",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 4, visuel: 5, arome: 5 },
   },
 ];
 
@@ -238,6 +267,7 @@ const FRANCAISE: DishProfile[] = [
   {
     id: "quiche-lorraine",
     name: "Quiche lorraine",
+    desireName: "Quiche lorraine crémeuse, lardons fumés dorés",
     aliases: ["quiche", "quiche lorraine"],
     cuisine: "francaise",
     region: "Lorraine",
@@ -262,10 +292,13 @@ const FRANCAISE: DishProfile[] = [
       "Lard brule = amertume",
       "Cuisson trop longue = creme seche et caoutchouteuse",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 4, texture: 4, visuel: 3, arome: 4 },
   },
   {
     id: "gratin-dauphinois",
     name: "Gratin dauphinois",
+    desireName: "Gratin dauphinois crémeux, croûte gratinée dorée",
     aliases: ["gratin", "gratin dauphinois", "gratin pommes de terre"],
     cuisine: "francaise",
     region: "Dauphiné",
@@ -290,10 +323,13 @@ const FRANCAISE: DishProfile[] = [
       "Sauce trop peu liquide = gratin sec",
       "Four trop chaud = surface brulee, dedans cru",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 5, texture: 4, visuel: 4, arome: 3 },
   },
   {
     id: "coq-au-vin",
     name: "Coq au vin",
+    desireName: "Coq au vin mijoté, sauce onctueuse au vin rouge",
     aliases: ["coq au vin", "poulet au vin rouge"],
     cuisine: "francaise",
     region: "Bourgogne",
@@ -318,10 +354,13 @@ const FRANCAISE: DishProfile[] = [
       "Poule pas bien saisie = pas couleur",
       "Vin reduit pas = sauce aqueuse et alcool trop fort",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 4, visuel: 5, arome: 5 },
   },
   {
     id: "beef-bourguignon",
     name: "Beef bourguignon",
+    desireName: "Bœuf bourguignon fondant, sauce au vin profonde",
     aliases: ["beef bourguignon", "boeuf bourguignon"],
     cuisine: "francaise",
     region: "Bourgogne",
@@ -346,10 +385,13 @@ const FRANCAISE: DishProfile[] = [
       "Pas bien saisir = pas croute saveur Maillard",
       "Cuisson trop rapide = boeuf dur",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 5, arome: 5 },
   },
   {
     id: "sole-meuniere",
     name: "Sole meunière",
+    desireName: "Sole meunière au beurre noisette, citron frais",
     aliases: ["sole meuniere", "sole a la meuniere"],
     cuisine: "francaise",
     region: "Classique",
@@ -374,10 +416,13 @@ const FRANCAISE: DishProfile[] = [
       "Beurre brule = amertume",
       "Trop cuire = chair seche et cassante",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 4, texture: 4, visuel: 5, arome: 4 },
   },
   {
     id: "sauce-creme-classique",
     name: "Sauce crème classique",
+    desireName: "Sauce crème onctueuse aux herbes",
     aliases: ["sauce creme", "sauce creme fraiche", "sauce a la creme"],
     cuisine: "francaise",
     region: "Classique",
@@ -402,10 +447,13 @@ const FRANCAISE: DishProfile[] = [
       "Creme bouille = sauce splits et granuleuse",
       "Pas assez reduction = sauce trop liquide",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 3, texture: 3, visuel: 2, arome: 3 },
   },
   {
     id: "tarte-salee",
     name: "Tarte salée maison",
+    desireName: "Tarte salée rustique aux légumes de saison",
     aliases: ["tarte", "tarte salee", "tarte legumes"],
     cuisine: "francaise",
     region: "Classique",
@@ -430,10 +478,13 @@ const FRANCAISE: DishProfile[] = [
       "Garniture trop serrée = pas cuire",
       "Trop tomate = sauce imbibe pate",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 3, texture: 4, visuel: 3, arome: 3 },
   },
   {
     id: "pain-au-beurre",
     name: "Pain au beurre français",
+    desireName: "Pain brioché au beurre doré, mie fondante",
     aliases: ["pain au beurre", "pain-au-beurre"],
     cuisine: "francaise",
     region: "Boulangerie",
@@ -458,10 +509,13 @@ const FRANCAISE: DishProfile[] = [
       "Levage insuff = pain compact",
       "Cuisson trop rapide = croute dure, dedans pas cuit",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 4, texture: 5, visuel: 3, arome: 4 },
   },
   {
     id: "omelette-persil",
     name: "Omelette persil",
+    desireName: "Omelette baveuse au persil frais, beurre mousseux",
     aliases: ["omelette", "omelette persil"],
     cuisine: "francaise",
     region: "Classique",
@@ -486,6 +540,8 @@ const FRANCAISE: DishProfile[] = [
       "Beurre cuit/noir = amertume",
       "Omelette trop cuite = caoutchouteuse",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 3, texture: 4, visuel: 2, arome: 3 },
   },
 ];
 
@@ -496,6 +552,7 @@ const MONDIAUX: DishProfile[] = [
   {
     id: "pizza-margherita",
     name: "Pizza margherita",
+    desireName: "Pizza margherita croustillante, mozzarella filante",
     aliases: ["pizza", "pizza margherita", "pizza classique"],
     cuisine: "italienne",
     region: "Napoli",
@@ -520,10 +577,13 @@ const MONDIAUX: DishProfile[] = [
       "Levage insuff = pizza dense",
       "Four pas chaud = pizza caoutchouc",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 4, arome: 4 },
   },
   {
     id: "burger-classique",
     name: "Burger maison",
+    desireName: "Burger smashé juteux, fromage fondant, bun toasté",
     aliases: ["burger", "hamburger", "cheeseburger"],
     cuisine: "americaine",
     region: "USA",
@@ -548,10 +608,13 @@ const MONDIAUX: DishProfile[] = [
       "Steak trop longtemps = viande seche",
       "Montage d'avance = pain degoute",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 4, arome: 4 },
   },
   {
     id: "curry-poulet",
     name: "Curry de poulet",
+    desireName: "Curry de poulet onctueux au lait de coco & épices",
     aliases: ["curry", "curry poulet", "curry de poulet"],
     cuisine: "indienne",
     region: "Inde",
@@ -576,10 +639,13 @@ const MONDIAUX: DishProfile[] = [
       "Poudre pas toastee = gout cru",
       "Trop rapide = poulet sec et sauce liquide",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 5, texture: 4, visuel: 4, arome: 5 },
   },
   {
     id: "pad-thai",
     name: "Pad thai",
+    desireName: "Pad thaï aux crevettes, cacahuètes & citron vert",
     aliases: ["pad thai", "nouilles thai"],
     cuisine: "thaï",
     region: "Thaïlande",
@@ -604,10 +670,13 @@ const MONDIAUX: DishProfile[] = [
       "Mouvement insuff = cuisson inegale",
       "Sauce trop epaisse au debut = colles",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 4, visuel: 5, arome: 5 },
   },
   {
     id: "bouillabaisse",
     name: "Bouillabaisse",
+    desireName: "Bouillabaisse marseillaise, rouille safranée & croûtons",
     aliases: ["bouillabaisse", "soupe poisson"],
     cuisine: "francaise",
     region: "Provence",
@@ -632,6 +701,8 @@ const MONDIAUX: DishProfile[] = [
       "Poisson trop longtemps = chair cassante seche",
       "Safran insuffisant = perte couleur & saveur",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 4, visuel: 5, arome: 5 },
   },
 ];
 
@@ -642,6 +713,7 @@ const PROTEINES: DishProfile[] = [
   {
     id: "poulet-grille",
     name: "Poulet grillé épicé",
+    desireName: "Poulet grillé croustillant aux épices, jus doré",
     aliases: ["poulet grille", "poulet grillé", "grilled chicken"],
     cuisine: "mondiale",
     region: "International",
@@ -666,10 +738,13 @@ const PROTEINES: DishProfile[] = [
       "Trop manipuler = pas de croûte",
       "Couper direct = jus perdu",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 4, texture: 5, visuel: 4, arome: 4 },
   },
   {
     id: "steak-minute",
     name: "Steak minute",
+    desireName: "Steak saisi à la perfection, beurre d\u0027herbes fondant",
     aliases: ["steak", "steak minute", "bavette"],
     cuisine: "francaise",
     region: "Classique",
@@ -694,10 +769,13 @@ const PROTEINES: DishProfile[] = [
       "Feu trop bas = viande bouillie grise",
       "Pas de repos = jus dans assiette pas dans viande",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 4, arome: 4 },
   },
   {
     id: "saumon-poele",
     name: "Saumon poêlé",
+    desireName: "Pavé de saumon peau croustillante, beurre citronné",
     aliases: ["saumon", "saumon poele", "pavé de saumon"],
     cuisine: "mondiale",
     region: "International",
@@ -722,10 +800,13 @@ const PROTEINES: DishProfile[] = [
       "Trop cuit = sec et farineux",
       "Poêle pas chaude = peau colle",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 5, arome: 4 },
   },
   {
     id: "oeufs-brouilles-proteines",
     name: "Oeufs brouillés protéinés",
+    desireName: "Œufs brouillés crémeux, ciboulette fraîche",
     aliases: ["oeufs brouilles", "scrambled eggs", "oeufs proteines"],
     cuisine: "mondiale",
     region: "International",
@@ -750,10 +831,13 @@ const PROTEINES: DishProfile[] = [
       "Pas remuer = bloc compact",
       "Trop cuire = secs et granuleux",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 3, texture: 4, visuel: 2, arome: 3 },
   },
   {
     id: "bowl-quinoa-poulet",
     name: "Bowl quinoa poulet",
+    desireName: "Bowl protéiné quinoa, poulet grillé & avocat",
     aliases: ["bowl", "buddha bowl", "bowl quinoa", "bowl proteine"],
     cuisine: "mondiale",
     region: "International",
@@ -778,6 +862,8 @@ const PROTEINES: DishProfile[] = [
       "Poulet émincé trop fin = sec",
       "Trop de sauce = plat noyé",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 4, texture: 3, visuel: 5, arome: 3 },
   },
 ];
 
@@ -788,6 +874,7 @@ const BUDGET: DishProfile[] = [
   {
     id: "pates-aglio-olio",
     name: "Pâtes aglio e olio",
+    desireName: "Spaghetti à l\u0027ail doré, huile d\u0027olive & piment",
     aliases: ["pates", "pates ail", "aglio olio", "spaghetti ail"],
     cuisine: "italienne",
     region: "Napoli",
@@ -812,10 +899,13 @@ const BUDGET: DishProfile[] = [
       "Pas d'eau de cuisson = sec",
       "Pâtes trop cuites = pâteux",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 4, texture: 3, visuel: 3, arome: 5 },
   },
   {
     id: "riz-saute-legumes",
     name: "Riz sauté aux légumes",
+    desireName: "Riz sauté au wok, légumes croquants & sauce soja",
     aliases: ["riz saute", "riz sauté", "fried rice"],
     cuisine: "asiatique",
     region: "Asie",
@@ -840,10 +930,13 @@ const BUDGET: DishProfile[] = [
       "Feu bas = riz mou, pas grillé",
       "Trop de sauce = riz trempé salé",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 3, texture: 4, visuel: 3, arome: 3 },
   },
   {
     id: "soupe-legumes",
     name: "Soupe de légumes maison",
+    desireName: "Velouté de légumes de saison, touche de crème",
     aliases: ["soupe", "soupe legumes", "veloute"],
     cuisine: "francaise",
     region: "Classique",
@@ -868,10 +961,13 @@ const BUDGET: DishProfile[] = [
       "Trop eau = soupe diluée sans goût",
       "Saler au début = trop salé à la fin (concentration)",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 3, texture: 3, visuel: 2, arome: 3 },
   },
   {
     id: "crepes-garnies",
     name: "Crêpes garnies",
+    desireName: "Crêpes fines & moelleuses, garniture gourmande",
     aliases: ["crepes", "crêpes", "galettes"],
     cuisine: "francaise",
     region: "Bretagne",
@@ -896,10 +992,13 @@ const BUDGET: DishProfile[] = [
       "Feu trop fort = crêpes brûlées dehors, crues dedans",
       "Trop de pâte = crêpes épaisses",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 4, texture: 4, visuel: 3, arome: 3 },
   },
   {
     id: "lentilles-curry",
     name: "Dhal de lentilles",
+    desireName: "Dhal onctueux au curcuma doré, naan chaud",
     aliases: ["dhal", "lentilles", "lentilles curry", "dal"],
     cuisine: "indienne",
     region: "Inde",
@@ -924,6 +1023,8 @@ const BUDGET: DishProfile[] = [
       "Feu trop fort = accroche au fond",
       "Pas assez d'eau = purée sèche",
     ],
+    premiumTier: "classique",
+    plaisir: { gourmandise: 4, texture: 4, visuel: 4, arome: 5 },
   },
 ];
 
@@ -934,6 +1035,7 @@ const GASTRONOMIQUES: DishProfile[] = [
   {
     id: "filet-mignon-sauce",
     name: "Filet mignon en croûte",
+    desireName: "Filet mignon en croûte dorée, duxelles de champignons",
     aliases: ["filet mignon", "filet mignon en croute", "wellington"],
     cuisine: "francaise",
     region: "Gastronomique",
@@ -958,10 +1060,13 @@ const GASTRONOMIQUES: DishProfile[] = [
       "Pas saisir avant = viande grise sans saveur",
       "Trop cuire = viande sèche, pas de rosé",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 5, arome: 5 },
   },
   {
     id: "risotto-champignons",
     name: "Risotto aux champignons",
+    desireName: "Risotto crémeux aux champignons, copeaux de parmesan",
     aliases: ["risotto", "risotto champignons", "risotto porcini"],
     cuisine: "italienne",
     region: "Lombardie",
@@ -986,10 +1091,13 @@ const GASTRONOMIQUES: DishProfile[] = [
       "Pas remuer = riz collé au fond",
       "Oublier mantecatura = risotto sec",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 5, arome: 5 },
   },
   {
     id: "tartare-boeuf",
     name: "Tartare de boeuf",
+    desireName: "Tartare de bœuf au couteau, jaune d\u0027œuf coulant",
     aliases: ["tartare", "tartare boeuf", "steak tartare"],
     cuisine: "francaise",
     region: "Gastronomique",
@@ -1014,10 +1122,13 @@ const GASTRONOMIQUES: DishProfile[] = [
       "Hachoir = purée de viande, pas de texture",
       "Assaisonner à l'avance = viande cuit dans acide",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 4, visuel: 5, arome: 4 },
   },
   {
     id: "tatin-tarte",
     name: "Tarte tatin",
+    desireName: "Tarte tatin caramélisée, pommes fondantes dorées",
     aliases: ["tatin", "tarte tatin", "tarte renversee"],
     cuisine: "francaise",
     region: "Sologne",
@@ -1042,6 +1153,8 @@ const GASTRONOMIQUES: DishProfile[] = [
       "Pommes pas assez serrées = tarte creuse",
       "Attendre pour retourner = colle au moule",
     ],
+    premiumTier: "signature",
+    plaisir: { gourmandise: 5, texture: 5, visuel: 5, arome: 5 },
   },
 ];
 
@@ -1052,6 +1165,7 @@ const RAPIDES: DishProfile[] = [
   {
     id: "tartine-avocat",
     name: "Tartine avocat-oeuf",
+    desireName: "Tartine croquante avocat crémeux & œuf coulant",
     aliases: ["tartine avocat", "avocado toast", "toast avocat"],
     cuisine: "mondiale",
     region: "International",
@@ -1076,10 +1190,13 @@ const RAPIDES: DishProfile[] = [
       "Pain pas toasté = s'imbibe et se ramollit",
       "Écraser trop = purée, garder des morceaux",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 4, texture: 4, visuel: 5, arome: 3 },
   },
   {
     id: "wrap-poulet",
     name: "Wrap poulet crudités",
+    desireName: "Wrap croustillant poulet grillé & crudités fraîches",
     aliases: ["wrap", "wrap poulet", "tortilla poulet"],
     cuisine: "mondiale",
     region: "International",
@@ -1104,10 +1221,13 @@ const RAPIDES: DishProfile[] = [
       "Trop garnir = impossible à rouler",
       "Tortilla froide = se casse en pliant",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 3, texture: 4, visuel: 3, arome: 3 },
   },
   {
     id: "salade-composee",
     name: "Salade composée complète",
+    desireName: "Salade fraîche poulet grillé, vinaigrette citron maison",
     aliases: ["salade", "salade composee", "salade complete"],
     cuisine: "francaise",
     region: "Classique",
@@ -1132,6 +1252,8 @@ const RAPIDES: DishProfile[] = [
       "Oeuf trop cuit = jaune verdâtre sec",
       "Ingrédients pas frais = goût plat",
     ],
+    premiumTier: "essentiel",
+    plaisir: { gourmandise: 3, texture: 3, visuel: 4, arome: 3 },
   },
 ];
 

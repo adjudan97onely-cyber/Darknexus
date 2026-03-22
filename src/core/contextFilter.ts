@@ -114,9 +114,9 @@ function shuffleTiedScores(arr: FilteredDish[]): void {
 }
 
 /**
- * Diversifie les résultats: max 1 plat par famille culinaire
- * pour éviter "3 plats en sauce" ou "3 fritures".
- * Si preferredCuisine est set, relâche la limite par cuisine pour cette cuisine.
+ * Mix intelligent des résultats: assure une diversité de niveaux premium.
+ * Cible optimale par set de 5: 1 essentiel + 2 classiques + 1 signature + 1 meilleur score
+ * Diversifie aussi par famille et cuisine.
  */
 function diversifyResults(
   sorted: FilteredDish[],
@@ -126,38 +126,57 @@ function diversifyResults(
   const result: FilteredDish[] = [];
   const usedFamilies = new Set<string>();
   const cuisineCount = new Map<string, number>();
-  const MAX_PER_CUISINE = preferredCuisine ? 99 : 2; // pas de limite si cuisine demandée
-  const MAX_OTHER_CUISINE = 2; // limite pour les autres cuisines
+  const MAX_PER_CUISINE = preferredCuisine ? 99 : 2;
+  const MAX_OTHER_CUISINE = 2;
 
-  // Premier pass: 1 plat par famille, max par cuisine
-  for (const item of sorted) {
-    if (result.length >= maxResults) break;
+  // Séparer par premiumTier
+  const signatures = sorted.filter((d) => d.dish.premiumTier === "signature");
+  const classiques = sorted.filter((d) => d.dish.premiumTier === "classique");
+  const essentiels = sorted.filter((d) => d.dish.premiumTier === "essentiel");
+
+  const canAdd = (item: FilteredDish): boolean => {
     const family = item.dish.family;
     const cuisine = item.dish.cuisine;
     const count = cuisineCount.get(cuisine) || 0;
     const limit = (preferredCuisine && cuisine.toLowerCase() === preferredCuisine.toLowerCase())
       ? MAX_PER_CUISINE : MAX_OTHER_CUISINE;
+    return !usedFamilies.has(family) && count < limit;
+  };
 
-    if (!usedFamilies.has(family) && count < limit) {
-      result.push(item);
-      usedFamilies.add(family);
-      cuisineCount.set(cuisine, count + 1);
-    }
+  const add = (item: FilteredDish): boolean => {
+    if (!canAdd(item)) return false;
+    result.push(item);
+    usedFamilies.add(item.dish.family);
+    cuisineCount.set(item.dish.cuisine, (cuisineCount.get(item.dish.cuisine) || 0) + 1);
+    return true;
+  };
+
+  // 1. Garantir au moins 1 signature (WOW) si possible
+  for (const s of signatures) {
+    if (result.length >= 1) break;
+    add(s);
   }
 
-  // 2e pass: si pas assez, relâcher contrainte cuisine (mais garder famille unique)
-  if (result.length < maxResults) {
-    for (const item of sorted) {
-      if (result.length >= maxResults) break;
-      if (result.includes(item)) continue;
-      if (!usedFamilies.has(item.dish.family)) {
-        result.push(item);
-        usedFamilies.add(item.dish.family);
-      }
-    }
+  // 2. Ajouter 1 essentiel (simple)
+  for (const e of essentiels) {
+    if (result.filter((r) => r.dish.premiumTier === "essentiel").length >= 1) break;
+    add(e);
   }
 
-  // 3e pass: si TOUJOURS pas assez, autoriser famille dupliquée
+  // 3. Remplir avec classiques (équilibré)
+  for (const c of classiques) {
+    if (result.length >= maxResults - 1) break;
+    add(c);
+  }
+
+  // 4. Compléter avec les meilleurs scores restants (mix libre)
+  for (const item of sorted) {
+    if (result.length >= maxResults) break;
+    if (result.includes(item)) continue;
+    add(item);
+  }
+
+  // 5. Si pas assez, relâcher contrainte famille
   if (result.length < maxResults) {
     for (const item of sorted) {
       if (result.length >= maxResults) break;
@@ -166,6 +185,9 @@ function diversifyResults(
       }
     }
   }
+
+  // Re-trier par score pour affichage cohérent
+  result.sort((a, b) => b.score.total - a.score.total);
 
   return result;
 }
@@ -185,6 +207,8 @@ export function buildValidationMeta(
   timeLabel: string;
   budgetLabel: string;
   scoreDisplay: string;
+  plaisirLabel: string;
+  premiumLabel: string;
 } {
   const estimates = getDishEstimates(dish);
 
@@ -223,12 +247,24 @@ export function buildValidationMeta(
         ? `${estimates.totalTime} min`
         : `${estimates.totalTime} min 🕐`;
 
+  const p = dish.plaisir;
+  const plaisirAvg = (p.gourmandise + p.texture + p.visuel + p.arome) / 4;
+  const plaisirLabel = plaisirAvg >= 4.5 ? "🔥 Irrésistible" : plaisirAvg >= 3.5 ? "✨ Appétissant" : plaisirAvg >= 2.5 ? "👍 Correct" : "📋 Basique";
+
+  const premiumLabels: Record<string, string> = {
+    signature: "⭐ Signature",
+    classique: "🍽️ Classique",
+    essentiel: "📌 Essentiel",
+  };
+
   return {
     whyMatch: whyParts.join(" — "),
     coherenceLabel: coherenceLabels[intent.goal] || "Polyvalent",
     nutritionLabel: `Protéines: ${proteinLabels[estimates.proteinLevel - 1]}`,
     timeLabel: timeStr,
     budgetLabel: budgetLabels[estimates.budgetLevel - 1],
-    scoreDisplay: `${score.total}/100`,
+    scoreDisplay: `${score.total}/120`,
+    plaisirLabel,
+    premiumLabel: premiumLabels[dish.premiumTier] || dish.premiumTier,
   };
 }

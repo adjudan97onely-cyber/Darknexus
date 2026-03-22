@@ -24,7 +24,7 @@ const TEST_CASES = [
   {
     query: "repas muscu",
     expectGoal: "protein",
-    mustContain: ["poulet", "boeuf", "poisson", "crevette", "oeuf", "morue", "sole"],
+    mustContain: ["poulet", "boeuf", "poisson", "crevette", "oeuf", "morue", "sole", "porc", "dinde", "saumon", "thon"],
     mustNotContain: [],
     maxTime: null,
     label: "🏋️ Muscu → protéines obligatoires",

@@ -61,6 +61,13 @@ function estimateTotalTime(dish: DishProfile): number {
   return dish.timings.prep + dish.timings.cook + (dish.timings.rest || 0);
 }
 
+/** Score plaisir 0-20 basé sur les 4 axes du plat */
+function calculatePlaisirScore(dish: DishProfile): number {
+  const p = dish.plaisir;
+  const raw = (p.gourmandise + p.texture + p.visuel + p.arome) / 20; // 0-1
+  return Math.round(raw * 20);
+}
+
 // ==========================================
 // SCORING CONTEXTUEL
 // ==========================================
@@ -71,6 +78,7 @@ export interface ContextScore {
   timeScore: number; // 0-20 — Respect contrainte temps
   budgetScore: number; // 0-20 — Respect contrainte budget
   nutritionScore: number; // 0-20 — Respect contrainte nutrition
+  plaisirScore: number; // 0-20 — Score plaisir (gourmandise, texture, visuel, arome)
   rejected: boolean;
   rejectReason?: string;
   explanation: string;
@@ -88,6 +96,7 @@ export function scoreDish(dish: DishProfile, intent: ParsedIntent): ContextScore
   const budgetLevel = estimateBudgetLevel(dish);
   const proteinLevel = estimateProteinLevel(dish);
   const visualImpact = estimateVisualImpact(dish);
+  const plaisirScore = calculatePlaisirScore(dish);
 
   let intentCoherence = 0;
   let timeScore = 0;
@@ -230,7 +239,7 @@ export function scoreDish(dish: DishProfile, intent: ParsedIntent): ContextScore
     }
   }
 
-  const total = intentCoherence + timeScore + budgetScore + nutritionScore;
+  const total = intentCoherence + timeScore + budgetScore + nutritionScore + plaisirScore;
   const rejected = rejectReason != null || total < REJECTION_THRESHOLD;
 
   return {
@@ -239,6 +248,7 @@ export function scoreDish(dish: DishProfile, intent: ParsedIntent): ContextScore
     timeScore,
     budgetScore,
     nutritionScore,
+    plaisirScore,
     rejected,
     rejectReason: rejected ? rejectReason || `Score ${total} < seuil ${REJECTION_THRESHOLD}` : undefined,
     explanation: buildExplanation(dish, intent, {
@@ -247,6 +257,7 @@ export function scoreDish(dish: DishProfile, intent: ParsedIntent): ContextScore
       timeScore,
       budgetScore,
       nutritionScore,
+      plaisirScore,
       totalTime,
       budgetLevel,
       proteinLevel,
@@ -264,6 +275,7 @@ function buildExplanation(
     timeScore: number;
     budgetScore: number;
     nutritionScore: number;
+    plaisirScore: number;
     totalTime: number;
     budgetLevel: number;
     proteinLevel: number;
@@ -272,7 +284,7 @@ function buildExplanation(
 ): string {
   const parts: string[] = [];
 
-  parts.push(`${dish.name} → score ${scores.total}/100 pour "${intent.goal}"`);
+  parts.push(`${dish.desireName} → score ${scores.total}/120 pour "${intent.goal}"`);
 
   if (intent.goal === "speed") {
     parts.push(`Temps: ${scores.totalTime} min (${intent.constraints.maxTotalMinutes ? `max ${intent.constraints.maxTotalMinutes}` : "sans limite"})`);
@@ -287,6 +299,10 @@ function buildExplanation(
     parts.push(`Impact visuel: ${scores.visualImpact}/3`);
   }
 
+  const p = dish.plaisir;
+  const plaisirLabel = p.gourmandise >= 4 && p.visuel >= 4 ? "🔥 Premium" : p.gourmandise >= 3 ? "✨ Appétissant" : "📋 Classique";
+  parts.push(`Plaisir: ${scores.plaisirScore}/20 ${plaisirLabel}`);
+
   return parts.join(" | ");
 }
 
@@ -299,5 +315,7 @@ export function getDishEstimates(dish: DishProfile) {
     budgetLevel: estimateBudgetLevel(dish),
     proteinLevel: estimateProteinLevel(dish),
     visualImpact: estimateVisualImpact(dish),
+    plaisirScore: calculatePlaisirScore(dish),
+    premiumTier: dish.premiumTier,
   };
 }

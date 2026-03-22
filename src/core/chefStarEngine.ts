@@ -52,6 +52,8 @@ export interface ContextValidation {
   budgetLabel: string;
   scoreDisplay: string;
   intentSummary: string;
+  plaisirLabel: string;
+  premiumLabel: string;
 }
 
 interface AdaptedDish extends EngineRecipe {

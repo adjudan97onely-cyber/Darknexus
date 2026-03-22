@@ -393,18 +393,22 @@ function buildPedagogicDishAnswer(recipe, dish, servings) {
 
 function buildChefStarAnswer(recipe) {
   const ctx = recipe.contextValidation;
+  const displayName = recipe.dishProfile?.desireName || recipe.name;
+  const premiumBadge = ctx?.premiumLabel || "";
+  const plaisirBadge = ctx?.plaisirLabel || "";
+
   const intentBlock = ctx
     ? [
         `📊 Analyse d'intention: ${ctx.intentSummary}`,
         `✅ Pourquoi ce plat: ${ctx.whyMatch}`,
-        `📈 Score cohérence: ${ctx.scoreDisplay} | ${ctx.coherenceLabel}`,
-        `🕐 ${ctx.timeLabel} | 💰 ${ctx.budgetLabel} | 🥩 ${ctx.nutritionLabel}`,
+        `📈 Score: ${ctx.scoreDisplay} | ${ctx.coherenceLabel} | ${plaisirBadge}`,
+        `🕐 ${ctx.timeLabel} | 💰 ${ctx.budgetLabel} | 🥩 ${ctx.nutritionLabel} | ${premiumBadge}`,
         ``,
       ]
     : [];
 
   return [
-    `✦ ${recipe.name} (${recipe.portionRatio || 1}x portions)`,
+    `✦ ${displayName} ${premiumBadge}`,
     ``,
     ...intentBlock,
     `Signature culinaire: ${recipe.signature || ""}`,
@@ -661,8 +665,9 @@ export async function askCookingAssistant(question, context = {}) {
       // Le moteur retourne déjà trié par context score — prendre le #1
       const topRecipe = chefStarDishes[0];
       const ctx = topRecipe.contextValidation;
+      const displayName = topRecipe.dishProfile?.desireName || topRecipe.name;
       return {
-        title: `CHEF ÉTOILÉ - ${topRecipe.name}`,
+        title: `CHEF ÉTOILÉ - ${displayName}`,
         answer: buildChefStarAnswer(topRecipe),
         actions: [
           "Voir recette complète",
@@ -671,9 +676,11 @@ export async function askCookingAssistant(question, context = {}) {
         ],
         recipe: topRecipe,
         alternatives: chefStarDishes.slice(1).map((r) => ({
-          name: r.name,
+          name: r.dishProfile?.desireName || r.name,
           score: r.contextValidation?.contextScore?.total || r.score,
           whyMatch: r.contextValidation?.whyMatch || "",
+          premiumLabel: r.contextValidation?.premiumLabel || "",
+          plaisirLabel: r.contextValidation?.plaisirLabel || "",
         })),
         contextValidation: ctx
           ? {
