@@ -34,6 +34,7 @@ export interface IntentConstraints {
   maxDifficulty?: number;
   preferredFamilies?: string[]; // familles d'ingrédients à favoriser
   excludedFamilies?: string[]; // familles d'ingrédients à éviter
+  preferredCuisine?: string; // cuisine spécifique demandée
 }
 
 // ==========================================
@@ -234,7 +235,37 @@ export function parseIntent(query: string): ParsedIntent {
     }
   }
 
+  // Détection de cuisine spécifique (antillaise, indienne, etc.)
+  const CUISINE_MAP: Record<string, string> = {
+    "antillais": "antillaise", "antillaise": "antillaise", "antilles": "antillaise",
+    "creole": "antillaise", "créole": "antillaise", "guadeloupe": "antillaise",
+    "martinique": "antillaise",
+    "italien": "italienne", "italienne": "italienne", "italie": "italienne", "pasta": "italienne",
+    "indien": "indienne", "indienne": "indienne", "inde": "indienne",
+    "asiatique": "asiatique", "asie": "asiatique", "thai": "asiatique", "wok": "asiatique",
+    "americain": "americaine", "americaine": "americaine", "burger": "americaine",
+    "francais": "francaise", "francaise": "francaise", "france": "francaise", "bistrot": "francaise",
+  };
+  let detectedCuisine: string | undefined;
+  for (const [keyword, cuisine] of Object.entries(CUISINE_MAP)) {
+    if (q.includes(norm(keyword))) {
+      detectedCuisine = cuisine;
+      break;
+    }
+  }
+
   if (!bestMatch) {
+    // Si cuisine détectée sans autre intention, mode discovery avec cuisine
+    if (detectedCuisine) {
+      return {
+        goal: "discovery",
+        confidence: 0.7,
+        constraints: { preferredCuisine: detectedCuisine, minVisualImpact: 1 },
+        rawQuery: query,
+        matchedKeywords: [detectedCuisine],
+        explanation: `Cuisine ${detectedCuisine} demandée`,
+      };
+    }
     return {
       goal: "general",
       confidence: 0.3,
@@ -257,6 +288,11 @@ export function parseIntent(query: string): ParsedIntent {
   if (budgetMatch) {
     const amount = parseInt(budgetMatch[1], 10);
     constraints.maxBudgetLevel = amount <= 3 ? 1 : amount <= 8 ? 2 : 3;
+  }
+
+  // Ajouter cuisine détectée même quand un autre intent est déjà matché
+  if (detectedCuisine) {
+    constraints.preferredCuisine = detectedCuisine;
   }
 
   const confidence = Math.min(1, bestMatch.score / 8);

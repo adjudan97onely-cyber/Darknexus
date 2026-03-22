@@ -13,8 +13,8 @@ import { ParsedIntent, IntentGoal } from "./intentParser";
 
 /** Coût estimé 1-3 basé sur les ingredients */
 function estimateBudgetLevel(dish: DishProfile): 1 | 2 | 3 {
-  const expensive = ["boeuf", "crabe", "crustace", "sole", "safran", "vin-rouge", "champignon"];
-  const cheap = ["farine", "oeuf", "oignon", "tomate", "riz", "pomme-terre", "levure", "ail"];
+  const expensive = ["boeuf", "crabe", "crustace", "sole", "safran", "vin-rouge", "champignon", "crevette", "poisson-blanc", "poisson", "saumon", "langouste", "homard", "riz-arborio", "pate-feuilletee"];
+  const cheap = ["farine", "oeuf", "oignon", "tomate", "riz", "pomme-terre", "levure", "ail", "pates", "lentilles", "carotte", "pain", "tortilla", "salade", "poireau"];
 
   let expensiveCount = 0;
   let cheapCount = 0;
@@ -26,20 +26,22 @@ function estimateBudgetLevel(dish: DishProfile): 1 | 2 | 3 {
   }
 
   if (expensiveCount >= 2) return 3;
-  if (expensiveCount >= 1 && cheapCount < 2) return 2;
+  if (expensiveCount >= 1) return 2;
   return 1;
 }
 
-/** Niveau protéine estimé 1-3 basé sur les ingredients */
+/** Niveau protéine estimé 1-3 basé sur les ingredients + famille du plat */
 function estimateProteinLevel(dish: DishProfile): 1 | 2 | 3 {
-  const highProtein = ["poulet", "boeuf", "poisson", "crevette", "crabe", "morue", "sole", "tofu", "oeuf"];
-  const medProtein = ["fromage", "creme", "lait", "quinoa"];
+  const highProtein = ["poulet", "boeuf", "poisson", "crevette", "crabe", "morue", "sole", "tofu", "oeuf", "saumon", "thon", "porc", "dinde"];
+  const medProtein = ["fromage", "creme", "lait", "quinoa", "lentilles"];
+  const proteinFamilies = ["viande-grillee", "viande-noble", "viande-crue", "poisson-grille", "bowl-complet", "oeuf"];
 
   const families = dish.baseFamilies.map((f) => f.toLowerCase());
   const highCount = families.filter((f) => highProtein.some((hp) => f.includes(hp))).length;
   const medCount = families.filter((f) => medProtein.some((mp) => f.includes(mp))).length;
+  const isProteinFamily = proteinFamilies.includes(dish.family);
 
-  if (highCount >= 2) return 3;
+  if (highCount >= 2 || (highCount >= 1 && isProteinFamily)) return 3;
   if (highCount >= 1 || medCount >= 2) return 2;
   return 1;
 }
@@ -123,10 +125,15 @@ export function scoreDish(dish: DishProfile, intent: ParsedIntent): ContextScore
       intentCoherence = comfortCount >= 2 ? 40 : comfortCount === 1 ? 25 : 10;
       break;
     case "discovery":
-      // Haute difficulté / cuisine exotique = plus de découverte
-      const exoticCuisines = ["antillaise", "thaï", "indienne"];
-      const isExotic = exoticCuisines.includes(dish.cuisine.toLowerCase());
-      intentCoherence = isExotic ? 35 : dish.difficulty >= 3 ? 25 : 15;
+      // Si cuisine spécifique demandée, la cuisine bonus/malus dans le bloc CUISINE gère tout
+      // Sinon haute difficulté / cuisine exotique = plus de découverte
+      if (c.preferredCuisine) {
+        intentCoherence = 25; // neutre, le bonus cuisine fera le travail
+      } else {
+        const exoticCuisines = ["antillaise", "thaï", "indienne", "asiatique", "italienne"];
+        const isExotic = exoticCuisines.includes(dish.cuisine.toLowerCase());
+        intentCoherence = isExotic ? 35 : dish.difficulty >= 3 ? 25 : 15;
+      }
       break;
     case "general":
       intentCoherence = 30; // neutre
@@ -209,6 +216,17 @@ export function scoreDish(dish: DishProfile, intent: ParsedIntent): ContextScore
       if (intent.goal === "budget" && excluded > 0) {
         rejectReason = `Contient ingrédient(s) cher(s) exclu(s) du budget`;
       }
+    }
+  }
+
+  // ======== CUISINE PRÉFÉRÉE BONUS/MALUS ========
+  if (c.preferredCuisine) {
+    const dishCuisine = dish.cuisine.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const prefCuisine = c.preferredCuisine.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (dishCuisine === prefCuisine) {
+      intentCoherence = Math.min(40, intentCoherence + 15);
+    } else {
+      intentCoherence = Math.max(0, intentCoherence - 15);
     }
   }
 

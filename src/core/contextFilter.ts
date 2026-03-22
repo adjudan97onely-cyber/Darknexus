@@ -46,6 +46,12 @@ export function filterByIntent(
     // Pre-filter: chef level
     if (dish.minChefLevel > chefLevel) continue;
 
+    // Pre-filter: exclure les accompagnements (sauce, condiment) sauf requête explicite
+    const nonStandaloneFamilies = ["sauce", "condiment", "accompagnement"];
+    if (nonStandaloneFamilies.includes(dish.family) && !intent.rawQuery.toLowerCase().includes("sauce")) {
+      continue;
+    }
+
     const score = scoreDish(dish, intent);
     const entry: FilteredDish = { dish, score, rank: 0 };
 
@@ -59,11 +65,14 @@ export function filterByIntent(
   // Tri par score décroissant
   scored.sort((a, b) => b.score.total - a.score.total);
 
+  // Tiebreaker: mélanger les plats de même score pour éviter biais d'ordre
+  shuffleTiedScores(scored);
+
   // Assigner les rangs
   scored.forEach((item, idx) => (item.rank = idx + 1));
 
   // Diversifier: pas 2 plats identiques de même famille
-  const diversified = diversifyResults(scored, maxResults);
+  const diversified = diversifyResults(scored, maxResults, intent.constraints.preferredCuisine);
 
   const accepted = diversified.slice(0, maxResults);
   const topScore = accepted.length > 0 ? accepted[0].score.total : 0;
@@ -87,35 +96,72 @@ export function filterByIntent(
 }
 
 /**
+ * Mélange les plats ayant le même score pour éviter le biais d'ordre du tableau.
+ * Fisher-Yates partiel sur les groupes de même score.
+ */
+function shuffleTiedScores(arr: FilteredDish[]): void {
+  let i = 0;
+  while (i < arr.length) {
+    let j = i;
+    while (j < arr.length && arr[j].score.total === arr[i].score.total) j++;
+    // Shuffle arr[i..j-1]
+    for (let k = j - 1; k > i; k--) {
+      const r = i + Math.floor(Math.random() * (k - i + 1));
+      [arr[k], arr[r]] = [arr[r], arr[k]];
+    }
+    i = j;
+  }
+}
+
+/**
  * Diversifie les résultats: max 1 plat par famille culinaire
- * pour éviter "3 plats en sauce" ou "3 fritures"
+ * pour éviter "3 plats en sauce" ou "3 fritures".
+ * Si preferredCuisine est set, relâche la limite par cuisine pour cette cuisine.
  */
 function diversifyResults(
   sorted: FilteredDish[],
-  maxResults: number
+  maxResults: number,
+  preferredCuisine?: string
 ): FilteredDish[] {
   const result: FilteredDish[] = [];
   const usedFamilies = new Set<string>();
-  const usedCuisines = new Set<string>();
+  const cuisineCount = new Map<string, number>();
+  const MAX_PER_CUISINE = preferredCuisine ? 99 : 2; // pas de limite si cuisine demandée
+  const MAX_OTHER_CUISINE = 2; // limite pour les autres cuisines
 
-  // Premier pass: 1 plat par famille
+  // Premier pass: 1 plat par famille, max par cuisine
   for (const item of sorted) {
     if (result.length >= maxResults) break;
     const family = item.dish.family;
+    const cuisine = item.dish.cuisine;
+    const count = cuisineCount.get(cuisine) || 0;
+    const limit = (preferredCuisine && cuisine.toLowerCase() === preferredCuisine.toLowerCase())
+      ? MAX_PER_CUISINE : MAX_OTHER_CUISINE;
 
-    if (!usedFamilies.has(family)) {
+    if (!usedFamilies.has(family) && count < limit) {
       result.push(item);
       usedFamilies.add(family);
-      usedCuisines.add(item.dish.cuisine);
+      cuisineCount.set(cuisine, count + 1);
     }
   }
 
-  // Si pas assez, 2e pass: autoriser même famille mais cuisine diff
+  // 2e pass: si pas assez, relâcher contrainte cuisine (mais garder famille unique)
   if (result.length < maxResults) {
     for (const item of sorted) {
       if (result.length >= maxResults) break;
       if (result.includes(item)) continue;
-      if (!usedCuisines.has(item.dish.cuisine) || result.length < 3) {
+      if (!usedFamilies.has(item.dish.family)) {
+        result.push(item);
+        usedFamilies.add(item.dish.family);
+      }
+    }
+  }
+
+  // 3e pass: si TOUJOURS pas assez, autoriser famille dupliquée
+  if (result.length < maxResults) {
+    for (const item of sorted) {
+      if (result.length >= maxResults) break;
+      if (!result.includes(item)) {
         result.push(item);
       }
     }
