@@ -638,6 +638,7 @@ export async function askCookingAssistant(question, context = {}) {
   if (chefLevel === 10) {
     const chefStarDishes = generateChefStarRecipes({
       chefLevel,
+      query: lower, // NOUVEAU: passer la requête pour matching direct!
       slot: inferSlot(lower),
       cuisine: inferCuisine(lower),
       servings,
@@ -645,7 +646,10 @@ export async function askCookingAssistant(question, context = {}) {
     });
 
     if (chefStarDishes.length > 0) {
-      const topRecipe = chefStarDishes[0];
+      // DIVERSIFICATION: Randomiser entre les options disponibles
+      // Utilise vraiment du hasard pour éviter répétitions
+      const randomIndex = Math.floor(Math.random() * chefStarDishes.length);
+      const topRecipe = chefStarDishes[randomIndex];
       return {
         title: `CHEF ÉTOILÉ - ${topRecipe.name}`,
         answer: buildChefStarAnswer(topRecipe),

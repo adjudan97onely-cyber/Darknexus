@@ -35,6 +35,7 @@ interface ChefStarOptions {
   servings?: number;
   preferredDishes?: string[]; // IDs de plats préférés
   availableIngredients?: string[];
+  query?: string; // NOUVEAU: requête textuelle pour matching direct
 }
 
 interface AdaptedDish extends EngineRecipe {
@@ -276,6 +277,7 @@ export function buildAdaptedRecipe(
 
 /**
  * Interface principale: générer recettes chef étoilé
+ * AMÉLIORATION: Matching INTELLIGENT sur textuelle + diversification
  */
 export function generateChefStarRecipes(
   options: ChefStarOptions = {}
@@ -284,26 +286,121 @@ export function generateChefStarRecipes(
   const servings = Math.max(1, options.servings || 2);
   const recipes: AdaptedDish[] = [];
 
-  // Stratégie: sélectionner top 5 plats compatibles
-  const slot = options.slot || "lunch";
   let candidates = findDishesByChefLevel(1, chefLevel);
-  candidates = candidates.filter((dish) => dish.slot === slot);
 
-  if (options.cuisine && options.cuisine !== "all") {
-    const cuisineMatches = candidates.filter(
-      (dish) => normalize(dish.cuisine) === normalize(options.cuisine)
-    );
-    candidates = cuisineMatches.length > 0 ? cuisineMatches : candidates;
+  // OPTIMALISATION #1: Search par query directe (si fournie)
+  // Ceci PRIORISE les matches textuels directs (bokit→bokit, colombo→colombo, etc)
+  if (options.query && options.query.trim().length > 0) {
+    const directMatches = searchDishes(options.query);
+    if (directMatches.length > 0) {
+      // On a trouvé des plats qui matchent la requête directement
+      candidates = directMatches.filter((d) => canCookRecipe(d.id, chefLevel));
+      if (candidates.length > 0) {
+        // Construire adaptedRecipes depuis searchResults
+        for (const dish of candidates.slice(0, 3)) {
+          recipes.push(buildAdaptedRecipe(dish, chefLevel, servings));
+        }
+        return recipes.length > 0 ? recipes : [buildAdaptedRecipe(candidates[0], chefLevel, servings)];
+      }
+    }
   }
 
-  // Limiter à top diversité
-  candidates = candidates.slice(0, 5);
+  // OPTIMALISATION #2: Fallback sur slot + cuisine inference
+  const slot = options.slot || "lunch";
+  let slotMatches = candidates.filter((dish) => dish.slot === slot);
 
-  for (const dish of candidates) {
+  // Filtrer par cuisine (avec fallback)
+  if (options.cuisine && options.cuisine !== "all") {
+    const cuisineMatches = slotMatches.filter(
+      (dish) => normalize(dish.cuisine) === normalize(options.cuisine)
+    );
+    if (cuisineMatches.length > 0) {
+      slotMatches = cuisineMatches;
+    }
+  }
+
+  // Filtrer par ingrédients disponibles (si fournis)
+  if (options.availableIngredients && options.availableIngredients.length > 0) {
+    const scoredByIngredients = slotMatches.map((dish) => {
+      const matches = dish.baseFamilies.filter((family) =>
+        options.availableIngredients!.some(
+          (ingredient) =>
+            normalize(ingredient).includes(normalize(family)) ||
+            normalize(family).includes(normalize(ingredient))
+        )
+      ).length;
+      return { dish, score: matches };
+    });
+
+    // Gardez seulement les meilleurs matchs ingrédients
+    const maxScore = Math.max(...scoredByIngredients.map((s) => s.score));
+    const bestByIngredients = scoredByIngredients
+      .filter((s) => s.score >= maxScore * 0.7)
+      .map((s) => s.dish);
+
+    if (bestByIngredients.length > 0) {
+      slotMatches = bestByIngredients;
+    }
+  }
+
+  // Appliquer préférences utilisateur
+  if (options.preferredDishes && options.preferredDishes.length > 0) {
+    const preferred = slotMatches.filter((dish) =>
+      options.preferredDishes!.includes(dish.id)
+    );
+    if (preferred.length > 0) {
+      slotMatches = preferred;
+    }
+  }
+
+  // DIVERSIFIER: retourner jusqu'à 3 plats différents par difficulté
+  const byDifficulty = {
+    easy: slotMatches.filter((d) => d.difficulty <= 2),
+    medium: slotMatches.filter((d) => d.difficulty > 2 && d.difficulty <= 4),
+    hard: slotMatches.filter((d) => d.difficulty > 4),
+  };
+
+  const selected: DishProfile[] = [];
+
+  // Ajouter 1 plat medium (préféré)
+  if (byDifficulty.medium.length > 0) {
+    selected.push(byDifficulty.medium[0]);
+  } else if (byDifficulty.easy.length > 0) {
+    selected.push(byDifficulty.easy[0]);
+  } else if (byDifficulty.hard.length > 0) {
+    selected.push(byDifficulty.hard[0]);
+  }
+
+  // Ajouter 1 plat easy si disponible et distinct
+  if (byDifficulty.easy.length > 0 && !selected.includes(byDifficulty.easy[0])) {
+    selected.push(byDifficulty.easy[0]);
+  }
+
+  // Ajouter 1 plat hard si disponible et distinct
+  if (byDifficulty.hard.length > 0 && !selected.includes(byDifficulty.hard[0])) {
+    selected.push(byDifficulty.hard[0]);
+  }
+
+  // Fallback: si trop peu, prendre candidats distincts
+  if (selected.length < 2 && slotMatches.length > 1) {
+    for (const candidate of slotMatches) {
+      if (!selected.includes(candidate)) {
+        selected.push(candidate);
+        if (selected.length >= 3) break;
+      }
+    }
+  }
+
+  // Construire recettes
+  for (const dish of selected) {
     recipes.push(buildAdaptedRecipe(dish, chefLevel, servings));
   }
 
-  return recipes;
+  return recipes.length > 0
+    ? recipes
+    : candidates.length > 0
+      ? [buildAdaptedRecipe(candidates[0], chefLevel, servings)]
+      : [];
 }
 
 /**
