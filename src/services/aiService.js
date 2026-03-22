@@ -8,6 +8,17 @@ import { ALL_RECIPES } from "../data/recipes";
 import { normalizeUserProfile, recipeBlockedByProfile } from "../core/userProfile";
 import { getUserProfile } from "./userProfileService";
 import { applyAdminControls, recordGeneratedRecipes } from "./adminContentService";
+import { DEFAULT_CHEF_LEVEL } from "../core/chefLevel";
+import { generateChefStarRecipes } from "../core/chefStarEngine";
+
+// Configuration globale: niveau chef (par défaut niveau 10 = Chef Étoilé)
+let GLOBAL_CHEF_LEVEL = DEFAULT_CHEF_LEVEL;
+export function setChefLevel(level) {
+  GLOBAL_CHEF_LEVEL = Math.max(1, Math.min(10, Number(level) || DEFAULT_CHEF_LEVEL));
+}
+export function getChefLevel() {
+  return GLOBAL_CHEF_LEVEL;
+}
 
 const CULINARY_KNOWLEDGE = [
   {
@@ -380,6 +391,30 @@ function buildPedagogicDishAnswer(recipe, dish, servings) {
   ].join("\n");
 }
 
+function buildChefStarAnswer(recipe) {
+  return [
+    `✦ ${recipe.name} (${recipe.portionRatio || 1}x portions)`,
+    ``,
+    `Signature culinaire: ${recipe.signature || ""}`,
+    ``,
+    `Fondamentaux essentiels:`,
+    ...recipe.fundamentals?.map((f) => `  • ${f}`) || [],
+    ``,
+    `Techniques maîtrisées:`,
+    ...recipe.techniques?.slice(0, 2)?.map((t) => `  • ${t.name}: ${t.timing} min`) || [],
+    ``,
+    `Timing total: ${recipe.adaptedTiming?.total || 0} min (Prep: ${recipe.adaptedTiming?.prep || 0}min + Cuisson: ${recipe.adaptedTiming?.cook || 0}min${recipe.adaptedTiming?.rest ? ` + Repos: ${recipe.adaptedTiming.rest}min` : ""})`,
+    ``,
+    `Conseils professionnels:`,
+    ...recipe.tips?.slice(0, 2)?.map((tip) => `  ✓ ${tip}`) || [],
+    ``,
+    `Erreurs à éviter absolument:`,
+    ...recipe.mistakes?.slice(0, 2)?.map((mistake) => `  ✗ ${mistake}`) || [],
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 function diversify(recipes) {
   const grouped = [...recipes].reduce((acc, recipe) => {
     const key = recipe.blueprintKey || "default";
@@ -597,6 +632,7 @@ export async function askCookingAssistant(question, context = {}) {
   const ingredients = toIngredients(context.ingredients || []);
   const userProfile = normalizeUserProfile(context.userProfile || getUserProfile());
   const servings = inferServings(lower);
+  const chefLevel = GLOBAL_CHEF_LEVEL;
 
   const askedDish = findKnowledgeDish(lower);
   if (askedDish) {
@@ -609,6 +645,36 @@ export async function askCookingAssistant(question, context = {}) {
         recipe: expertRecipe,
         suggestions: {
           fundamentals: askedDish.fundamentals || [],
+        },
+      };
+    }
+  }
+
+  // MODE CHEF ÉTOILÉ (niveau 10): utiliser moteur star pour vrais plats
+  if (chefLevel === 10) {
+    const chefStarDishes = generateChefStarRecipes({
+      chefLevel,
+      slot: inferSlot(lower),
+      cuisine: inferCuisine(lower),
+      servings,
+      availableIngredients: ingredients.length ? ingredients : undefined,
+    });
+
+    if (chefStarDishes.length > 0) {
+      const topRecipe = chefStarDishes[0];
+      return {
+        title: `CHEF ÉTOILÉ - ${topRecipe.name}`,
+        answer: buildChefStarAnswer(topRecipe),
+        actions: [
+          "Voir recette complète",
+          "Fondamentaux culinaires",
+          "Erreurs à éviter",
+        ],
+        recipe: topRecipe,
+        suggestions: {
+          fundamentals: topRecipe.fundamentals || [],
+          techniques: topRecipe.techniques?.map((t) => t.name) || [],
+          profTips: topRecipe.tips || [],
         },
       };
     }
