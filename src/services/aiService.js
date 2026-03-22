@@ -356,28 +356,72 @@ function findExpertRecipeForDish(dish, servings, userProfile) {
   }
 
   const fallback = normalizeKnownRecipe(null, dish, servings);
-  if (fallback) {
-    return fallback;
-  }
-
-  const generated = generateRecipeCandidates(dish.baseIngredients || [], {
+  const generated = generateChefStarRecipes({
+    query: [dish?.name, ...(dish?.aliases || []), ...(dish?.baseIngredients || []).slice(0, 3)].filter(Boolean).join(" "),
     cuisine: dish.cuisine || "all",
     slot: dish.slot || "lunch",
     servings,
-    mode: "chef",
-    limit: 10,
+    chefLevel: getChefLevel(),
   });
 
-  const curated = personalizeRecipes(generated, userProfile)
+  const chefVariants = [
+    "version gourmande",
+    "style maison",
+    "façon chef",
+    "recette express",
+    "version créole",
+  ];
+
+  const scoreKnowledgeCandidate = (recipe) => {
+    let score = Number(recipe?.score || 0);
+    const recipeName = String(recipe?.name || recipe?.title || "").toLowerCase();
+    const dishName = String(dish?.name || "").toLowerCase();
+
+    if (dishName && recipeName.includes(dishName)) score += 5;
+    if (recipe?.cuisine === dish?.cuisine) score += 3;
+    if ((recipe?.ingredients || []).length > 3) score += 2;
+    if (recipeName.includes("basique")) score -= 2;
+
+    return score;
+  };
+
+  const enrichKnowledgeCandidate = (recipe, index) => {
+    const variant = chefVariants[index % chefVariants.length];
+    return {
+      ...recipe,
+      name: recipe.name || recipe.title || "Plat maison",
+      chefVariant: variant,
+      matchReason: recipe.matchReason || `Sélection chef: ${variant}`,
+    };
+  };
+
+  const results = [];
+
+  if (fallback) {
+    results.push({
+      ...fallback,
+      chefVariant: "base experte",
+      matchReason: fallback.matchReason || "Recette de référence issue de la base culinaire.",
+    });
+  }
+
+  results.push(...generated.map((recipe, index) => enrichKnowledgeCandidate(recipe, index)));
+
+  const curated = results
     .sort((a, b) => {
       const aHit = recipeMatchesDish(a, dish) ? 1 : 0;
       const bHit = recipeMatchesDish(b, dish) ? 1 : 0;
       if (aHit !== bHit) return bHit - aHit;
-      return (b.score || 0) - (a.score || 0);
-    });
+      return scoreKnowledgeCandidate(b) - scoreKnowledgeCandidate(a);
+    })
+    .filter((recipe, index, self) => {
+      const title = String(recipe.name || recipe.title || "").toLowerCase();
+      return index === self.findIndex((entry) => String(entry.name || entry.title || "").toLowerCase() === title);
+    })
+    .slice(0, 5);
 
   const strictMatch = curated.find((recipe) => recipeMatchesDish(recipe, dish));
-  return normalizeKnownRecipe(strictMatch || null, dish, servings);
+  return strictMatch || curated[0] || fallback || null;
 }
 
 function unique(values) {
@@ -398,10 +442,18 @@ function formatIngredientLabel(value) {
 }
 
 function resolveBaseType(recipe) {
-  const explicit = normalize(recipe?.baseType || recipe?.blueprintKey || recipe?.dishType || recipe?.dishFamily?.split(":").pop());
+  const explicit = normalize(
+    recipe?.baseType ||
+    recipe?.blueprintKey ||
+    recipe?.dishType ||
+    recipe?.dishFamily
+  );
+
   if (explicit) return explicit;
+
   const knownDish = findKnowledgeDish(recipe?.name || "");
   if (knownDish?.key) return knownDish.key;
+
   return normalize(recipe?.cookingMethod || "plat");
 }
 
