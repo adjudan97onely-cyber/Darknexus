@@ -380,6 +380,200 @@ function findExpertRecipeForDish(dish, servings, userProfile) {
   return normalizeKnownRecipe(strictMatch || null, dish, servings);
 }
 
+function unique(values) {
+  return [...new Set((values || []).filter(Boolean))];
+}
+
+function ingredientSet(recipe) {
+  const detailed = Array.isArray(recipe?.ingredientsDetailed) ? recipe.ingredientsDetailed.map((item) => item?.name) : [];
+  const plain = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
+  return unique((detailed.length ? detailed : plain).map((item) => normalize(item)).filter(Boolean));
+}
+
+function formatIngredientLabel(value) {
+  return String(value || "")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+    .trim();
+}
+
+function resolveBaseType(recipe) {
+  const explicit = normalize(recipe?.baseType || recipe?.blueprintKey || recipe?.dishType || recipe?.dishFamily?.split(":").pop());
+  if (explicit) return explicit;
+  const knownDish = findKnowledgeDish(recipe?.name || "");
+  if (knownDish?.key) return knownDish.key;
+  return normalize(recipe?.cookingMethod || "plat");
+}
+
+function ingredientSimilarity(left, right) {
+  const leftSet = new Set(left || []);
+  const rightSet = new Set(right || []);
+  if (!leftSet.size || !rightSet.size) return 0;
+  let intersection = 0;
+  leftSet.forEach((item) => {
+    if (rightSet.has(item)) intersection += 1;
+  });
+  return intersection / Math.max(leftSet.size, rightSet.size);
+}
+
+function estimateBudgetLabel(recipe) {
+  const cheap = ["farine", "oeuf", "oignon", "tomate", "riz", "pomme de terre", "pomme-terre", "ail", "carotte", "pates", "lentilles", "salade", "tortilla"];
+  const premium = ["saumon", "crevette", "chatrou", "boeuf", "sole", "fromage", "creme", "avocat"];
+  const ingredients = ingredientSet(recipe);
+  const cheapCount = ingredients.filter((item) => cheap.some((entry) => item.includes(normalize(entry)))).length;
+  const premiumCount = ingredients.filter((item) => premium.some((entry) => item.includes(normalize(entry)))).length;
+
+  if (premiumCount >= 2) return "Premium";
+  if (cheapCount >= Math.max(2, Math.ceil(ingredients.length / 2))) return "Petit budget";
+  return "Budget moyen";
+}
+
+function pickHighlightIngredients(ingredients) {
+  const ignored = new Set(["sel", "poivre", "huile d'olive", "huile", "herbes", "eau", "beurre"]);
+  return ingredients.filter((item) => !ignored.has(item)).slice(0, 3);
+}
+
+export function generateDishName(dish) {
+  const baseType = normalize(dish?.baseType);
+  const ingredients = pickHighlightIngredients((dish?.ingredients || []).map((item) => normalize(item)));
+  const protein = ingredients.find((item) => ["poulet", "boeuf", "poisson", "oeuf", "tofu", "crevette", "morue"].includes(item));
+  const vegetable = ingredients.find((item) => ["tomate", "brocoli", "courgette", "epinards", "carotte", "oignon", "poireau", "salade"].includes(item));
+  const proteinLabel = formatIngredientLabel(protein);
+  const vegetableLabel = formatIngredientLabel(vegetable);
+
+  switch (baseType) {
+    case "omelette":
+      return vegetableLabel ? `Omelette ${vegetableLabel} herbes` : "Omelette maison";
+    case "poelee":
+      return proteinLabel ? `Poelee de ${proteinLabel}` : "Poelee de legumes";
+    case "quiche":
+      return vegetableLabel ? `Quiche ${vegetableLabel} doree` : "Quiche maison";
+    case "bowl":
+      return proteinLabel ? `Bowl ${proteinLabel} croquant` : "Bowl veggie croquant";
+    case "soupe":
+      return vegetableLabel ? `Soupe ${vegetableLabel} veloutee` : "Soupe maison";
+    case "blaff":
+      return proteinLabel ? `Blaff ${proteinLabel}` : "Blaff creole";
+    case "curry":
+      return proteinLabel ? `Curry ${proteinLabel} coco` : "Curry coco doux";
+    case "pizza":
+      return vegetableLabel ? `Pizza ${vegetableLabel} maison` : "Pizza maison";
+    case "burger":
+      return proteinLabel ? `Burger ${proteinLabel} maison` : "Burger maison";
+    case "gratin":
+      return vegetableLabel ? `Gratin ${vegetableLabel} dore` : "Gratin maison";
+    case "tarte":
+      return vegetableLabel ? `Tarte ${vegetableLabel} salee` : "Tarte salee";
+    case "bokit":
+      return "Bokit maison";
+    case "colombo":
+      return proteinLabel ? `Colombo ${proteinLabel}` : "Colombo maison";
+    case "dombre":
+      return proteinLabel ? `Dombre ${proteinLabel}` : "Dombre creole";
+    case "pain-au-beurre":
+      return "Pain au beurre";
+    case "brioche":
+      return "Brioche maison";
+    case "gateau":
+      return "Gateau maison";
+    case "viennoiserie":
+      return "Viennoiserie maison";
+    default:
+      return proteinLabel ? `${proteinLabel} cuisine maison` : formatIngredientLabel(dish?.name || "Plat maison");
+  }
+}
+
+function createDishModel(recipe, variations = []) {
+  const ingredients = ingredientSet(recipe);
+  const model = {
+    id: recipe.id,
+    name: recipe.name,
+    baseType: resolveBaseType(recipe),
+    ingredients,
+    tags: unique([recipe.cuisine, ...(recipe.tags || [])]),
+    variations,
+  };
+  return {
+    ...model,
+    name: generateDishName(model),
+  };
+}
+
+function summarizeVariation(primaryRecipe, candidateRecipe) {
+  const primaryIngredients = ingredientSet(primaryRecipe);
+  const candidateIngredients = ingredientSet(candidateRecipe);
+  const extra = candidateIngredients.filter((item) => !primaryIngredients.includes(item)).slice(0, 2);
+  if (extra.length > 0) {
+    return `Ajouter ${extra.map(formatIngredientLabel).join(" & ")}`;
+  }
+  if (candidateRecipe.cookingMethod && candidateRecipe.cookingMethod !== primaryRecipe.cookingMethod) {
+    return `Version ${formatIngredientLabel(candidateRecipe.cookingMethod)}`;
+  }
+  return null;
+}
+
+function mergeRecipeGroup(group) {
+  const sortedGroup = [...group].sort((a, b) => (b.score || 0) - (a.score || 0));
+  const primary = { ...sortedGroup[0] };
+  const groupedVariations = unique(sortedGroup.slice(1).map((item) => summarizeVariation(primary, item)).filter(Boolean));
+  const dish = createDishModel(primary, groupedVariations);
+
+  return {
+    ...primary,
+    name: dish.name,
+    baseType: dish.baseType,
+    budgetLabel: estimateBudgetLabel(primary),
+    dish,
+    mergedCount: sortedGroup.length,
+    variationOptions: unique([...(primary.variants || []), ...groupedVariations]).slice(0, 4),
+  };
+}
+
+function dedupeDishResults(recipes, limit = 5) {
+  const groups = [];
+  const rankedRecipes = [...recipes].sort((a, b) => (b.score || 0) - (a.score || 0));
+
+  rankedRecipes.forEach((recipe) => {
+    const recipeBaseType = resolveBaseType(recipe);
+    const recipeIngredients = ingredientSet(recipe);
+    const existingGroup = groups.find((group) => group.baseType === recipeBaseType && ingredientSimilarity(group.referenceIngredients, recipeIngredients) >= 0.7);
+
+    if (existingGroup) {
+      existingGroup.items.push(recipe);
+      return;
+    }
+
+    groups.push({
+      baseType: recipeBaseType,
+      referenceIngredients: recipeIngredients,
+      items: [recipe],
+    });
+  });
+
+  const merged = groups
+    .map((group) => mergeRecipeGroup(group.items))
+    .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+  const distinct = [];
+  const remaining = [];
+  const seenBaseTypes = new Set();
+
+  merged.forEach((recipe) => {
+    if (seenBaseTypes.has(recipe.baseType)) {
+      remaining.push(recipe);
+      return;
+    }
+    seenBaseTypes.add(recipe.baseType);
+    distinct.push(recipe);
+  });
+
+  return [...distinct, ...remaining].slice(0, Math.min(5, Math.max(1, Number(limit) || 5)));
+}
+
+function finalizeRecipeCollection(recipes, limit = 5) {
+  return attachAlternatives(dedupeDishResults(recipes, limit));
+}
+
 function buildPedagogicDishAnswer(recipe, dish, servings) {
   const beginnerSteps = (recipe.steps || []).slice(0, 6).map((step, index) => `${index + 1}) ${step}`);
   const fundamentals = (dish.fundamentals || []).slice(0, 3).join(" • ");
@@ -561,7 +755,7 @@ function personalizeRecipes(recipes, profile) {
   const normalizedProfile = normalizeUserProfile(profile || getUserProfile());
   const filtered = recipes.filter((recipe) => !recipeBlockedByProfile(recipe.ingredients || [], normalizedProfile));
   const enriched = filtered.map((recipe) => enrichRecipe(recipe, normalizedProfile));
-  return attachAlternatives(enriched).sort((a, b) => (b.score || 0) - (a.score || 0));
+  return enriched.sort((a, b) => (b.score || 0) - (a.score || 0));
 }
 
 export { CUISINE_MODES, formatIngredientLine, scaleRecipeForServings };
@@ -573,7 +767,7 @@ export function generateDynamicRecipesFromIngredients(ingredients, options = {})
       mode: options.mode || "chef",
       slot: options.slot || "lunch",
       servings: options.servings || 2,
-      limit: options.limit || 12,
+      limit: Math.max(10, Number(options.limit) || 12),
     })
   ), options.userProfile);
 
@@ -582,7 +776,7 @@ export function generateDynamicRecipesFromIngredients(ingredients, options = {})
     cuisine: options.cuisine || "all",
   });
   recordGeneratedRecipes(generated);
-  return withAdminLayer;
+  return finalizeRecipeCollection(withAdminLayer, options.limit || 5);
 }
 
 export function recommendRecipesFromIngredients(ingredients, limit = 12, options = {}) {
@@ -591,7 +785,7 @@ export function recommendRecipesFromIngredients(ingredients, limit = 12, options
     mode: options.mode || "chef",
     slot: options.slot || "lunch",
     servings: options.servings || 2,
-    limit: Math.max(8, Number(limit) || 12),
+    limit: Math.min(5, Math.max(1, Number(limit) || 5)),
     userProfile: options.userProfile,
   });
 }
@@ -620,7 +814,7 @@ export function smartSearchRecipes(query) {
   const askedDish = findKnowledgeDish(q);
   if (askedDish) {
     const expertRecipe = findExpertRecipeForDish(askedDish, inferServings(q), getUserProfile());
-    if (expertRecipe) return [expertRecipe];
+    if (expertRecipe) return finalizeRecipeCollection([expertRecipe], 1);
   }
 
   const generated = personalizeRecipes(diversify(
@@ -639,7 +833,7 @@ export function smartSearchRecipes(query) {
     query,
   });
   recordGeneratedRecipes(generated);
-  return withAdminLayer;
+  return finalizeRecipeCollection(withAdminLayer, 5);
 }
 
 export async function askCookingAssistant(question, context = {}) {
@@ -737,11 +931,11 @@ export async function askCookingAssistant(question, context = {}) {
     servings,
     limit: 6,
   }), userProfile);
-  const ranked = applyAdminControls(rankedBase, {
+  const ranked = finalizeRecipeCollection(applyAdminControls(rankedBase, {
     ingredients: ingredients.length ? ingredients : lower.split(/\s+/),
     cuisine,
     query: question,
-  });
+  }), 5);
   recordGeneratedRecipes(rankedBase);
   const pick = ranked[0] || rankedBase[0] || surpriseBalancedRecipe();
 

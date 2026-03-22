@@ -123,6 +123,20 @@ export function RecipeDetailPage() {
         </ul>
       </section>
 
+      {(displayedRecipe.variationOptions?.length || displayedRecipe.variants?.length) ? (
+        <section className="rounded-xl bg-white/5 p-3">
+          <h2 className="text-xl font-bold">Variantes possibles</h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-white/90">
+            {[...(displayedRecipe.variationOptions || []), ...(displayedRecipe.variants || [])]
+              .filter((item, index, all) => all.indexOf(item) === index)
+              .slice(0, 5)
+              .map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section>
         <h2 className="text-xl font-bold">Etapes ultra detaillees</h2>
         <ol className="mt-2 list-decimal space-y-2 pl-5 text-white/90">
