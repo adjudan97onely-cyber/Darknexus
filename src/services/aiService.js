@@ -8,6 +8,7 @@ import { ALL_RECIPES } from "../data/recipes";
 import { normalizeUserProfile, recipeBlockedByProfile } from "../core/userProfile";
 import { getUserProfile } from "./userProfileService";
 import { applyAdminControls, recordGeneratedRecipes } from "./adminContentService";
+import { getDishes, matchByIngredients } from "../core/dishKnowledge";
 import { DEFAULT_CHEF_LEVEL } from "../core/chefLevel";
 import { generateChefStarRecipes } from "../core/chefStarEngine";
 
@@ -760,16 +761,73 @@ function personalizeRecipes(recipes, profile) {
 
 export { CUISINE_MODES, formatIngredientLine, scaleRecipeForServings };
 
-export function generateDynamicRecipesFromIngredients(ingredients, options = {}) {
-  const generated = personalizeRecipes(diversify(
-    generateRecipeCandidates(toIngredients(ingredients), {
-      cuisine: options.cuisine || "all",
-      mode: options.mode || "chef",
-      slot: options.slot || "lunch",
+// ===== UTILISER LES 44 PLATS DE dishKnowledge.ts EN PRIORITÉ =====
+function recipesFromDishKnowledge(ingredientQuery, limit = 12, options = {}) {
+  try {
+    // Utiliser matchByIngredients pour trouver les plats pertinents
+    const matched = matchByIngredients(ingredientQuery.join(" ")) || [];
+    
+    // Filtrer par cuisine si spécifié
+    let filtered = matched;
+    if (options.cuisine && options.cuisine !== "all") {
+      filtered = matched.filter(dish => dish.cuisine === options.cuisine);
+    }
+    
+    // Filtrer par slot si spécifié
+    if (options.slot) {
+      filtered = filtered.filter(dish => dish.slot === options.slot);
+    }
+    
+    // Convertir DishProfile en EngineRecipe format
+    const recipes = filtered.slice(0, limit).map((dish, idx) => ({
+      id: dish.id,
+      name: dish.name,
+      desireName: dish.desireName || dish.name,
+      blueprintKey: dish.family,
+      cuisine: dish.cuisine,
+      slot: dish.slot,
+      difficulty: dish.difficulty,
+      minChefLevel: dish.minChefLevel,
+      family: dish.family,
+      cookingMethod: dish.technique,
       servings: options.servings || 2,
-      limit: Math.max(10, Number(options.limit) || 12),
-    })
-  ), options.userProfile);
+      timings: dish.timings,
+      ingredients: (dish.ingredients || []).map(ing => ing.name || ing),
+      baseIngredients: dish.baseIngredients || dish.baseFamilies,
+      steps: dish.steps || [],
+      profTips: dish.profTips || [],
+      mistakes: dish.mistakes || [],
+      signature: dish.signature || "",
+      category: dish.category || "plat",
+      dishProfile: dish,
+      rank: idx + 1,
+    }));
+    
+    return recipes.length > 0 ? recipes : null; // null = fallback à generateRecipeCandidates
+  } catch (e) {
+    console.error("Error using dishKnowledge recipes:", e);
+    return null;
+  }
+}
+
+export function generateDynamicRecipesFromIngredients(ingredients, options = {}) {
+  // D'ABORD: essayer les 44 plats de dishKnowledge
+  const knowledgeRecipes = recipesFromDishKnowledge(toIngredients(ingredients), 12, {
+    cuisine: options.cuisine || "all",
+    slot: options.slot || "lunch",
+    servings: options.servings || 2,
+  });
+  
+  // Utiliser dishKnowledge si résultats, sinon fallback generateRecipeCandidates
+  const baseRecipes = knowledgeRecipes || generateRecipeCandidates(toIngredients(ingredients), {
+    cuisine: options.cuisine || "all",
+    mode: options.mode || "chef",
+    slot: options.slot || "lunch",
+    servings: options.servings || 2,
+    limit: Math.max(10, Number(options.limit) || 12),
+  });
+
+  const generated = personalizeRecipes(diversify(baseRecipes), options.userProfile);
 
   const withAdminLayer = applyAdminControls(generated, {
     ingredients: toIngredients(ingredients),
