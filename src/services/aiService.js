@@ -634,23 +634,7 @@ export async function askCookingAssistant(question, context = {}) {
   const servings = inferServings(lower);
   const chefLevel = GLOBAL_CHEF_LEVEL;
 
-  const askedDish = findKnowledgeDish(lower);
-  if (askedDish) {
-    const expertRecipe = findExpertRecipeForDish(askedDish, servings, userProfile);
-    if (expertRecipe) {
-      return {
-        title: `Chef expert - ${expertRecipe.name}`,
-        answer: buildPedagogicDishAnswer(expertRecipe, askedDish, servings),
-        actions: ["Voir recette", "Version debutant", "Verifier cuisson"],
-        recipe: expertRecipe,
-        suggestions: {
-          fundamentals: askedDish.fundamentals || [],
-        },
-      };
-    }
-  }
-
-  // MODE CHEF ÉTOILÉ (niveau 10): utiliser moteur star pour vrais plats
+  // MODE CHEF ÉTOILÉ PRIORITAIRE (niveau 10): vrais plats avant fallback
   if (chefLevel === 10) {
     const chefStarDishes = generateChefStarRecipes({
       chefLevel,
@@ -675,6 +659,23 @@ export async function askCookingAssistant(question, context = {}) {
           fundamentals: topRecipe.fundamentals || [],
           techniques: topRecipe.techniques?.map((t) => t.name) || [],
           profTips: topRecipe.tips || [],
+        },
+      };
+    }
+  }
+
+  // Fallback mode: recherche par plats connus (si Chef Star n'a pas trouvé)
+  const askedDish = findKnowledgeDish(lower);
+  if (askedDish) {
+    const expertRecipe = findExpertRecipeForDish(askedDish, servings, userProfile);
+    if (expertRecipe) {
+      return {
+        title: `Chef expert - ${expertRecipe.name}`,
+        answer: buildPedagogicDishAnswer(expertRecipe, askedDish, servings),
+        actions: ["Voir recette", "Version debutant", "Verifier cuisson"],
+        recipe: expertRecipe,
+        suggestions: {
+          fundamentals: askedDish.fundamentals || [],
         },
       };
     }
