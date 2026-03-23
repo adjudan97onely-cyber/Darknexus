@@ -9,7 +9,7 @@ export function RecipeDetailPage() {
   const { recipeId } = useParams();
   const location = useLocation();
   const [imageVersion, setImageVersion] = useState(0);
-  const [servings, setServings] = useState(2);
+  const [servings, setServings] = useState(null);
 
   const recipe = useMemo(() => {
     const fromState = location.state?.recipe;
@@ -17,18 +17,25 @@ export function RecipeDetailPage() {
     return getRecipeByIdFromAdminLayer(recipeId);
   }, [recipeId, location.state]);
 
+  // Initialiser servings depuis la recette (ex: 4 pour colombo)
+  useEffect(() => {
+    if (recipe && servings === null) {
+      setServings(recipe.servings || 4);
+    }
+  }, [recipe, servings]);
+
   const displayedRecipe = useMemo(() => {
-    if (!recipe) return null;
+    if (!recipe || servings === null) return null;
     return scaleRecipeForServings(
       {
         ...recipe,
-        servings: recipe.servings || 2,
+        servings: recipe.servings || 4,
         ingredientsDetailed:
           recipe.ingredientsDetailed ||
           (recipe.ingredients || []).map((line) => ({
             name: line,
             quantity: 1,
-            unit: "portion",
+            unit: "",
           })),
       },
       servings

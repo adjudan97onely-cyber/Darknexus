@@ -12,6 +12,26 @@ import { getDishes, matchByIngredients } from "../core/dishKnowledge";
 import { DEFAULT_CHEF_LEVEL } from "../core/chefLevel";
 import { generateChefStarRecipes } from "../core/chefStarEngine";
 
+/**
+ * Parse une quantité brute d'ingrédient ("800g", "2 cs", "3 branches", "2") 
+ * en { quantity: number, unit: string }
+ */
+function parseIngredientQuantity(raw) {
+  if (!raw || typeof raw !== "string") return { quantity: 1, unit: "" };
+  const trimmed = raw.trim();
+  // "800g" ou "500ml" — nombre collé à l'unité
+  const collé = trimmed.match(/^(\d+(?:[.,]\d+)?)\s*(g|kg|ml|cl|l|dl)$/i);
+  if (collé) return { quantity: parseFloat(collé[1].replace(",", ".")), unit: collé[2].toLowerCase() };
+  // "2 cs", "3 branches", "4 gousses", "1 boîte"
+  const séparé = trimmed.match(/^(\d+(?:[.,]\d+)?)\s+(.+)$/);
+  if (séparé) return { quantity: parseFloat(séparé[1].replace(",", ".")), unit: séparé[2] };
+  // Nombre seul "2", "3"
+  const nombre = trimmed.match(/^(\d+(?:[.,]\d+)?)$/);
+  if (nombre) return { quantity: parseFloat(nombre[1].replace(",", ".")), unit: "" };
+  // Texte seul ("QS", "à goût")
+  return { quantity: 1, unit: trimmed };
+}
+
 // Configuration globale: niveau chef (par défaut niveau 10 = Chef Étoilé)
 let GLOBAL_CHEF_LEVEL = DEFAULT_CHEF_LEVEL;
 export function setChefLevel(level) {
@@ -806,9 +826,15 @@ function recipesFromDishKnowledge(ingredientQuery, limit = 12, options = {}) {
         minChefLevel: dish.minChefLevel || 2,
         family: dish.family || "plat",
         cookingMethod: dish.technique || "braise",
-        servings: options.servings || 2,
+        servings: dish.servings || options.servings || 4,
         timings: dish.timings || { prep: 15, cook: 30 },
         ingredients: Array.isArray(dish.ingredients) ? dish.ingredients.map(ing => typeof ing === "string" ? ing : ing?.name || "") : [],
+        ingredientsDetailed: Array.isArray(dish.ingredients) ? dish.ingredients.map(ing => {
+          if (typeof ing === "string") return { name: ing, quantity: 1, unit: "portion" };
+          const raw = ing?.quantity || "";
+          const parsed = parseIngredientQuantity(raw);
+          return { name: ing?.name || "", quantity: parsed.quantity, unit: parsed.unit };
+        }) : [],
         baseIngredients: dish.baseIngredients || dish.baseFamilies || [],
         steps: Array.isArray(dish.steps) ? dish.steps : [],
         profTips: Array.isArray(dish.profTips) ? dish.profTips : [],

@@ -205,6 +205,9 @@ export function scoreDish(dish: DishProfile, intent: ParsedIntent): ContextScore
   // ======== VISUAL IMPACT CHECK ========
   if (c.minVisualImpact && visualImpact < c.minVisualImpact) {
     intentCoherence = Math.max(0, intentCoherence - 8);
+    if (intent.goal === "impress" && dish.difficulty < 3) {
+      rejectReason = `Pas assez impressionnant (difficulté ${dish.difficulty}/5, impact visuel ${visualImpact}/3)`;
+    }
   }
 
   // ======== FAMILLE PRÉFÉRÉE BONUS ========

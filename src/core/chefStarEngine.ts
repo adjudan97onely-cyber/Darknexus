@@ -318,11 +318,15 @@ export function generateChefStarRecipes(
 
   // ═══════════ ÉTAPE 2: MATCH EXACT PAR NOM + INGREDIENTS ═══════════
   // Si l'user demande "bokit", "colombo", "pâtes fromage" → matching intelligent
+  // IMPORTANT: quand une intention claire est détectée (speed, impress, budget…),
+  // on skip matchByIngredients pour éviter les faux positifs
+  // (ex: "plat rapide soir" → "plat" matche l'alias "plat Toulouse" du Cassoulet)
+  const hasStrongIntent = intent.goal !== "general" && intent.confidence >= 0.5;
   if (query.trim().length > 0) {
-    // D'abord: match exact par nom/alias
+    // D'abord: match exact par nom/alias (full-string, pas de faux positif)
     let directMatches = searchDishes(query);
-    // Si pas de match exact, essayer par baseIngredients
-    if (directMatches.length === 0) {
+    // Si pas de match exact ET PAS d'intention forte, essayer par baseIngredients
+    if (directMatches.length === 0 && !hasStrongIntent) {
       directMatches = matchByIngredients(query);
     }
     if (directMatches.length > 0) {
