@@ -1,202 +1,78 @@
 """
-Configuration SQLite pour Analyseur de Loteries
-SQLite utilisé car MongoDB n'est pas disponible localement
+Centralized MongoDB Database Configuration
+Singleton pattern to ensure only one AsyncIOMotorClient instance
 """
-import sqlite3
-import json
-import os
-from pathlib import Path
-from dotenv import load_dotenv
 
+import os
+from motor.motor_asyncio import AsyncIOMotorClient
+from dotenv import load_dotenv
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Load environment variables
 load_dotenv()
 
-DB_PATH = os.getenv("DB_PATH", "lottery_analyzer.db")
-db: sqlite3.Connection = None
-
-# Schéma SQLite
-SCHEMA = {
-    "draws": """
-        CREATE TABLE IF NOT EXISTS draws (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            lottery_type TEXT NOT NULL,
-            numbers TEXT NOT NULL,
-            date TEXT NOT NULL,
-            bonus INTEGER,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """,
-    "analysis": """
-        CREATE TABLE IF NOT EXISTS analysis (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            lottery_type TEXT NOT NULL,
-            frequency TEXT NOT NULL,
-            anomalies TEXT NOT NULL,
-            mean_appearance REAL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """,
-    "recommendations": """
-        CREATE TABLE IF NOT EXISTS recommendations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            lottery_type TEXT NOT NULL,
-            numbers TEXT NOT NULL,
-            score REAL NOT NULL,
-            reason TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """,
-    "matches": """
-        CREATE TABLE IF NOT EXISTS matches (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            team1 TEXT NOT NULL,
-            team2 TEXT NOT NULL,
-            date TEXT NOT NULL,
-            league TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """,
-    "predictions": """
-        CREATE TABLE IF NOT EXISTS predictions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            match_id INTEGER NOT NULL,
-            prediction TEXT NOT NULL,
-            probability REAL,
-            reason TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """
-}
+# Initialize client (singleton pattern)
+_client = None
+_db = None
 
 
-async def connect_db():
-    """Connecte à SQLite"""
-    global db
-    # S'assurer que le répertoire existe
-    Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
+async def get_client():
+    """Get the MongoDB client instance"""
+    global _client
+    if _client is None:
+        mongo_url = os.environ.get('MONGO_URL')
+        if not mongo_url:
+            raise ValueError("MONGO_URL not found in environment variables")
+        
+        _client = AsyncIOMotorClient(mongo_url)
+        logger.info(f"✅ MongoDB client initialized: {mongo_url[:30]}...")
     
-    db = sqlite3.connect(DB_PATH, check_same_thread=False)
-    db.row_factory = sqlite3.Row  # Pour accéder aux colonnes par nom
+    return _client
+
+
+async def get_database():
+    """Get the MongoDB database instance"""
+    global _db
+    if _db is None:
+        client = await get_client()
+        db_name = os.environ.get('DB_NAME', 'darknexus')
+        _db = client[db_name]
+        logger.info(f"✅ Database selected: {db_name}")
     
-    # Créer les tables
-    cursor = db.cursor()
-    for table_name, schema in SCHEMA.items():
-        cursor.execute(schema)
-    db.commit()
-    
-    print(f"✅ Connecté à SQLite: {DB_PATH}")
-    return db
+    return _db
 
 
-async def close_db():
-    """Ferme la connexion SQLite"""
-    if db:
-        db.close()
-        print("✅ Déconnecté de SQLite")
+async def close_client():
+    """Close the MongoDB client connection"""
+    global _client
+    if _client is not None:
+        _client.close()
+        _client = None
+        logger.info("✅ MongoDB client closed")
 
 
-async def get_db():
-    """Récupère la DB courante"""
-    return db
+# Convenience functions for common collections
+async def get_users_collection():
+    """Get the users collection"""
+    db = await get_database()
+    return db.users
 
 
-class DBCollection:
-    """Wrapper pour imiter interface MongoDB"""
-    def __init__(self, table_name: str):
-        self.table_name = table_name
-    
-    async def find_one(self, query: dict = None):
-        cursor = db.cursor()
-        if query:
-            conditions = " AND ".join([f"{k}=?" for k in query.keys()])
-            cursor.execute(f"SELECT * FROM {self.table_name} WHERE {conditions}", list(query.values()))
-        else:
-            cursor.execute(f"SELECT * FROM {self.table_name} LIMIT 1")
-        row = cursor.fetchone()
-        return dict(row) if row else None
-    
-    async def find(self, query: dict = None):
-        cursor = db.cursor()
-        if query:
-            conditions = " AND ".join([f"{k}=?" for k in query.keys()])
-            cursor.execute(f"SELECT * FROM {self.table_name} WHERE {conditions}", list(query.values()))
-        else:
-            cursor.execute(f"SELECT * FROM {self.table_name}")
-        rows = cursor.fetchall()
-        return [dict(row) for row in rows]
-    
-    async def insert_one(self, document: dict):
-        cursor = db.cursor()
-        columns = ", ".join(document.keys())
-        placeholders = ", ".join(["?" for _ in document])
-        cursor.execute(f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders})", list(document.values()))
-        db.commit()
-        return {"inserted_id": cursor.lastrowid}
-    
-    async def insert_many(self, documents: list):
-        cursor = db.cursor()
-        for doc in documents:
-            columns = ", ".join(doc.keys())
-            placeholders = ", ".join(["?" for _ in doc])
-            cursor.execute(f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders})", list(doc.values()))
-        db.commit()
-        return {"inserted_ids": [d.get('id') for d in documents]}
-    
-    async def update_one(self, query: dict, update: dict):
-        cursor = db.cursor()
-        set_clause = ", ".join([f"{k}=?" for k in update.keys()])
-        where_clause = " AND ".join([f"{k}=?" for k in query.keys()])
-        cursor.execute(f"UPDATE {self.table_name} SET {set_clause} WHERE {where_clause}", 
-                      list(update.values()) + list(query.values()))
-        db.commit()
-        return {"modified_count": cursor.rowcount}
-    
-    async def delete_one(self, query: dict):
-        cursor = db.cursor()
-        conditions = " AND ".join([f"{k}=?" for k in query.keys()])
-        cursor.execute(f"DELETE FROM {self.table_name} WHERE {conditions}", list(query.values()))
-        db.commit()
-        return {"deleted_count": cursor.rowcount}
-    
-    async def count_documents(self, query: dict = None):
-        cursor = db.cursor()
-        if query:
-            conditions = " AND ".join([f"{k}=?" for k in query.keys()])
-            cursor.execute(f"SELECT COUNT(*) FROM {self.table_name} WHERE {conditions}", list(query.values()))
-        else:
-            cursor.execute(f"SELECT COUNT(*) FROM {self.table_name}")
-        return cursor.fetchone()[0]
-    
-    async def delete_many(self, query: dict = None):
-        cursor = db.cursor()
-        if query:
-            conditions = " AND ".join([f"{k}=?" for k in query.keys()])
-            cursor.execute(f"DELETE FROM {self.table_name} WHERE {conditions}", list(query.values()))
-        else:
-            cursor.execute(f"DELETE FROM {self.table_name}")
-        db.commit()
-        return {"deleted_count": cursor.rowcount}
+async def get_projects_collection():
+    """Get the projects collection"""
+    db = await get_database()
+    return db.projects
 
 
-async def get_draws_collection():
-    """Récupère la collection des tirages"""
-    return DBCollection("draws")
+async def get_chat_messages_collection():
+    """Get the chat_messages collection"""
+    db = await get_database()
+    return db.chat_messages
 
 
-async def get_analysis_collection():
-    """Récupère la collection des analyses"""
-    return DBCollection("analysis")
-
-
-async def get_recommendations_collection():
-    """Récupère la collection des recommandations"""
-    return DBCollection("recommendations")
-
-
-async def get_matches_collection():
-    """Récupère la collection des matchs sportifs"""
-    return db["matches"]
-
-
-async def get_predictions_collection():
-    """Récupère la collection des prédictions sportives"""
-    return db["predictions"]
+async def get_status_checks_collection():
+    """Get the status_checks collection"""
+    db = await get_database()
+    return db.status_checks

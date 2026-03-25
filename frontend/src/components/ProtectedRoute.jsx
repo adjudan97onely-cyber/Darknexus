@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import api from '../services/axiosConfig';
 
 const ProtectedRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -25,15 +22,7 @@ const ProtectedRoute = ({ children }) => {
 
     try {
       // Vérifier le token auprès du backend
-      const response = await axios.post(
-        `${API}/auth/verify`,
-        {},
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+      const response = await api.post(`/api/auth/verify`, {});
 
       if (response.data.valid) {
         setIsAuthenticated(true);

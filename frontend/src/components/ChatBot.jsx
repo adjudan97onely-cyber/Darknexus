@@ -5,10 +5,7 @@ import { Card } from './ui/card';
 import { Send, Loader2, Bot, User, Sparkles } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import VoiceInput from './VoiceInput';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import api from '../services/axiosConfig';
 
 const ChatBot = ({ projectId, onCodeUpdate }) => {
   const [messages, setMessages] = useState([]);
@@ -33,10 +30,25 @@ const ChatBot = ({ projectId, onCodeUpdate }) => {
   const loadChatHistory = async () => {
     try {
       setLoadingHistory(true);
-      const response = await axios.get(`${API}/chat/history/${projectId}`);
+      const response = await api.get(`/api/chat/history/${projectId}`);
       setMessages(response.data);
     } catch (error) {
       console.error('Error loading chat history:', error);
+      
+      let errorMsg = "Impossible de charger l'historique du chat";
+      if (error.response?.status === 401) {
+        errorMsg = "Session expirée, veuillez vous reconnecter";
+      } else if (error.response?.status === 404) {
+        errorMsg = "Projet non trouvé";
+      } else if (error.response?.data?.detail) {
+        errorMsg = error.response.data.detail;
+      }
+      
+      toast({
+        title: "❌ Erreur",
+        description: errorMsg,
+        variant: "destructive"
+      });
     } finally {
       setLoadingHistory(false);
     }
@@ -59,7 +71,7 @@ const ChatBot = ({ projectId, onCodeUpdate }) => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${API}/chat/message`, {
+      const response = await api.post(`/api/chat/message`, {
         project_id: projectId,
         message: userMessage
       });
@@ -77,11 +89,32 @@ const ChatBot = ({ projectId, onCodeUpdate }) => {
         onCodeUpdate();
       }
 
+      // Toast de succès
+      toast({
+        title: "✅ Message envoyé",
+        description: "L'IA a traité votre demande"
+      });
+
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      // Supprimer le message utilisateur en cas d'erreur
+      setMessages(prev => prev.filter(msg => msg.timestamp !== userMessage));
+      
+      let errorMsg = "Impossible d'envoyer le message";
+      if (error.response?.status === 401) {
+        errorMsg = "Session expirée, veuillez vous reconnecter";
+      } else if (error.response?.status === 404) {
+        errorMsg = "Le projet ou la conversation n'existe pas";
+      } else if (error.response?.status === 422) {
+        errorMsg = "Format de message invalide";
+      } else if (error.response?.data?.detail) {
+        errorMsg = error.response.data.detail;
+      }
+      
       toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer le message",
+        title: "❌ Erreur",
+        description: errorMsg,
         variant: "destructive"
       });
     } finally {

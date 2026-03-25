@@ -4,8 +4,7 @@ import { Card } from './ui/card';
 import { Mic, X, Send, Loader2, Volume2, StopCircle, Minimize2, Maximize2 } from 'lucide-react';
 import VoiceInput from './VoiceInput';
 import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import { buildBackendUrl } from '../services/backendUrl';
 
 /**
  * ASSISTANT VOCAL FLOTTANT - Style WhatsApp
@@ -44,7 +43,7 @@ const FloatingVoiceAssistant = () => {
 
     try {
       // Envoyer au backend pour traitement
-      const response = await axios.post(`${BACKEND_URL}/api/chat/voice-command`, {
+      const response = await axios.post(buildBackendUrl('/api/chat/voice-command'), {
         voice_input: transcript
       });
 

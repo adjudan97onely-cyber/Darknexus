@@ -1,6 +1,5 @@
 {
-  "buildCommand": "cd frontend && yarn install && yarn build",
-  "outputDirectory": "frontend/build",
-  "installCommand": "yarn install",
-  "framework": null
+  "buildCommand": "cd killagain-food && npm install && npm run build",
+  "outputDirectory": "killagain-food/dist",
+  "framework": "vite"
 }

@@ -1,11 +1,9 @@
-import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+import api from './axiosConfig';
 
 export const aiAssistantAPI = {
   // Analyse l'idée de projet
   analyzeIdea: async (userInput) => {
-    const response = await axios.post(`${API_URL}/api/ai-assistant/analyze`, {
+    const response = await api.post(`/api/ai-assistant/analyze`, {
       user_input: userInput
     });
     return response.data;
@@ -13,7 +11,7 @@ export const aiAssistantAPI = {
 
   // Génère la description complète
   generateDescription: async (userInput, answers = {}) => {
-    const response = await axios.post(`${API_URL}/api/ai-assistant/generate`, {
+    const response = await api.post(`/api/ai-assistant/generate`, {
       user_input: userInput,
       answers: answers
     });

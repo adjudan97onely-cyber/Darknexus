@@ -11,9 +11,7 @@ import { ArrowLeft, Sparkles, Loader2, CheckCircle2, Zap, Rocket } from 'lucide-
 import { projectTypes } from '../mock/mockData';
 import { useToast } from '../hooks/use-toast';
 import WhisperVoiceInput from '../components/WhisperVoiceInput';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import { buildBackendUrl } from '../services/backendUrl';
 
 const QuickCreatePage = () => {
   const navigate = useNavigate();
@@ -61,7 +59,7 @@ const QuickCreatePage = () => {
 
     try {
       // Utiliser fetch pour le streaming (pas axios)
-      const response = await fetch(`${BACKEND_URL}/api/streaming/generate-project`, {
+      const response = await fetch(buildBackendUrl('/api/streaming/generate-project'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

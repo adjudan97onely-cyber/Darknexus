@@ -6,6 +6,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Shield, ArrowLeft, Key, CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
+import { buildBackendUrl } from '../services/backendUrl';
 
 const AdminSettingsPage = () => {
   const navigate = useNavigate();
@@ -58,12 +59,11 @@ const AdminSettingsPage = () => {
     setLoading(true);
 
     try {
-      const API_URL = process.env.REACT_APP_BACKEND_URL;
       const token = localStorage.getItem('token');
 
       // Vérifier d'abord l'ancien mot de passe en tentant une connexion
       const user = JSON.parse(localStorage.getItem('user'));
-      const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
+      const loginResponse = await fetch(buildBackendUrl('/api/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -85,7 +85,7 @@ const AdminSettingsPage = () => {
       }
 
       // Appeler l'API de changement de mot de passe
-      const response = await fetch(`${API_URL}/api/auth/change-password`, {
+      const response = await fetch(buildBackendUrl('/api/auth/change-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

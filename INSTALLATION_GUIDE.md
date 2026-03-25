@@ -1,287 +1,344 @@
-# 🚀 Guide Complet - Analyseur Intelligent Multi-Loteries & Paris Sportifs
+# 🚀 ADJ KILLAGAIN IA 2.0 - INSTALLATION LOCALE
 
-## 📋 Prérequis Système
+## 🎯 BIENVENUE DANS TON ARME DE GUERRE IA !
 
-- **Python**: 3.8 ou supérieur
-- **Node.js**: 16 ou supérieur
-- **MongoDB**: 4.5 ou supérieur (local ou cloud)
-- **Systèmes**: Windows, macOS, Linux
+Cette plateforme te permet de créer des projets illimités avec 6 modèles IA experts + l'agent E1 LITE.
 
-## 🔧 Installation Étape par Étape
+---
 
-### 1️⃣ Préparation MongoDB
+## 📋 CE QUI EST INCLUS
 
-#### Option A: MongoDB Local
+✅ **Backend FastAPI** - Serveur Python avec agent intelligent
+✅ **Frontend React** - Interface moderne et intuitive
+✅ **Agent E1 LITE** - Agent intelligent complet
+✅ **6 Modèles IA** - GPT-5, Claude 4, Gemini 3
+✅ **Chat Live** - Conversation avec l'IA
+✅ **Base de données MongoDB** - Stockage des projets
+
+---
+
+## 💻 PRÉ-REQUIS (À INSTALLER D'ABORD)
+
+### 1. **Python 3.11+**
+- Windows: https://www.python.org/downloads/
+- Mac: `brew install python@3.11`
+- Linux: `sudo apt install python3.11`
+
+### 2. **Node.js 18+**
+- Windows/Mac/Linux: https://nodejs.org/
+
+### 3. **MongoDB**
+- Windows/Mac: https://www.mongodb.com/try/download/community
+- Linux: `sudo apt install mongodb`
+- OU utiliser MongoDB Atlas (cloud gratuit): https://www.mongodb.com/cloud/atlas
+
+### 4. **Yarn** (gestionnaire de packages)
 ```bash
-# Windows
-# Télécharger depuis https://www.mongodb.com/try/download/community
-# Installer et faire tourner mongod
-
-# macOS
-brew install mongodb-community
-brew services start mongodb-community
-
-# Linux
-sudo apt-get install -y mongodb
-sudo systemctl start mongod
+npm install -g yarn
 ```
 
-#### Option B: MongoDB Atlas (Cloud)
-1. Créer un compte sur [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Créer un cluster gratuit
-3. Copier la URI de connexion
-4. L'utiliser dans le fichier `.env` du backend
+---
 
-### 2️⃣ Configuration Backend
+## 🔑 CLÉ API REQUISE
+
+Tu as 2 options :
+
+### Option 1 : Utiliser la clé Emergent LLM (Recommandé)
+- Va sur https://emergent.sh
+- Profile → Universal Key
+- Copie ta clé : `sk-emergent-...`
+- Ajoute du crédit si nécessaire
+
+### Option 2 : Utiliser ta propre clé OpenAI
+- Va sur https://platform.openai.com/api-keys
+- Crée une clé API
+- Ajoute du crédit sur ton compte
+
+---
+
+## 🚀 INSTALLATION ÉTAPE PAR ÉTAPE
+
+### Étape 1 : Extraire le ZIP
+```bash
+# Extrais le fichier ADJ_KILLAGAIN_IA_2.0.zip où tu veux
+cd ADJ_KILLAGAIN_IA_2.0
+```
+
+### Étape 2 : Configurer le Backend
 
 ```bash
-# Naviguer au dossier backend
-cd analytics-lottery/backend
+# Aller dans le dossier backend
+cd backend
 
-# Créer un environnement virtuel
+# Créer l'environnement virtuel Python
 python -m venv venv
 
 # Activer l'environnement
 # Windows:
 venv\Scripts\activate
-# macOS/Linux:
+# Mac/Linux:
 source venv/bin/activate
 
 # Installer les dépendances
 pip install -r requirements.txt
 
-# Créer le fichier .env
+# Configurer les variables d'environnement
+# Copier le fichier .env.example vers .env
 cp .env.example .env
 
-# Éditer .env avec vos configurations
-# Exemple pour MongoDB local:
-# MONGO_URL=mongodb://localhost:27017
-# DB_NAME=adj_killagain_db
-# PORT=5001
+# Éditer le fichier .env avec tes informations
+# Windows: notepad .env
+# Mac: nano .env
+# Linux: nano .env
 ```
 
-### 3️⃣ Configuration Frontend
+**Dans le fichier `.env`, configure :**
+```env
+MONGO_URL=mongodb://localhost:27017
+DB_NAME=adj_killagain_db
+CORS_ORIGINS=*
+EMERGENT_LLM_KEY=sk-emergent-TON_CLE_ICI
+```
+
+### Étape 3 : Configurer le Frontend
 
 ```bash
-# Naviguer au dossier frontend
-cd analytics-lottery/frontend
+# Ouvrir un NOUVEAU terminal
+cd frontend
 
 # Installer les dépendances
-npm install
+yarn install
 
-# Créer le fichier .env
+# Configurer l'environnement
 cp .env.example .env
 
-# Vérifier que VITE_API_URL pointe vers le backend
-# Par défaut: http://localhost:5001
+# Éditer le fichier .env
+# Windows: notepad .env
+# Mac/Linux: nano .env
 ```
 
-## ▶️ Lancer l'Application
+**Dans le fichier `.env`, configure :**
+```env
+REACT_APP_BACKEND_URL=http://localhost:8001
+WDS_SOCKET_PORT=3000
+ENABLE_HEALTH_CHECK=false
+```
 
-### Terminal 1: Démarrer MongoDB (si local)
+### Étape 4 : Démarrer MongoDB
+
 ```bash
+# Terminal séparé
+
+# Si MongoDB installé localement :
 mongod
+
+# Si MongoDB Atlas (cloud) :
+# Utilise l'URL de connexion fournie par Atlas dans backend/.env
 ```
 
-### Terminal 2: Lancer le Backend
+### Étape 5 : Démarrer le Backend
+
 ```bash
-cd analytics-lottery/backend
-
-# Activer l'environnement virtuel (si pas déjà actif)
-source venv/bin/activate  # macOS/Linux
-# ou
-venv\Scripts\activate     # Windows
-
-# Démarrer le serveur FastAPI
-python main.py
-
-# Vous devriez voir:
-# ✅ Application démarrée avec succès
-# 📊 Données de sample initialisées (ou détectées)
-# Serveur actif sur http://localhost:5001
+# Dans le terminal backend (avec venv activé)
+cd backend
+uvicorn server:app --host 0.0.0.0 --port 8001 --reload
 ```
 
-### Terminal 3: Lancer le Frontend
+Tu devrais voir :
+```
+INFO:     Uvicorn running on http://0.0.0.0:8001
+INFO:     Application startup complete.
+```
+
+### Étape 6 : Démarrer le Frontend
+
 ```bash
-cd analytics-lottery/frontend
-
-# Démarrer le serveur de développement Vite
-npm run dev
-
-# Vous devriez voir:
-# VITE v... ready in XXX ms ⚡
-# ➜  Local:   http://localhost:5173
+# Dans le terminal frontend
+cd frontend
+yarn start
 ```
 
-## 🌐 Accéder à l'Application
-
-Ouvrir votre navigateur à: **http://localhost:5173**
-
-## 📊 Vérifier que tout fonctionne
-
-### 1. Dashboard
-- Devrait afficher les 3 loteries (Kéno, Euromillions, Loto)
-- Afficher les stats globales des sports
-
-### 2. Analyser Kéno
-- Cliquer sur "Keno" dans la barre latérale
-- Voir les fréquences, numéros chauds/froids
-- Consulter les recommandations
-
-### 3. Vérifier l'API
-```bash
-# Dans un terminal/PowerShell
-curl http://localhost:5001/health
-
-# Réponse attendue:
-# {"status":"healthy","database":"connected"}
-```
-
-## 🐛 Dépannage
-
-### Erreur: "Impossible de se connecter à MongoDB"
-```python
-# Vérifier que mongod tourne
-# Vérifier MONGO_URL dans .env
-
-# Si MongoDB n'est pas là, télécharger depuis:
-# https://www.mongodb.com/try/download/community
-```
-
-### Erreur: "Port 5001 déjà utilisé"
-```bash
-# Changer le port dans backend/.env
-PORT=5002
-
-# Ou tuer le processus existant
-# Windows:
-netstat -ano | findstr :5001
-taskkill /PID <PID> /F
-
-# macOS/Linux:
-lsof -ti:5001 | xargs kill -9
-```
-
-### Erreur: "Port 5173 déjà utilisé"
-```bash
-# Vite trouvera automatiquement un autre port
-# Généralement 5174, 5175, etc.
-```
-
-### Erreur: "Module not found" (Python)
-```bash
-# S'assurer que l'environnement virtuel est actif
-# Réinstaller les dépendances
-pip install -r requirements.txt --upgrade
-```
-
-### Erreur: "Module not found" (Node.js)
-```bash
-# Réinstaller node_modules
-rm -rf node_modules
-npm cache clean --force
-npm install
-```
-
-### API retourne 404
-- Vérifier que le backend tourne sur le bon port
-- Vérifier que VITE_API_URL dans frontend/.env est correct
-- Vérifier la console navigateur (F12) pour les erreurs
-
-## 📈 Utiliser l'Application
-
-### Dashboard
-- Vue d'ensemble de toutes les analyses
-- Cartes récapitulatives avec stats clés
-- Onglets pour chaque section
-
-### Kéno
-- **Analyse Détaillée**: Graphiques de distribution, top numéros
-- **Recommandations**: Numéros recommandés avec scores
-- **Grilles Générées**: Grilles complètes prêtes à jouer
-
-### Euromillions
-- Même structure que Kéno
-- Focus sur les 5 numéros principaux
-- Bonus tracké séparément
-
-### Loto
-- Analyse des 49 numéros
-- Visualisation pair/impair et bas/haut
-- Tests statistiques chi-square
-
-### Football (Sports)
-- Recommandations de matchs
-- Prédictions avec probabilités
-- Analyse de forme d'équipe
-
-## 🔄 Workflow Typique
-
-1. **Lancer l'app** → Voir le Dashboard
-2. **Choisir une loterie** → Analyser les données
-3. **Consulter les recommandations** → Voir les numéros conseillés
-4. **Générer une grille** → Obtenir une grille complète
-5. **Pour les sports** → Prédire les matchs prochains
-
-## 💾 Données et Persistance
-
-### Données de Sample
-- Générées automatiquement au 1er démarrage
-- Sauvegardées dans MongoDB
-- 100+ tirages simulés par loterie
-- 50+ matchs simulés
-
-### Collections MongoDB
-```
-adj_killagain_db/
-├── draws              # Tous les tirages de loterie
-├── analysis           # Résultats d'analyse mis en cache
-├── recommendations    # Recommandations générées
-├── matches            # Données des matchs
-└── predictions        # Prédictions sportives
-```
-
-## 🚀 Déploiement (Production)
-
-### Backend (Heroku/Render/etc)
-```bash
-# Créer un Procfile
-echo "web: gunicorn main:app" > Procfile
-
-# Ajouter gunicorn à requirements.txt
-pip freeze | grep -v venv > requirements.txt
-echo "gunicorn" >> requirements.txt
-```
-
-### Frontend (Vercel/Netlify)
-```bash
-# Build
-npm run build
-
-# Output dans le dossier dist/
-# Déployer ce dossier
-```
-
-## 📞 Support et Questions
-
-- Consulter les logs (voir terminal où tourne l'app)
-- Vérifier la console navigateur (F12)
-- Vérifier que tous les services tournent
-
-## 🎯 Prochaines Étapes
-
-✅ **Phase 1 Complète:**
-- ✓ Architecture complète
-- ✓ Algorithmes d'analyse
-- ✓ API fonctionnelle
-- ✓ Interface grafique
-
-🔜 **Phase 2 (Futur):**
-- WebSockets pour temps réel
-- Machine Learning
-- Données réelles
-- Persistance utilisateur
+Ton navigateur devrait s'ouvrir automatiquement sur `http://localhost:3000`
 
 ---
 
-**Bon analyse! 🎰**
+## 🎉 C'EST INSTALLÉ !
+
+**Ton arme IA est maintenant opérationnelle sur ton PC ! 🔥**
+
+### URLs d'accès :
+- **Frontend** : http://localhost:3000
+- **Backend API** : http://localhost:8001
+- **Documentation API** : http://localhost:8001/docs
+
+---
+
+## 💪 UTILISATION
+
+### Créer un projet :
+1. Clique sur "Créer un Projet"
+2. Décris ton projet (texte ou vocal)
+3. Choisis le modèle IA
+4. Génère !
+
+### Utiliser l'Agent E1 LITE :
+1. Ouvre un projet
+2. Clique sur "Chat IA Live 💬"
+3. Demande ce que tu veux :
+   - "Analyse mon projet"
+   - "Debug tout"
+   - "Améliore le design"
+   - "Ajoute [fonctionnalité]"
+
+### Actions disponibles :
+- ✏️ **Éditer** : Modifier nom/description
+- 🔧 **Améliorer** : Upgrades via modal
+- 💬 **Chat** : Conversation avec agent intelligent
+- 📦 **Télécharger** : Exporter en ZIP
+- 🗑️ **Supprimer** : Effacer un projet
+
+---
+
+## 🔧 DÉPANNAGE
+
+### Le backend ne démarre pas
+```bash
+# Vérifie que MongoDB tourne
+# Vérifie le fichier .env
+# Vérifie que le port 8001 est libre
+```
+
+### Le frontend ne se connecte pas au backend
+```bash
+# Vérifie que REACT_APP_BACKEND_URL=http://localhost:8001
+# Redémarre le frontend après changement .env
+```
+
+### Erreur "EMERGENT_LLM_KEY not found"
+```bash
+# Ajoute ta clé dans backend/.env
+# Redémarre le backend
+```
+
+### MongoDB ne démarre pas
+```bash
+# Windows : Installe MongoDB Community Server
+# Mac : brew services start mongodb-community
+# Linux : sudo systemctl start mongodb
+# Ou utilise MongoDB Atlas (gratuit)
+```
+
+---
+
+## 📚 COMMANDES UTILES
+
+### Arrêter les serveurs
+```bash
+# Ctrl+C dans chaque terminal
+```
+
+### Redémarrer après modifications
+```bash
+# Backend : Le --reload s'en charge automatiquement
+# Frontend : Également auto-reload
+
+# Si besoin de redémarrage manuel :
+# Ctrl+C puis relancer les commandes
+```
+
+### Voir les logs
+```bash
+# Backend : Affichés directement dans le terminal
+# Frontend : Console du navigateur (F12)
+```
+
+### Mettre à jour les dépendances
+```bash
+# Backend
+cd backend
+pip install -r requirements.txt
+
+# Frontend
+cd frontend
+yarn install
+```
+
+---
+
+## 🌐 DÉPLOIEMENT EN LIGNE (OPTIONNEL)
+
+### Sur un serveur VPS (DigitalOcean, AWS, etc.)
+
+1. **Copie le code sur le serveur**
+```bash
+scp -r ADJ_KILLAGAIN_IA_2.0 user@ton-serveur:/home/user/
+```
+
+2. **Installe les dépendances sur le serveur**
+```bash
+ssh user@ton-serveur
+cd ADJ_KILLAGAIN_IA_2.0
+# Suis les étapes d'installation
+```
+
+3. **Configure Nginx comme reverse proxy**
+```nginx
+server {
+    listen 80;
+    server_name ton-domaine.com;
+    
+    location / {
+        proxy_pass http://localhost:3000;
+    }
+    
+    location /api {
+        proxy_pass http://localhost:8001;
+    }
+}
+```
+
+4. **Utilise PM2 pour garder les processus actifs**
+```bash
+npm install -g pm2
+pm2 start backend/server.py --interpreter python
+pm2 start "yarn start" --name frontend --cwd frontend
+pm2 save
+pm2 startup
+```
+
+---
+
+## 🆘 SUPPORT
+
+Des questions ? Besoin d'aide ?
+
+1. Vérifie la documentation API : http://localhost:8001/docs
+2. Regarde les logs dans les terminaux
+3. Assure-toi que tous les prérequis sont installés
+
+---
+
+## 🎯 PROCHAINES ÉTAPES
+
+Maintenant que ton arme est installée :
+
+1. ✅ Crée ton premier projet
+2. ✅ Teste l'agent E1 LITE
+3. ✅ Expérimente les 6 modèles IA
+4. ✅ Utilise la dictée vocale
+5. ✅ Deviens le ROI ! 👑
+
+---
+
+## 📝 NOTES IMPORTANTES
+
+- **Clé API** : Garde ta clé secrète, ne la partage jamais
+- **Crédits** : Surveille ton utilisation sur le dashboard Emergent
+- **Sauvegarde** : MongoDB stocke tout dans `/data/db`
+- **Performance** : Pour de meilleurs résultats, utilise un PC avec 8GB+ RAM
+
+---
+
+**BIENVENUE DANS TON ARME IA, MON POTE ! 🔥👑**
+
+*ADJ KILLAGAIN IA 2.0 - Powered by E1 LITE*

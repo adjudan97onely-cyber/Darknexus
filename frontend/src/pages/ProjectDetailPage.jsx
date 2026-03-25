@@ -34,9 +34,21 @@ const ProjectDetailPage = () => {
     
     // Si le projet est en cours de génération, poller toutes les 3 secondes
     let pollInterval;
+    const MAX_POLLING_TIME = 5 * 60 * 1000; // 5 minutes
+    const startTime = Date.now();
     
     const startPolling = async () => {
       try {
+        // Vérifier si nous avons dépassé le délai maximal
+        if (Date.now() - startTime > MAX_POLLING_TIME) {
+          toast({
+            title: "⏱️ Délai dépassé",
+            description: "La génération prend plus de 5 minutes. Veuillez rafraîchir la page ou contacter le support.",
+            variant: "destructive"
+          });
+          return;
+        }
+
         const data = await projectsAPI.getProject(projectId);
         setProject(data);
         
@@ -58,6 +70,11 @@ const ProjectDetailPage = () => {
         }
       } catch (error) {
         console.error('Polling error:', error);
+        toast({
+          title: "❌ Erreur",
+          description: "Impossible à vérifier le statut du projet",
+          variant: "destructive"
+        });
       }
     };
     

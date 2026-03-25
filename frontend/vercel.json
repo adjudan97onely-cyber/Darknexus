@@ -1,8 +1,10 @@
 {
+  "buildCommand": "CI=false yarn run build",
+  "outputDirectory": "build",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://analytics-lottery-backend.vercel.app/api/$1"
+      "destination": "https://adj-killagain-ia-2-0-adjudan97onely-6632s-projects.vercel.app/api/$1"
     },
     {
       "source": "/(.*)",

@@ -1,0 +1,530 @@
+﻿ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+Ôòæ   VALIDATION UX ÔÇö VUE CLIENT PAYANT                    Ôòæ
+ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
+
+
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+Ôûê  ├ëCRAN: "repas muscu"
+Ôûê  ­ƒÅï´©Å Muscu
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+
+ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+Ôöé  ­ƒô▒ ├ëCRAN APPLICATION ÔÇö Ce que le client voit       Ôöé
+ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒÆ¼ CHAT: "CHEF ├ëTOIL├ë - Omelette persil (Chef ├ëtoil├® - 2 pers.)"
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  Ôöé Ô£ª Omelette persil (Chef ├ëtoil├® - 2 pers.) (2x portions)
+  Ôöé ­ƒôè Analyse d'intention: Prot├®ines ├®lev├®es ┬À riche en prot├®ines
+  Ôöé Ô£à Pourquoi ce plat: Ingr├®dients riches: oeuf ÔÇö Omelette tendre creuse dedans, pli├®e parfaite, garniture simple
+  Ôöé ­ƒôê Score coh├®rence: 90/100 | Riche en prot├®ines
+  Ôöé ­ƒòÉ 9 min ÔÜí | ­ƒÆ░ ├ëconomique | ­ƒÑ® Prot├®ines: ├ëlev├®
+  Ôöé Signature culinaire: Omelette tendre creuse dedans, pli├®e parfaite, garniture simple
+  Ôöé Fondamentaux essentiels:
+  Ôöé   ÔÇó oeufs battus doux
+  Ôöé   ÔÇó beurre frais mousseux
+  Ôöé   ÔÇó pliage avant bien cuit
+  Ôöé Techniques ma├«tris├®es:
+  Ôöé   ÔÇó sear: 8 min
+  Ôöé ... (7 lignes suppl├®mentaires)
+
+  ­ƒôï CARTES RECETTES (5 r├®sultats):
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Omelette persil
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À oeuf
+  Ôöé ÔÅ▒´©Å  18 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  beurre, oeuf, persil
+  Ôöé ­ƒôè  Score: 90/100 ┬À Riche en prot├®ines
+  Ôöé ­ƒÆí  Ingr├®dients riches: oeuf ÔÇö Omelette tendre creuse dedans, pli├®e parfai...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Poulet grill├® ├®pic├®
+  Ôöé ­ƒÅÀ´©Å  mondiale ┬À viande-grillee
+  Ôöé ÔÅ▒´©Å  18 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  citron, epices, poulet
+  Ôöé ­ƒôè  Score: 90/100 ┬À Riche en prot├®ines
+  Ôöé ­ƒÆí  Ingr├®dients riches: poulet ÔÇö Poulet juteux cro├╗te ├®pic├®e dor├®e, tendre...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 3 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Saumon po├¬l├®
+  Ôöé ­ƒÅÀ´©Å  mondiale ┬À poisson-grille
+  Ôöé ÔÅ▒´©Å  22 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  aneth, citron, saumon
+  Ôöé ­ƒôè  Score: 90/100 ┬À Riche en prot├®ines
+  Ôöé ­ƒÆí  Ingr├®dients riches:  ÔÇö Pav├® de saumon peau croustillante, chair fondan...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 4 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Filet mignon en cro├╗te
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À viande-noble
+  Ôöé ÔÅ▒´©Å  55 min ┬À Difficult├® 5/5
+  Ôöé ­ƒÑÿ  champignon, moutarde, pate-feuilletee, porc
+  Ôöé ­ƒôè  Score: 90/100 ┬À Riche en prot├®ines
+  Ôöé ­ƒÆí  Ingr├®dients riches:  ÔÇö Filet mignon dor├® en cro├╗te feuillet├®e, duxelle...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 5 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Colombo de poulet
+  Ôöé ­ƒÅÀ´©Å  antillaise ┬À curry-arom
+  Ôöé ÔÅ▒´©Å  38 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  ail, epices, oignon, poulet, tomate
+  Ôöé ­ƒôè  Score: 65/100 ┬À Prot├®ines mod├®r├®es
+  Ôöé ­ƒÆí  Ingr├®dients riches: poulet ÔÇö Poulet tendre dans sauce riche epices col...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒôî ALTERNATIVES SUGG├ëR├ëES:
+     ÔÇó Poulet grill├® ├®pic├® (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Saumon po├¬l├® (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Filet mignon en cro├╗te (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Colombo de poulet (Chef ├ëtoil├® - 2 pers.) (score 65)
+
+  ­ƒöÿ BOUTONS:
+     [Voir recette compl├¿te]
+     [Fondamentaux culinaires]
+     [Erreurs ├á ├®viter]
+
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+Ôûê  ├ëCRAN: "repas 2Ôé¼"
+Ôûê  ­ƒÆ░ Budget 2Ôé¼
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+
+ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+Ôöé  ­ƒô▒ ├ëCRAN APPLICATION ÔÇö Ce que le client voit       Ôöé
+ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒÆ¼ CHAT: "CHEF ├ëTOIL├ë - Bokit traditionnel (Chef ├ëtoil├® - 2 pers.)"
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  Ôöé Ô£ª Bokit traditionnel (Chef ├ëtoil├® - 2 pers.) (1x portions)
+  Ôöé ­ƒôè Analyse d'intention: Budget serr├® ┬À tr├¿s ├®conomique
+  Ôöé Ô£à Pourquoi ce plat: Ingr├®dients ├®conomiques: farine, levure ÔÇö Poche gonfl├®e dor├®e avec int├®rieur moelleux, garnie apr├¿s
+  Ôöé ­ƒôê Score coh├®rence: 90/100 | Tr├¿s ├®conomique
+  Ôöé ­ƒòÉ 65 min ­ƒòÉ | ­ƒÆ░ ├ëconomique | ­ƒÑ® Prot├®ines: Faible
+  Ôöé Signature culinaire: Poche gonfl├®e dor├®e avec int├®rieur moelleux, garnie apr├¿s
+  Ôöé Fondamentaux essentiels:
+  Ôöé   ÔÇó pate levee legere
+  Ôöé   ÔÇó friture exact 165C
+  Ôöé   ÔÇó repos essentiellement
+  Ôöé Techniques ma├«tris├®es:
+  Ôöé   ÔÇó fry: 20 min
+  Ôöé ... (7 lignes suppl├®mentaires)
+
+  ­ƒôï CARTES RECETTES (5 r├®sultats):
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Bokit traditionnel
+  Ôöé ­ƒÅÀ´©Å  antillaise ┬À friture
+  Ôöé ÔÅ▒´©Å  65 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  farine, levure
+  Ôöé ­ƒôè  Score: 90/100 ┬À Tr├¿s ├®conomique
+  Ôöé ­ƒÆí  Ingr├®dients ├®conomiques: farine, levure ÔÇö Poche gonfl├®e dor├®e avec int...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Colombo de poulet
+  Ôöé ­ƒÅÀ´©Å  antillaise ┬À curry-arom
+  Ôöé ÔÅ▒´©Å  38 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  ail, epices, oignon, poulet, tomate
+  Ôöé ­ƒôè  Score: 90/100 ┬À Tr├¿s ├®conomique
+  Ôöé ­ƒÆí  Ingr├®dients ├®conomiques: ail, epices, oignon, poulet, tomate ÔÇö Poulet ...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 3 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Quiche lorraine
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À tarte-oeufs
+  Ôöé ÔÅ▒´©Å  22 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  creme, farine, lard, oeuf
+  Ôöé ­ƒôè  Score: 90/100 ┬À Tr├¿s ├®conomique
+  Ôöé ­ƒÆí  Ingr├®dients ├®conomiques: farine, oeuf, creme, lard ÔÇö Tarte cr├®meuse la...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 4 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Gratin dauphinois
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À gratin
+  Ôöé ÔÅ▒´©Å  43 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  creme, lait, pomme-terre
+  Ôöé ­ƒôè  Score: 90/100 ┬À Tr├¿s ├®conomique
+  Ôöé ­ƒÆí  Ingr├®dients ├®conomiques: pomme-terre, creme, lait ÔÇö Pommes de terre cr...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 5 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Pizza margherita
+  Ôöé ­ƒÅÀ´©Å  italienne ┬À pizza
+  Ôöé ÔÅ▒´©Å  122 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  farine, fromage, levure, tomate
+  Ôöé ­ƒôè  Score: 90/100 ┬À Tr├¿s ├®conomique
+  Ôöé ­ƒÆí  Ingr├®dients ├®conomiques: farine, levure, tomate, fromage ÔÇö Pizza crous...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒôî ALTERNATIVES SUGG├ëR├ëES:
+     ÔÇó Colombo de poulet (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Quiche lorraine (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Gratin dauphinois (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Pizza margherita (Chef ├ëtoil├® - 2 pers.) (score 90)
+
+  ­ƒöÿ BOUTONS:
+     [Voir recette compl├¿te]
+     [Fondamentaux culinaires]
+     [Erreurs ├á ├®viter]
+
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+Ôûê  ├ëCRAN: "plat rapide soir"
+Ôûê  ÔÜí Rapide soir
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+
+ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+Ôöé  ­ƒô▒ ├ëCRAN APPLICATION ÔÇö Ce que le client voit       Ôöé
+ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒÆ¼ CHAT: "CHEF ├ëTOIL├ë - Omelette persil (Chef ├ëtoil├® - 2 pers.)"
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  Ôöé Ô£ª Omelette persil (Chef ├ëtoil├® - 2 pers.) (2x portions)
+  Ôöé ­ƒôè Analyse d'intention: Rapide (< 20 min) ┬À max 20 min
+  Ôöé Ô£à Pourquoi ce plat: Temps total: 9 min (prep 5 + cook 4) ÔÇö Omelette tendre creuse dedans, pli├®e parfaite, garniture simple
+  Ôöé ­ƒôê Score coh├®rence: 90/100 | 9 min total
+  Ôöé ­ƒòÉ 9 min ÔÜí | ­ƒÆ░ ├ëconomique | ­ƒÑ® Prot├®ines: ├ëlev├®
+  Ôöé Signature culinaire: Omelette tendre creuse dedans, pli├®e parfaite, garniture simple
+  Ôöé Fondamentaux essentiels:
+  Ôöé   ÔÇó oeufs battus doux
+  Ôöé   ÔÇó beurre frais mousseux
+  Ôöé   ÔÇó pliage avant bien cuit
+  Ôöé Techniques ma├«tris├®es:
+  Ôöé   ÔÇó sear: 8 min
+  Ôöé ... (7 lignes suppl├®mentaires)
+
+  ­ƒôï CARTES RECETTES (5 r├®sultats):
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Omelette persil
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À oeuf
+  Ôöé ÔÅ▒´©Å  18 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  beurre, oeuf, persil
+  Ôöé ­ƒôè  Score: 90/100 ┬À 9 min total
+  Ôöé ­ƒÆí  Temps total: 9 min (prep 5 + cook 4) ÔÇö Omelette tendre creuse dedans, ...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Burger maison
+  Ôöé ­ƒÅÀ´©Å  americaine ┬À sandwich-viande
+  Ôöé ÔÅ▒´©Å  36 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  boeuf, fromage, legumes, pain
+  Ôöé ­ƒôè  Score: 90/100 ┬À 18 min total
+  Ôöé ­ƒÆí  Temps total: 18 min (prep 10 + cook 8) ÔÇö Burger savoureux steak saisir...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 3 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Poulet grill├® ├®pic├®
+  Ôöé ­ƒÅÀ´©Å  mondiale ┬À viande-grillee
+  Ôöé ÔÅ▒´©Å  18 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  citron, epices, poulet
+  Ôöé ­ƒôè  Score: 90/100 ┬À 18 min total
+  Ôöé ­ƒÆí  Temps total: 18 min (prep 5 + cook 10) ÔÇö Poulet juteux cro├╗te ├®pic├®e d...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 4 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Saumon po├¬l├®
+  Ôöé ­ƒÅÀ´©Å  mondiale ┬À poisson-grille
+  Ôöé ÔÅ▒´©Å  22 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  aneth, citron, saumon
+  Ôöé ­ƒôè  Score: 90/100 ┬À 11 min total
+  Ôöé ­ƒÆí  Temps total: 11 min (prep 3 + cook 8) ÔÇö Pav├® de saumon peau croustilla...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 5 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  P├ótes aglio e olio
+  Ôöé ­ƒÅÀ´©Å  italienne ┬À pates
+  Ôöé ÔÅ▒´©Å  17 min ┬À Difficult├® 1/5
+  Ôöé ­ƒÑÿ  ail, huile-olive, pates, piment
+  Ôöé ­ƒôè  Score: 90/100 ┬À 17 min total
+  Ôöé ­ƒÆí  Temps total: 17 min (prep 5 + cook 12) ÔÇö Spaghetti al dente, ail dor├®,...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒôî ALTERNATIVES SUGG├ëR├ëES:
+     ÔÇó Burger maison (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Poulet grill├® ├®pic├® (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Saumon po├¬l├® (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó P├ótes aglio e olio (Chef ├ëtoil├® - 2 pers.) (score 90)
+
+  ­ƒöÿ BOUTONS:
+     [Voir recette compl├¿te]
+     [Fondamentaux culinaires]
+     [Erreurs ├á ├®viter]
+
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+Ôûê  ├ëCRAN: "recette antillaise"
+Ôûê  ­ƒî┤ Antillaise
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+
+ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+Ôöé  ­ƒô▒ ├ëCRAN APPLICATION ÔÇö Ce que le client voit       Ôöé
+ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒÆ¼ CHAT: "CHEF ├ëTOIL├ë - Bokit traditionnel (Chef ├ëtoil├® - 2 pers.)"
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  Ôöé Ô£ª Bokit traditionnel (Chef ├ëtoil├® - 2 pers.) (1x portions)
+  Ôöé ­ƒôè Analyse d'intention: G├®n├®ral
+  Ôöé Ô£à Pourquoi ce plat: Poche gonfl├®e dor├®e avec int├®rieur moelleux, garnie apr├¿s
+  Ôöé ­ƒôê Score coh├®rence: 75/100 | Polyvalent
+  Ôöé ­ƒòÉ 65 min ­ƒòÉ | ­ƒÆ░ ├ëconomique | ­ƒÑ® Prot├®ines: Faible
+  Ôöé Signature culinaire: Poche gonfl├®e dor├®e avec int├®rieur moelleux, garnie apr├¿s
+  Ôöé Fondamentaux essentiels:
+  Ôöé   ÔÇó pate levee legere
+  Ôöé   ÔÇó friture exact 165C
+  Ôöé   ÔÇó repos essentiellement
+  Ôöé Techniques ma├«tris├®es:
+  Ôöé   ÔÇó fry: 20 min
+  Ôöé ... (7 lignes suppl├®mentaires)
+
+  ­ƒôï CARTES RECETTES (5 r├®sultats):
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Bokit traditionnel
+  Ôöé ­ƒÅÀ´©Å  antillaise ┬À friture
+  Ôöé ÔÅ▒´©Å  65 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  farine, levure
+  Ôöé ­ƒôè  Score: 75/100 ┬À Polyvalent
+  Ôöé ­ƒÆí  Poche gonfl├®e dor├®e avec int├®rieur moelleux, garnie apr├¿s...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Colombo de poulet
+  Ôöé ­ƒÅÀ´©Å  antillaise ┬À curry-arom
+  Ôöé ÔÅ▒´©Å  38 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  ail, epices, oignon, poulet, tomate
+  Ôöé ­ƒôè  Score: 75/100 ┬À Polyvalent
+  Ôöé ­ƒÆí  Poulet tendre dans sauce riche epices colombo, l├®gumes fondants...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 3 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Quiche lorraine
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À tarte-oeufs
+  Ôöé ÔÅ▒´©Å  22 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  creme, farine, lard, oeuf
+  Ôöé ­ƒôè  Score: 75/100 ┬À Polyvalent
+  Ôöé ­ƒÆí  Tarte cr├®meuse lard croustillant, custard doree, texture legere...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 4 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Gratin dauphinois
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À gratin
+  Ôöé ÔÅ▒´©Å  43 min ┬À Difficult├® 2/5
+  Ôöé ­ƒÑÿ  creme, lait, pomme-terre
+  Ôöé ­ƒôè  Score: 75/100 ┬À Polyvalent
+  Ôöé ­ƒÆí  Pommes de terre cremeuses fondantes, surface doree et croustillante...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 5 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Pizza margherita
+  Ôöé ­ƒÅÀ´©Å  italienne ┬À pizza
+  Ôöé ÔÅ▒´©Å  122 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  farine, fromage, levure, tomate
+  Ôöé ­ƒôè  Score: 75/100 ┬À Polyvalent
+  Ôöé ­ƒÆí  Pizza croustillante dehors moelleuse dedans, tomate fromage simple...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒôî ALTERNATIVES SUGG├ëR├ëES:
+     ÔÇó Colombo de poulet (Chef ├ëtoil├® - 2 pers.) (score 75)
+     ÔÇó Quiche lorraine (Chef ├ëtoil├® - 2 pers.) (score 75)
+     ÔÇó Gratin dauphinois (Chef ├ëtoil├® - 2 pers.) (score 75)
+     ÔÇó Pizza margherita (Chef ├ëtoil├® - 2 pers.) (score 75)
+
+  ­ƒöÿ BOUTONS:
+     [Voir recette compl├¿te]
+     [Fondamentaux culinaires]
+     [Erreurs ├á ├®viter]
+
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+Ôûê  ├ëCRAN: "impressionner un invit├®"
+Ôûê  ­ƒîƒ Impressionner
+ÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûêÔûê
+
+ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+Ôöé  ­ƒô▒ ├ëCRAN APPLICATION ÔÇö Ce que le client voit       Ôöé
+ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒÆ¼ CHAT: "CHEF ├ëTOIL├ë - Colombo de poulet (Chef ├ëtoil├® - 2 pers.)"
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  Ôöé Ô£ª Colombo de poulet (Chef ├ëtoil├® - 2 pers.) (0.5x portions)
+  Ôöé ­ƒôè Analyse d'intention: Impressionner
+  Ôöé Ô£à Pourquoi ce plat: Technique: braise, difficult├® 3/5 ÔÇö Poulet tendre dans sauce riche epices colombo, l├®gumes fondants
+  Ôöé ­ƒôê Score coh├®rence: 90/100 | Spectaculaire
+  Ôöé ­ƒòÉ 75 min ­ƒòÉ | ­ƒÆ░ ├ëconomique | ­ƒÑ® Prot├®ines: Moyen
+  Ôöé Signature culinaire: Poulet tendre dans sauce riche epices colombo, l├®gumes fondants
+  Ôöé Fondamentaux essentiels:
+  Ôöé   ÔÇó marinade 30min avant
+  Ôöé   ÔÇó epices colombo toastees
+  Ôöé   ÔÇó mijotage 45min min
+  Ôöé Techniques ma├«tris├®es:
+  Ôöé   ÔÇó braise: 25 min
+  Ôöé ... (7 lignes suppl├®mentaires)
+
+  ­ƒôï CARTES RECETTES (5 r├®sultats):
+  ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Colombo de poulet
+  Ôöé ­ƒÅÀ´©Å  antillaise ┬À curry-arom
+  Ôöé ÔÅ▒´©Å  38 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  ail, epices, oignon, poulet, tomate
+  Ôöé ­ƒôè  Score: 90/100 ┬À Spectaculaire
+  Ôöé ­ƒÆí  Technique: braise, difficult├® 3/5 ÔÇö Poulet tendre dans sauce riche epi...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 2 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Dombr├® aux crevettes
+  Ôöé ­ƒÅÀ´©Å  antillaise ┬À pate-epicee
+  Ôöé ÔÅ▒´©Å  50 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  ail, crevette, farine, oignon, tomate
+  Ôöé ­ƒôè  Score: 90/100 ┬À Spectaculaire
+  Ôöé ­ƒÆí  Technique: braise, difficult├® 3/5 ÔÇö Petits dombr├®s pates dans sauce to...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 3 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Coq au vin
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À braise-rouge
+  Ôöé ÔÅ▒´©Å  110 min ┬À Difficult├® 4/5
+  Ôöé ­ƒÑÿ  champignon, lard, oignon, poulet, vin-rouge
+  Ôöé ­ƒôè  Score: 90/100 ┬À Spectaculaire
+  Ôöé ­ƒÆí  Technique: braise, difficult├® 4/5 ÔÇö Poulet tendre vin rouge riche, sau...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 4 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Curry de poulet
+  Ôöé ­ƒÅÀ´©Å  indienne ┬À curry
+  Ôöé ÔÅ▒´©Å  31 min ┬À Difficult├® 3/5
+  Ôöé ­ƒÑÿ  ail, epices, gingembre, oignon, poulet
+  Ôöé ­ƒôè  Score: 90/100 ┬À Spectaculaire
+  Ôöé ­ƒÆí  Technique: braise, difficult├® 3/5 ÔÇö Poulet tendre sauce curry coco onc...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ÔöîÔöÇÔöÇÔöÇ Carte 5 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+  Ôöé ­ƒì¢´©Å  Bouillabaisse
+  Ôöé ­ƒÅÀ´©Å  francaise ┬À soupe-poisson
+  Ôöé ÔÅ▒´©Å  75 min ┬À Difficult├® 4/5
+  Ôöé ­ƒÑÿ  ail, crustace, poisson-blanc, safran, tomate
+  Ôöé ­ƒôè  Score: 90/100 ┬À Spectaculaire
+  Ôöé ­ƒÆí  Technique: braise, difficult├® 4/5 ÔÇö Soupe poisson aromatique riche saf...
+  ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+
+  ­ƒôî ALTERNATIVES SUGG├ëR├ëES:
+     ÔÇó Dombr├® aux crevettes (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Coq au vin (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Curry de poulet (Chef ├ëtoil├® - 2 pers.) (score 90)
+     ÔÇó Bouillabaisse (Chef ├ëtoil├® - 2 pers.) (score 90)
+
+  ­ƒöÿ BOUTONS:
+     [Voir recette compl├¿te]
+     [Fondamentaux culinaires]
+     [Erreurs ├á ├®viter]
+
+
+ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+­ƒöì ANALYSE CRITIQUE ÔÇö OEIL DU CLIENT PAYANT
+ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+
+­ƒôè 1. DIVERSIT├ë ENTRE SC├ëNARIOS
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  Total cartes affich├®es: 25
+  Plats UNIQUES: 15
+  Taux diversit├®: 60%
+
+  ÔÜá´©Å PLATS R├ëP├ëT├ëS (apparaissent dans plusieurs sc├®narios):
+     ÔÇó "Colombo de poulet" ├ù 4 fois ÔåÆ ­ƒÅï´©Å Muscu, ­ƒÆ░ Budget 2Ôé¼, ­ƒî┤ Antillaise, ­ƒîƒ Impressionner
+     ÔÇó "Omelette persil" ├ù 2 fois ÔåÆ ­ƒÅï´©Å Muscu, ÔÜí Rapide soir
+     ÔÇó "Poulet grill├® ├®pic├®" ├ù 2 fois ÔåÆ ­ƒÅï´©Å Muscu, ÔÜí Rapide soir
+     ÔÇó "Saumon po├¬l├®" ├ù 2 fois ÔåÆ ­ƒÅï´©Å Muscu, ÔÜí Rapide soir
+     ÔÇó "Bokit traditionnel" ├ù 2 fois ÔåÆ ­ƒÆ░ Budget 2Ôé¼, ­ƒî┤ Antillaise
+     ÔÇó "Quiche lorraine" ├ù 2 fois ÔåÆ ­ƒÆ░ Budget 2Ôé¼, ­ƒî┤ Antillaise
+     ÔÇó "Gratin dauphinois" ├ù 2 fois ÔåÆ ­ƒÆ░ Budget 2Ôé¼, ­ƒî┤ Antillaise
+     ÔÇó "Pizza margherita" ├ù 2 fois ÔåÆ ­ƒÆ░ Budget 2Ôé¼, ­ƒî┤ Antillaise
+
+­ƒôè 2. PATTERNS D'INGR├ëDIENTS
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  poulet           ÔûêÔûêÔûêÔûêÔûêÔûê 32%
+  ail              ÔûêÔûêÔûêÔûêÔûêÔûê 32%
+  tomate           ÔûêÔûêÔûêÔûêÔûêÔûê 32%
+  epices           ÔûêÔûêÔûêÔûêÔûêÔûê 28%
+  oignon           ÔûêÔûêÔûêÔûêÔûêÔûê 28%
+  farine           ÔûêÔûêÔûêÔûêÔûêÔûê 28%
+  oeuf             ÔûêÔûêÔûê 16%
+  citron           ÔûêÔûêÔûê 16%
+
+­ƒôè 3. FAMILLES CULINAIRES
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  curry-arom           4 plats (16%)
+  oeuf                 2 plats (8%)
+  viande-grillee       2 plats (8%)
+  poisson-grille       2 plats (8%)
+  friture              2 plats (8%)
+  tarte-oeufs          2 plats (8%)
+  gratin               2 plats (8%)
+  pizza                2 plats (8%)
+  viande-noble         1 plats (4%)
+  sandwich-viande      1 plats (4%)
+  pates                1 plats (4%)
+  pate-epicee          1 plats (4%)
+  braise-rouge         1 plats (4%)
+  curry                1 plats (4%)
+  soupe-poisson        1 plats (4%)
+
+­ƒôè 4. COH├ëRENCE PAR SC├ëNARIO
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+  ­ƒÅï´©Å Muscu ("repas muscu"):
+    Plats uniques: 5/5
+    Cuisines: 3 | Familles: 5
+    Duplication ingr├®dients: 0%
+
+  ­ƒÆ░ Budget 2Ôé¼ ("repas 2Ôé¼"):
+    Plats uniques: 5/5
+    Cuisines: 3 | Familles: 5
+    Duplication ingr├®dients: 0%
+
+  ÔÜí Rapide soir ("plat rapide soir"):
+    Plats uniques: 5/5
+    Cuisines: 4 | Familles: 5
+    Duplication ingr├®dients: 0%
+
+  ­ƒî┤ Antillaise ("recette antillaise"):
+    Plats uniques: 5/5
+    Cuisines: 3 | Familles: 5
+    Duplication ingr├®dients: 0%
+
+  ­ƒîƒ Impressionner ("impressionner un invit├®"):
+    Plats uniques: 5/5
+    Cuisines: 3 | Familles: 5
+    Duplication ingr├®dients: 0%
+
+­ƒôè 5. NOMS TROP SIMILAIRES
+ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+  ÔÜá´©Å "Colombo de poulet" Ôåö "Curry de poulet" (noms trop proches)
+
+
+ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+­ƒÆú SCORE FINAL ÔÇö CLIENT PAYANT EXIGEANT
+ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+
+  DIVERSIT├ë:    10/10 ÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿà
+  CR├ëDIBILIT├ë:  10/10 ÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿà
+  EFFET WOW:    9/10 ÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿàÔÿå
+
+  MOYENNE:      9.7/10
+
+  ­ƒÅå VERDICT: EXCEPTIONNEL ÔÇö JE PAYE SANS H├ëSITER
+
+
+ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+­ƒöº ACTIONS CORRECTIVES RECOMMAND├ëES
+ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+
+  ÔØî PROBL├êME: Trop de plats r├®p├®t├®s entre sc├®narios
+     ÔåÆ AJOUTER des plats dans dishKnowledge.ts
+        Manque: plat rapide prot├®in├® (poulet grill├®, steak minute)
+        Manque: plat budget prot├®in├® (lentilles, ┼ôufs brouill├®s)
+        Manque: plat rapide antillais (salade cr├®ole, ti-punch snack)

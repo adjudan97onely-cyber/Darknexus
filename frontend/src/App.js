@@ -13,16 +13,9 @@ import WebScraperPage from "./pages/WebScraperPage";
 import LoginPage from "./pages/LoginPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-// import FloatingVoiceAssistant from "./components/FloatingVoiceAssistant"; // DÉSACTIVÉ
 import { Toaster } from "./components/ui/sonner";
 
 function AppContent() {
-  const location = useLocation();
-  const showFloatingAssistant = location.pathname !== '/login' && 
-                                 location.pathname !== '/create' &&
-                                 location.pathname !== '/quick-create' &&
-                                 location.pathname !== '/assistant';
-
   return (
     <>
       <Routes>
@@ -40,9 +33,6 @@ function AppContent() {
         <Route path="/scraper" element={<ProtectedRoute><WebScraperPage /></ProtectedRoute>} />
         <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
       </Routes>
-      
-      {/* Assistant Vocal Flottant - DÉSACTIVÉ (non fonctionnel) */}
-      {/* {showFloatingAssistant && <FloatingVoiceAssistant />} */}
       
       <Toaster />
     </>

@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import { Badge } from './ui/badge';
-import axios from 'axios';
+import api from '../services/axiosConfig';
 
 const WhisperVoiceInput = ({ onTranscript, disabled = false, showTranscript = false }) => {
   const [isRecording, setIsRecording] = useState(false);
@@ -85,18 +85,12 @@ const WhisperVoiceInput = ({ onTranscript, disabled = false, showTranscript = fa
 
   const transcribeAudio = async (audioBlob) => {
     try {
-      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
-      
       // Créer FormData pour envoyer le fichier
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
 
       // Envoyer à l'API Whisper
-      const response = await axios.post(`${API_URL}/api/whisper/transcribe`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await api.post(`/api/whisper/transcribe`, formData);
 
       if (response.data.success) {
         const transcribedText = response.data.text;

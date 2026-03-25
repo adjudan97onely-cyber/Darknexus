@@ -6,10 +6,7 @@ import { Textarea } from '../components/ui/textarea';
 import { ArrowLeft, Send, Loader2, Paperclip, Mic, User, Bot, Sparkles, X, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import VoiceInput from '../components/VoiceInput';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import api from '../services/axiosConfig';
 
 /**
  * ASSISTANT IA - Interface identique à Emergent

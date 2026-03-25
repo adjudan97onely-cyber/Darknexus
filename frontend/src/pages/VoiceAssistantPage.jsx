@@ -6,10 +6,7 @@ import { Mic, Sparkles, MessageSquare, Zap, ArrowLeft, Volume2, VolumeX } from '
 import { useNavigate } from 'react-router-dom';
 import VoiceInput from '../components/VoiceInput';
 import { useToast } from '../hooks/use-toast';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import api from '../services/axiosConfig';
 
 const VoiceAssistantPage = () => {
   const navigate = useNavigate();

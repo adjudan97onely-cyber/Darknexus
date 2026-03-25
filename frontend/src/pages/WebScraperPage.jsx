@@ -8,9 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from '../components/ui/badge';
 import { ArrowLeft, Globe, Loader2, CheckCircle2, XCircle, Table, FileText, Link, Image, List } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import api from '../services/axiosConfig';
 
 const WebScraperPage = () => {
   const navigate = useNavigate();
@@ -43,7 +41,7 @@ const WebScraperPage = () => {
     setResult(null);
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/scraper/scrape`, {
+      const response = await api.post('/api/scraper/scrape', {
         url: url,
         extract_type: extractType
       });
