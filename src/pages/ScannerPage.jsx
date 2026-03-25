@@ -6,6 +6,8 @@ import { recommendRecipesFromIngredients, surpriseBalancedRecipe } from "../serv
 import { getCurrentRole, getLimits, hasAccess } from "../services/roleService";
 import { recordIngredientsUsage, recordRecipeSeen } from "../services/userMemoryService";
 
+const DEFAULT_INGREDIENTS = ["tomate", "oignon", "poulet"];
+
 export function ScannerPage({ favoriteIds, onToggleFavorite, onSetDetectedIngredients }) {
   const [ingredients, setIngredients] = useState([]);
   const [cuisineMode, setCuisineMode] = useState("all");
@@ -17,10 +19,13 @@ export function ScannerPage({ favoriteIds, onToggleFavorite, onSetDetectedIngred
   const maxResults = Math.min(16, limits.scanResults);
 
   const cappedIngredients = ingredients.slice(0, limits.scanIngredients);
+  // Use actual ingredients if scanned, otherwise defaults for initial display
+  const activeIngredients = cappedIngredients.length > 0 ? cappedIngredients : DEFAULT_INGREDIENTS;
+  const hasScanned = cappedIngredients.length > 0;
 
   const recommendations = useMemo(
-    () => recommendRecipesFromIngredients(cappedIngredients, maxResults, { cuisine: cuisineMode, servings }),
-    [cappedIngredients, cuisineMode, servings, maxResults]
+    () => recommendRecipesFromIngredients(activeIngredients, maxResults, { cuisine: cuisineMode, servings }),
+    [activeIngredients, cuisineMode, servings, maxResults]
   );
 
   function handleDetected(nextIngredients) {
@@ -32,7 +37,21 @@ export function ScannerPage({ favoriteIds, onToggleFavorite, onSetDetectedIngred
 
   function addSurpriseRecipe() {
     const pick = surpriseBalancedRecipe();
-    setIngredients((prev) => [...new Set([...(prev || []), ...(pick.ingredients || []).slice(0, 3)])]);
+    if (pick) {
+      setIngredients((prev) => {
+        const merged = [...new Set([...(prev.length > 0 ? prev : DEFAULT_INGREDIENTS), ...(pick.ingredients || []).slice(0, 3)])];
+        onSetDetectedIngredients(merged);
+        return merged;
+      });
+    }
+  }
+
+  function removeIngredient(item) {
+    setIngredients((prev) => {
+      const next = prev.filter((i) => i !== item);
+      onSetDetectedIngredients(next);
+      return next;
+    });
   }
 
   return (
@@ -77,28 +96,42 @@ export function ScannerPage({ favoriteIds, onToggleFavorite, onSetDetectedIngred
           </p>
         )}
         <div className="mt-3 flex flex-wrap gap-2">
-          {(cappedIngredients.length > 0 ? cappedIngredients : ["tomate", "oignon", "poulet"]).map((item) => (
-            <span key={item} className="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-semibold text-cyan-100">
-              {item}
-            </span>
+          {activeIngredients.map((item) => (
+            <button
+              key={item}
+              onClick={() => removeIngredient(item)}
+              className="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-semibold text-cyan-100 hover:bg-red-400/30 hover:text-red-200 transition-colors"
+              title="Cliquer pour retirer"
+            >
+              {item} ×
+            </button>
           ))}
+          {!hasScanned && (
+            <span className="text-xs text-white/40 self-center ml-2">Ingredients par defaut — scanne ou ecris les tiens</span>
+          )}
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {recommendations.map((recipe) => (
-          <RecipeCard
-            key={recipe.id}
-            recipe={recipe}
-            isFavorite={favoriteIds.has(recipe.id)}
-            onToggleFavorite={onToggleFavorite}
-            onOpen={(item) => {
-              recordRecipeSeen(item);
-              navigate(`/recettes/${item.id}`, { state: { recipe: item } });
-            }}
-          />
-        ))}
-      </section>
+      {recommendations.length > 0 ? (
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          {recommendations.map((recipe) => (
+            <RecipeCard
+              key={recipe.id}
+              recipe={recipe}
+              isFavorite={favoriteIds.has(recipe.id)}
+              onToggleFavorite={onToggleFavorite}
+              onOpen={(item) => {
+                recordRecipeSeen(item);
+                navigate(`/recettes/${item.id}`, { state: { recipe: item } });
+              }}
+            />
+          ))}
+        </section>
+      ) : (
+        <section className="rounded-2xl border border-white/20 bg-slate-950/70 p-6 text-center">
+          <p className="text-white/60">Aucune recette trouvee pour ces ingredients. Essaie d'en ajouter ou clique sur "Surprendre".</p>
+        </section>
+      )}
     </div>
   );
 }
