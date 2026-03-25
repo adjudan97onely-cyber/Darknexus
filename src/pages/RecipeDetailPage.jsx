@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { Share2, Copy, Check, ShoppingCart, Timer, TimerOff, Play, Pause, RotateCcw } from "lucide-react";
+import { Share2, Check, ShoppingCart, Timer, Play, Pause, RotateCcw } from "lucide-react";
 import { formatIngredientLine, scaleRecipeForServings } from "../services/aiService";
 import { clearRecipeImage, resolveRecipeImage, setRecipeImage } from "../services/recipeImageService";
 import { recordRecipeSeen } from "../services/userMemoryService";
@@ -58,6 +58,44 @@ export function RecipeDetailPage() {
     if (recipe) recordRecipeSeen(recipe);
   }, [recipe]);
 
+  // Timer countdown effect - MUST BE BEFORE EARLY RETURN
+  useEffect(() => {
+    if (!timerRunning || timerSeconds <= 0) {
+      clearInterval(timerRef.current);
+      return;
+    }
+    timerRef.current = setInterval(() => {
+      setTimerSeconds(prev => {
+        if (prev <= 1) {
+          setTimerRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [timerRunning, timerSeconds]);
+
+  // Play sound when timer reaches 0 - MUST BE BEFORE EARLY RETURN
+  useEffect(() => {
+    if (timerInitialized && timerSeconds === 0 && !timerRunning) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.3, 0.6].forEach(delay => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.value = 880;
+          gain.gain.value = 0.3;
+          osc.start(ctx.currentTime + delay);
+          osc.stop(ctx.currentTime + delay + 0.2);
+        });
+      } catch (_) { /* no audio context */ }
+    }
+  }, [timerSeconds, timerInitialized, timerRunning]);
+
+  // Early return if recipe not found
   if (!displayedRecipe) {
     return (
       <section className="rounded-2xl border border-white/20 bg-slate-950/70 p-5 text-white">
@@ -66,6 +104,7 @@ export function RecipeDetailPage() {
     );
   }
 
+  // NOW SAFE TO USE displayedRecipe
   const imageSrc = resolveRecipeImage(displayedRecipe);
 
   // --- SHARE ---
@@ -117,41 +156,6 @@ export function RecipeDetailPage() {
     setTimerInitialized(false);
   }
 
-  // Timer countdown effect
-  useEffect(() => {
-    if (timerRunning && timerSeconds > 0) {
-      timerRef.current = setInterval(() => {
-        setTimerSeconds(prev => {
-          if (prev <= 1) {
-            setTimerRunning(false);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [timerRunning, timerSeconds]);
-
-  // Play sound when timer reaches 0
-  useEffect(() => {
-    if (timerInitialized && timerSeconds === 0 && !timerRunning) {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        [0, 0.3, 0.6].forEach(delay => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.frequency.value = 880;
-          gain.gain.value = 0.3;
-          osc.start(ctx.currentTime + delay);
-          osc.stop(ctx.currentTime + delay + 0.2);
-        });
-      } catch (_) { /* no audio context */ }
-    }
-  }, [timerSeconds, timerInitialized, timerRunning]);
-
   function formatTime(sec) {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -164,7 +168,7 @@ export function RecipeDetailPage() {
     const reader = new FileReader();
     reader.onload = () => {
       if (typeof reader.result === "string") {
-        setRecipeImage(recipe.id, reader.result);
+        setRecipeImage(displayedRecipe.id, reader.result);
         setImageVersion((v) => v + 1);
       }
     };
