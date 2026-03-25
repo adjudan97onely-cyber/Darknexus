@@ -32,6 +32,22 @@ import { parseIntent, ParsedIntent, intentSummary } from "./intentParser";
 import { filterByIntent, FilterResult, buildValidationMeta } from "./contextFilter";
 import { scoreDish, ContextScore } from "./contextScorer";
 
+/** Parse une quantité Knowledge Layer ("800g", "2 cs", "3", "150ml") en qty + unit */
+function parseKnowledgeQuantity(raw?: string): { qty: number; unit: string } {
+  if (!raw) return { qty: 1, unit: "" };
+  const m = raw.match(/^([\d.,/]+)\s*(g|kg|ml|cl|L|cs|cc|gousses?|branches?|pieces?|c\.\s*[aà]\s*(?:soupe|cafe))?(.*)$/i);
+  if (m) {
+    let qty = parseFloat(m[1].replace(",", "."));
+    if (isNaN(qty)) qty = 1;
+    const unit = (m[2] || "").trim();
+    return { qty, unit };
+  }
+  // Pas de nombre → quantité textuelle ("1L", "quelques")
+  const numOnly = parseFloat(raw.replace(",", "."));
+  if (!isNaN(numOnly)) return { qty: numOnly, unit: "" };
+  return { qty: 1, unit: "" };
+}
+
 interface ChefStarOptions {
   chefLevel?: ChefLevel;
   cuisine?: string;
@@ -212,30 +228,37 @@ export function buildAdaptedRecipe(
     },
   ];
 
-  // Adapter ingrédients aux portions
-  const ingredientsAdapted = dish.baseFamilies.map((family) => ({
-    name: family,
-    quantity: Math.round(100 * ratio) / 100,
-    unit: "unit", // Simplifié pour base
-  }));
+  // Adapter ingrédients aux portions — Knowledge Layer prioritaire
+  const ingredientsAdapted = dish.ingredients && dish.ingredients.length > 0
+    ? dish.ingredients.map((ing) => {
+        const parsed = parseKnowledgeQuantity(ing.quantity);
+        const scaled = parsed.unit === "" || ["", "pièce", "piece"].includes(parsed.unit)
+          ? Math.max(1, Math.round(parsed.qty * ratio))
+          : Math.round(parsed.qty * ratio * 10) / 10;
+        return { name: ing.name, quantity: scaled, unit: parsed.unit };
+      })
+    : dish.baseFamilies.map((family) => ({
+        name: family,
+        quantity: Math.round(100 * ratio) / 100,
+        unit: "unité",
+      }));
 
-  // Construire étapes avec details pro
-  const stepsBasic = [
-    `Préparation: ${adaptedTiming.prep} min (mise en place des ingrédients)`,
-    `Technique: ${dish.technique} (${adaptedTiming.cook} min)`,
-  ];
-
-  const steps = chefLevel >= 8
-    ? [
-        ...stepsBasic,
-        ...dish.profTips.slice(0, 2),
-        `Finition et vérification`,
-      ]
-    : [
-        ...stepsBasic,
-        ...dish.profTips.slice(0, 1),
-        `Servir immédiatement selon préparation`,
-      ];
+  // Construire étapes — Knowledge Layer prioritaire
+  const steps = dish.steps && dish.steps.length > 0
+    ? dish.steps
+    : chefLevel >= 8
+      ? [
+          `Mise en place: préparer tous les ingrédients (${adaptedTiming.prep} min)`,
+          `${dish.technique}: cuisson principale (${adaptedTiming.cook} min)`,
+          ...dish.profTips.slice(0, 2),
+          `Dresser et servir immédiatement`,
+        ]
+      : [
+          `Mise en place: préparer tous les ingrédients (${adaptedTiming.prep} min)`,
+          `${dish.technique}: cuisson principale (${adaptedTiming.cook} min)`,
+          ...dish.profTips.slice(0, 1),
+          `Dresser et servir`,
+        ];
 
   const recipe: AdaptedDish = {
     id: `chef-star-${dish.id}-${toServings}`,

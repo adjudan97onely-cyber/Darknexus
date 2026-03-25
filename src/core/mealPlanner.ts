@@ -2,6 +2,7 @@ import { filterRecipesForSlot, type ProteinFamily } from "./foodRules";
 import { calculateDailyNeeds, calculateMacroTargets, sumDayNutrition } from "./nutritionEngine";
 import { generateRecipeCandidates, type CuisineMode, type EngineRecipe } from "./recipeEngine";
 import { normalizeUserProfile, recipeBlockedByProfile, type UserProfile } from "./userProfile";
+import { ALL_RECIPES } from "../data/recipes";
 
 type Goal = "lose" | "maintain" | "gain";
 type ActivityLevel = "low" | "moderate" | "high";
@@ -21,9 +22,116 @@ interface MealPlannerInput {
 }
 
 const DAY_NAMES = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
-const THEMES = ["Energie maitrisee", "Semaine tonique", "Digestion propre", "Variation proteique", "Equilibre antillais", "Leger mais complet", "Recuperation douce"];
-const CUISINE_ROTATION: CuisineMode[] = ["francaise", "healthy", "antillaise", "monde", "healthy", "rapide", "antillaise"];
-const PROTEIN_ROTATION: ProteinFamily[] = ["egg", "poultry", "fish", "vegetarian", "seafood", "poultry", "fish"];
+const THEMES = [
+  "Energie maitrisee", "Semaine tonique", "Saveurs creoles",
+  "Variation proteique", "Equilibre du monde", "Leger mais complet", "Recuperation douce",
+];
+const CUISINE_ROTATION: CuisineMode[] = ["francaise", "antillaise", "healthy", "monde", "antillaise", "rapide", "francaise"];
+const PROTEIN_ROTATION: ProteinFamily[] = ["egg", "poultry", "fish", "vegetarian", "seafood", "meat", "fish"];
+
+// --------------- Static recipe bridge ---------------
+
+const PROTEIN_KEYWORDS: Record<ProteinFamily, string[]> = {
+  poultry: ["poulet", "dinde", "volaille", "boucane"],
+  fish: ["poisson", "morue", "thon", "saumon", "blaff", "court-bouillon", "escabeche"],
+  meat: ["boeuf", "cochon", "porc", "steak", "viande", "tripe"],
+  seafood: ["crevette", "crabe", "langouste", "lambi", "oursin", "chatrou"],
+  egg: ["oeuf", "omelette"],
+  vegetarian: ["legume", "vegetarien", "lentille", "haricot", "pois", "avocat", "banane", "chodo", "dombre-haricot"],
+  none: [],
+};
+
+function detectProteinFamily(recipe: any): ProteinFamily {
+  const blob = [recipe.name || "", ...(recipe.tags || []), ...(Array.isArray(recipe.ingredients) ? recipe.ingredients : [])].join(" ").toLowerCase();
+  for (const [family, keywords] of Object.entries(PROTEIN_KEYWORDS) as [ProteinFamily, string[]][]) {
+    if (family === "none") continue;
+    if (keywords.some((kw) => blob.includes(kw))) return family;
+  }
+  return "none";
+}
+
+function detectSlot(recipe: any): string {
+  const tags = (recipe.tags || []).join(" ").toLowerCase();
+  const name = (recipe.name || "").toLowerCase();
+  if (tags.includes("dessert") || name.includes("chodo") || name.includes("chaudeau")) return "snack";
+  if (tags.includes("street-food") || name.includes("bokit") || name.includes("agoulou")) return "snack";
+  if (tags.includes("petit-dej") || tags.includes("breakfast")) return "breakfast";
+  return "lunch"; // lunch doubles as dinner candidate
+}
+
+function staticRecipeToEngine(r: any, servings: number): EngineRecipe {
+  const proteinFamily = detectProteinFamily(r);
+  const ingredientNames = Array.isArray(r.ingredients)
+    ? r.ingredients.map((i: string) => {
+        const m = i.match(/^[\d.,/]+\s*(?:g|kg|ml|cl|L|c\.?\s*[aà]\s*(?:soupe|cafe))?\s*(.+)$/i);
+        return m ? m[1].trim() : i;
+      })
+    : [];
+  const cuisineStr = (r.cuisine || "all").toLowerCase();
+  const slot = detectSlot(r);
+  return {
+    id: `static-${r.id}`,
+    source: "static-database",
+    cuisine: cuisineStr as any,
+    mode: "normal",
+    style: cuisineStr === "antillaise" ? "saveurs creoles" : `${cuisineStr} maison`,
+    dishType: r.tags?.[0] || "plat",
+    difficulty: r.difficulty || "Facile",
+    prepMinutes: r.prepMinutes || 15,
+    cookMinutes: r.cookMinutes || 20,
+    restMinutes: r.restMinutes || 0,
+    servings,
+    ingredientsDetailed: Array.isArray(r.ingredients)
+      ? r.ingredients.map((line: string) => {
+          const m = line.match(/^([\d.,/]+)\s*(g|kg|ml|cl|L|c\.?\s*a\s*(?:soupe|cafe))?\s*(.+)$/i);
+          if (m) return { name: m[3].trim(), quantity: parseFloat(m[1].replace(",", ".")), unit: m[2] || "" };
+          return { name: line, quantity: 1, unit: "" };
+        })
+      : [],
+    ingredients: ingredientNames,
+    steps: r.steps || [],
+    tags: r.tags || [],
+    tips: r.tips || [],
+    mistakes: r.mistakes || [],
+    slotHints: slot === "snack" ? ["snack", "lunch"] : slot === "lunch" ? ["lunch", "dinner"] : [slot as any],
+    nutrition: r.nutrition || { kcal: 500, protein: 22, carbs: 50, fat: 20 },
+    imagePrompt: r.name || "",
+    score: 75,
+    matchReason: `Recette verifiee: ${r.name}`,
+    blueprintKey: `static-${r.id}`,
+    cookingMethod: "saute" as any,
+    proteinFamily,
+    primaryProtein: ingredientNames[0] || undefined,
+    dishFamily: `static:${r.id}`,
+    name: r.name,
+    flavorBalance: { score: 80, balance: ["acid", "fat", "fresh"], missing: [], notes: [] },
+  } as EngineRecipe;
+}
+
+let _staticCache: Map<string, EngineRecipe[]> | null = null;
+
+function getStaticPool(slot: string, cuisine: CuisineMode, servings: number): EngineRecipe[] {
+  if (!_staticCache) {
+    _staticCache = new Map();
+    for (const r of ALL_RECIPES) {
+      const engine = staticRecipeToEngine(r, 2); // base 2 portions, scaled later if needed
+      const s = detectSlot(r);
+      const slotKeys = s === "lunch" ? ["lunch", "dinner"] : s === "snack" ? ["snack", "lunch"] : [s];
+      for (const sk of slotKeys) {
+        const arr = _staticCache.get(sk) || [];
+        arr.push(engine);
+        _staticCache.set(sk, arr);
+      }
+    }
+  }
+  const all = _staticCache.get(slot) || [];
+  const pool = cuisine === "all" ? all : (() => {
+    const filtered = all.filter((r) => r.cuisine === cuisine || r.cuisine === "all");
+    return filtered.length >= 3 ? filtered : all;
+  })();
+  // Shuffle to avoid always picking the same static recipes first
+  return pool.map((r) => ({ ...r, score: r.score + Math.random() * 10 }));
+}
 
 function formatDateKey(date: Date): string {
   const y = date.getFullYear();
@@ -164,12 +272,23 @@ function pickRecipeWithFamilyControl(
 }
 
 function buildPoolFor(slot: "breakfast" | "lunch" | "dinner" | "snack", ingredients: string[], cuisine: CuisineMode, servings: number): EngineRecipe[] {
-  return generateRecipeCandidates(ingredients, {
+  const generated = generateRecipeCandidates(ingredients, {
     slot,
     cuisine,
     servings,
-    limit: 24,
+    limit: 30,
   });
+  const statics = getStaticPool(slot, cuisine, servings);
+  // Merge: static recipes first (higher quality), then generated, deduplicated by id
+  const seen = new Set<string>();
+  const merged: EngineRecipe[] = [];
+  for (const r of [...statics, ...generated]) {
+    if (!seen.has(r.id)) {
+      seen.add(r.id);
+      merged.push(r);
+    }
+  }
+  return merged;
 }
 
 export function generateWeeklyMealPlan({
