@@ -68,11 +68,43 @@ const CULINARY_KNOWLEDGE = [
   },
   {
     key: "accras",
-    aliases: ["accras", "accras morue", "acras"],
+    aliases: ["accras", "accras morue", "accras crevettes", "accras legumes", "accras malanga", "acras"],
     cuisine: "antillaise",
     slot: "snack",
     fundamentals: ["morue dessalee", "pate epicee", "friture courte"],
     baseIngredients: ["morue", "farine", "oignon", "ail", "levure chimique"],
+  },
+  {
+    key: "poyo",
+    aliases: ["poyo", "ti nain", "ti-nain", "banane verte", "tinain"],
+    cuisine: "antillaise",
+    slot: "lunch",
+    fundamentals: ["banane verte bouillie", "accompagnement proteine", "sauce chien ou vinaigrette"],
+    baseIngredients: ["banane verte", "morue", "citron vert", "oignon", "cive"],
+  },
+  {
+    key: "agoulou",
+    aliases: ["agoulou", "sandwich antillais", "agoulou poulet"],
+    cuisine: "antillaise",
+    slot: "snack",
+    fundamentals: ["pain croustillant", "sauce chien", "garniture genereuse"],
+    baseIngredients: ["baguette", "poulet", "citron vert", "oignon", "cive"],
+  },
+  {
+    key: "poulet-boucane",
+    aliases: ["poulet boucane", "poulet-boucane", "boucane", "poulet fume"],
+    cuisine: "antillaise",
+    slot: "lunch",
+    fundamentals: ["marinade longue", "cuisson lente", "glacage final"],
+    baseIngredients: ["poulet", "paprika", "ail", "citron vert", "sauce soja"],
+  },
+  {
+    key: "riz-colle",
+    aliases: ["riz colle", "riz-colle", "riz colle haricots", "riz haricots rouges"],
+    cuisine: "antillaise",
+    slot: "lunch",
+    fundamentals: ["rincage du riz", "lait de coco", "cuisson couverte sans remuer"],
+    baseIngredients: ["riz", "haricots rouges", "lait de coco", "oignon", "thym"],
   },
   {
     key: "dombre",
@@ -974,16 +1006,26 @@ function normalizeDishType(dish) {
  */
 function findRecipesForDish(dishName) {
   const normalized = (dishName || "").toLowerCase();
+  // Alias map: certains plats ont un nom different dans la base
+  const aliasMap = {
+    "poyo": ["poyo", "ti nain", "ti-nain", "banane verte"],
+    "ti nain": ["poyo", "ti nain", "ti-nain", "banane verte"],
+    "agoulou": ["agoulou"],
+    "accras": ["accras", "acras"],
+    "boucane": ["boucane", "poulet boucane"],
+    "riz colle": ["riz colle", "riz-colle"],
+    "riz-colle": ["riz colle", "riz-colle"],
+  };
+  const searchTerms = aliasMap[normalized] || [normalized];
   
   return ALL_RECIPES.filter((recipe) => {
     const recipeName = (recipe.name || "").toLowerCase();
+    const recipeId = (recipe.id || "").toLowerCase();
+    const recipeTags = (recipe.tags || []).map(t => t.toLowerCase()).join(" ");
     const recipeDesire = (recipe.desireName || "").toLowerCase();
+    const haystack = `${recipeName} ${recipeId} ${recipeTags} ${recipeDesire}`;
     
-    return (
-      recipeName.includes(normalized) ||
-      recipeDesire.includes(normalized) ||
-      normalized.includes(recipeName.split(" ")[0]) // Match premier mot
-    );
+    return searchTerms.some(term => haystack.includes(term));
   });
 }
 
@@ -1003,7 +1045,7 @@ export async function askCookingAssistant(question, context = {}) {
     const askedDish = findKnowledgeDish(lower);
     
     // Si plat connu (bokit, agoulou, accras, etc.), utiliser les VRAIES variantes
-    if (askedDish && (askedDish.key === "bokit" || askedDish.key === "accras" || askedDish.key === "agoulou" || askedDish.key === "poyo")) {
+    if (askedDish && (askedDish.key === "bokit" || askedDish.key === "accras" || askedDish.key === "agoulou" || askedDish.key === "poyo" || askedDish.key === "colombo" || askedDish.key === "blaff" || askedDish.key === "dombre" || askedDish.key === "court-bouillon" || askedDish.key === "poulet-boucane" || askedDish.key === "riz-colle")) {
       const matchedRecipes = findRecipesForDish(askedDish.key);
       if (matchedRecipes && matchedRecipes.length > 0) {
         const baseCuisine = askedDish.cuisine || "antillaise";

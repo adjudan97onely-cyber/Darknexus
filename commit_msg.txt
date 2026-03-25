@@ -1,0 +1,14 @@
+﻿feat: refonte complete recettes authentiques antillaises
+
+CORRECTIONS MAJEURES:
+- Agoulou: corrige de abats a VRAI sandwich antillais (pain + sauce chien)
+- Poyo: corrige a Ti Nain (banane verte bouillie) 4 variantes
+- Accras: ajout variante legumes pays (malanga), morue/crevettes detailles
+
+ENRICHISSEMENTS toutes recettes:
+- Colombo, blaff, riz colle, dombres, court-bouillon, poulet boucane
+- Bokits morue/steak/veggie enrichis
+
+TECHNIQUE:
+- aiService.js findRecipesForDish cherche dans id+nom+tags
+- Alias poyo/ti-nain/agoulou/boucane/riz-colle dans CULINARY_KNOWLEDGE
