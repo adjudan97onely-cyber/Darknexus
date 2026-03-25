@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F57C00"/>
+      <stop offset="1" stop-color="#FBC02D"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  <circle cx="330" cy="340" r="190" fill="#fff" fill-opacity="0.92"/>
+  <circle cx="330" cy="340" r="125" fill="#F3E5AB"/>
+  <rect x="210" y="300" width="240" height="70" rx="35" fill="#8D6E63"/>
+  <text x="560" y="300" fill="#ffffff" font-family="Segoe UI, sans-serif" font-size="70" font-weight="700">Bokit classique</text>
+  <text x="560" y="385" fill="#fffde7" font-family="Segoe UI, sans-serif" font-size="36">Pain frit garni - style antillais</text>
+</svg>

@@ -1,0 +1,1813 @@
+{
+  "timestamp": "2026-03-22T09:03:58.783Z",
+  "moteurScore": 8,
+  "moteurVerdict": "✅ BON - Production possible",
+  "statistics": {
+    "total": 22,
+    "passed": 22,
+    "excellent": 7,
+    "refused": 0,
+    "avgScore": "8.00",
+    "scores": [
+      {
+        "name": "{",
+        "score": 10,
+        "verdict": "🏆 EXCELLENT - Niveau chef",
+        "issues": [],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 36,
+            "cook": 62
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 10,
+        "verdict": "🏆 EXCELLENT - Niveau chef",
+        "issues": [],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 17,
+            "cook": 51
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 10,
+        "verdict": "🏆 EXCELLENT - Niveau chef",
+        "issues": [],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 35,
+            "cook": 63
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 10,
+        "verdict": "🏆 EXCELLENT - Niveau chef",
+        "issues": [],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 35,
+            "cook": 24
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 8,
+        "verdict": "✅ BON - Acceptable",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 29,
+            "cook": 57
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 6,
+        "verdict": "⚠️ MOYEN - À améliorer",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise",
+          "⚠️ Manque signature ou fondamentaux (pas de profondeur)"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"Chef expert - Colombo de poulet antillais\",\n  \"answer\": \"Colombo de poulet antillais (base experte colombo) pour 2 personnes.\\nStructure pro a respecter: marinade • epices colombo • mijotage progressif.\\nPlan debutant pas-a-pas:\\n1) Marine le poulet avec colombo, ail, citron, sel 30 minutes.\\n2) Saisis le poulet dans une cocotte.\\n3) Ajoute oignon, thym, laurier et mouille a hauteur.\\n4) Integre les legumes et laisse mijoter 35 minutes.\\n5) Rectifie l'assaisonnement et sers avec riz blanc.\",\n  \"actions\": [\n    \"Voir recette\",\n    \"Version debutant\",\n    \"Verifier cuisson\"\n  ],\n  \"recipe\": {\n    \"id\": \"colombo-poulet\",\n    \"name\": \"Colombo de poulet antillais\",\n    \"tags\": [\n      \"plat\",\n      \"famille\",\n      \"epice\"\n    ],\n    \"image\": \"/recipes/colombo-poulet.svg\",\n    \"prepMinutes\": 20,\n    \"restMinutes\": 30,\n    \"cookMinutes\": 50,\n    \"difficulty\": \"Intermediaire\",\n    \"ingredients\": [\n      \"1 kg poulet en morceaux\",\n      \"2 c. a soupe poudre a colombo\",\n      \"2 pommes de terre\",\n      \"1 aubergine\",\n      \"1 oignon\",\n      \"2 gousses ail\",\n      \"Thym, laurier, citron vert\"\n    ],\n    \"steps\": [\n      \"Marine le poulet avec colombo, ail, citron, sel 30 minutes.\",\n      \"Saisis le poulet dans une cocotte.\",\n      \"Ajoute oignon, thym, laurier et mouille a hauteur.\",\n      \"Integre les legumes et laisse mijoter 35 minutes.\",\n      \"Rectifie l'assaisonnement et sers avec riz blanc.\"\n    ],\n    \"tips\": [\n      \"Un filet de citron en fin de cuisson reveille le plat\"\n    ],\n    \"mistakes\": [\n      \"Cuisson trop courte: epices crues\",\n      \"Trop d'eau: sauce diluee\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 620,\n      \"protein\": 42,\n      \"carbs\": 34,\n      \"fat\": 34\n    },\n    \"servings\": 2,\n    \"cuisine\": \"antillaise\",\n    \"matchReason\": \"Recette issue de la base culinaire experte.\",\n    \"score\": 95\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade\",\n      \"epices colombo\",\n      \"mijotage progressif\"\n    ]\n  }\n}",
+          "signature": null,
+          "fundamentals": null,
+          "techniques": [
+            "mijoter",
+            "mijoter"
+          ],
+          "timing": {
+            "prep": 14,
+            "cook": 31
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 8,
+        "verdict": "✅ BON - Acceptable",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité francaise"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 21,
+            "cook": 25
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 8,
+        "verdict": "✅ BON - Acceptable",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité mondiale"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 29,
+            "cook": 21
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 6,
+        "verdict": "⚠️ MOYEN - À améliorer",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise",
+          "⚠️ Manque signature ou fondamentaux (pas de profondeur)"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"Chef expert - Bokit classique\",\n  \"answer\": \"Bokit classique (base experte bokit) pour 2 personnes.\\nStructure pro a respecter: pate levee • friture chaude • garniture apres cuisson.\\nPlan debutant pas-a-pas:\\n1) Melange farine, levure et sel, puis ajoute l'eau tiede progressivement.\\n2) Petris 8 minutes jusqu'a une pate souple.\\n3) Laisse reposer 45 minutes couvert.\\n4) Divise en boules et etale en disques epais.\\n5) Fais frire 1 minute par face jusqu'a gonflement dore.\\n6) Ouvre, garnis et sers immediatement.\",\n  \"actions\": [\n    \"Voir recette\",\n    \"Version debutant\",\n    \"Verifier cuisson\"\n  ],\n  \"recipe\": {\n    \"id\": \"bokit-classique\",\n    \"name\": \"Bokit classique\",\n    \"tags\": [\n      \"guadeloupe\",\n      \"street-food\",\n      \"debutant\"\n    ],\n    \"image\": \"/recipes/bokit-classique.svg\",\n    \"prepMinutes\": 25,\n    \"restMinutes\": 45,\n    \"cookMinutes\": 10,\n    \"difficulty\": \"Facile\",\n    \"ingredients\": [\n      \"500 g farine\",\n      \"8 g levure boulangere seche\",\n      \"1 c. a cafe sel\",\n      \"300 ml eau tiede\",\n      \"Huile de friture\",\n      \"Jambon, fromage, crudites pour la garniture\"\n    ],\n    \"steps\": [\n      \"Melange farine, levure et sel, puis ajoute l'eau tiede progressivement.\",\n      \"Petris 8 minutes jusqu'a une pate souple.\",\n      \"Laisse reposer 45 minutes couvert.\",\n      \"Divise en boules et etale en disques epais.\",\n      \"Fais frire 1 minute par face jusqu'a gonflement dore.\",\n      \"Ouvre, garnis et sers immediatement.\"\n    ],\n    \"tips\": [\n      \"Si la pate colle trop, farine legerement tes mains.\",\n      \"Huile chaude mais pas fumante pour eviter un bokit gras.\"\n    ],\n    \"mistakes\": [\n      \"Ne pas respecter le repos: bokit compact.\",\n      \"Huile trop froide: bokit imbibe d'huile.\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 540,\n      \"protein\": 18,\n      \"carbs\": 58,\n      \"fat\": 24\n    },\n    \"servings\": 2,\n    \"cuisine\": \"antillaise\",\n    \"matchReason\": \"Recette issue de la base culinaire experte.\",\n    \"score\": 95\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"pate levee\",\n      \"friture chaude\",\n      \"garniture apres cuisson\"\n    ]\n  }\n}",
+          "signature": null,
+          "fundamentals": null,
+          "techniques": [
+            "frire",
+            "frire"
+          ],
+          "timing": {
+            "prep": 22,
+            "cook": 40
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 6,
+        "verdict": "⚠️ MOYEN - À améliorer",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise",
+          "⚠️ Manque signature ou fondamentaux (pas de profondeur)"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"Chef expert - Colombo de poulet antillais\",\n  \"answer\": \"Colombo de poulet antillais (base experte colombo) pour 2 personnes.\\nStructure pro a respecter: marinade • epices colombo • mijotage progressif.\\nPlan debutant pas-a-pas:\\n1) Marine le poulet avec colombo, ail, citron, sel 30 minutes.\\n2) Saisis le poulet dans une cocotte.\\n3) Ajoute oignon, thym, laurier et mouille a hauteur.\\n4) Integre les legumes et laisse mijoter 35 minutes.\\n5) Rectifie l'assaisonnement et sers avec riz blanc.\",\n  \"actions\": [\n    \"Voir recette\",\n    \"Version debutant\",\n    \"Verifier cuisson\"\n  ],\n  \"recipe\": {\n    \"id\": \"colombo-poulet\",\n    \"name\": \"Colombo de poulet antillais\",\n    \"tags\": [\n      \"plat\",\n      \"famille\",\n      \"epice\"\n    ],\n    \"image\": \"/recipes/colombo-poulet.svg\",\n    \"prepMinutes\": 20,\n    \"restMinutes\": 30,\n    \"cookMinutes\": 50,\n    \"difficulty\": \"Intermediaire\",\n    \"ingredients\": [\n      \"1 kg poulet en morceaux\",\n      \"2 c. a soupe poudre a colombo\",\n      \"2 pommes de terre\",\n      \"1 aubergine\",\n      \"1 oignon\",\n      \"2 gousses ail\",\n      \"Thym, laurier, citron vert\"\n    ],\n    \"steps\": [\n      \"Marine le poulet avec colombo, ail, citron, sel 30 minutes.\",\n      \"Saisis le poulet dans une cocotte.\",\n      \"Ajoute oignon, thym, laurier et mouille a hauteur.\",\n      \"Integre les legumes et laisse mijoter 35 minutes.\",\n      \"Rectifie l'assaisonnement et sers avec riz blanc.\"\n    ],\n    \"tips\": [\n      \"Un filet de citron en fin de cuisson reveille le plat\"\n    ],\n    \"mistakes\": [\n      \"Cuisson trop courte: epices crues\",\n      \"Trop d'eau: sauce diluee\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 620,\n      \"protein\": 42,\n      \"carbs\": 34,\n      \"fat\": 34\n    },\n    \"servings\": 2,\n    \"cuisine\": \"antillaise\",\n    \"matchReason\": \"Recette issue de la base culinaire experte.\",\n    \"score\": 95\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade\",\n      \"epices colombo\",\n      \"mijotage progressif\"\n    ]\n  }\n}",
+          "signature": null,
+          "fundamentals": null,
+          "techniques": [
+            "mijoter",
+            "mijoter"
+          ],
+          "timing": {
+            "prep": 32,
+            "cook": 57
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 6,
+        "verdict": "⚠️ MOYEN - À améliorer",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise",
+          "⚠️ Manque signature ou fondamentaux (pas de profondeur)"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"Chef expert - Colombo de poulet antillais\",\n  \"answer\": \"Colombo de poulet antillais (base experte colombo) pour 2 personnes.\\nStructure pro a respecter: marinade • epices colombo • mijotage progressif.\\nPlan debutant pas-a-pas:\\n1) Marine le poulet avec colombo, ail, citron, sel 30 minutes.\\n2) Saisis le poulet dans une cocotte.\\n3) Ajoute oignon, thym, laurier et mouille a hauteur.\\n4) Integre les legumes et laisse mijoter 35 minutes.\\n5) Rectifie l'assaisonnement et sers avec riz blanc.\",\n  \"actions\": [\n    \"Voir recette\",\n    \"Version debutant\",\n    \"Verifier cuisson\"\n  ],\n  \"recipe\": {\n    \"id\": \"colombo-poulet\",\n    \"name\": \"Colombo de poulet antillais\",\n    \"tags\": [\n      \"plat\",\n      \"famille\",\n      \"epice\"\n    ],\n    \"image\": \"/recipes/colombo-poulet.svg\",\n    \"prepMinutes\": 20,\n    \"restMinutes\": 30,\n    \"cookMinutes\": 50,\n    \"difficulty\": \"Intermediaire\",\n    \"ingredients\": [\n      \"1 kg poulet en morceaux\",\n      \"2 c. a soupe poudre a colombo\",\n      \"2 pommes de terre\",\n      \"1 aubergine\",\n      \"1 oignon\",\n      \"2 gousses ail\",\n      \"Thym, laurier, citron vert\"\n    ],\n    \"steps\": [\n      \"Marine le poulet avec colombo, ail, citron, sel 30 minutes.\",\n      \"Saisis le poulet dans une cocotte.\",\n      \"Ajoute oignon, thym, laurier et mouille a hauteur.\",\n      \"Integre les legumes et laisse mijoter 35 minutes.\",\n      \"Rectifie l'assaisonnement et sers avec riz blanc.\"\n    ],\n    \"tips\": [\n      \"Un filet de citron en fin de cuisson reveille le plat\"\n    ],\n    \"mistakes\": [\n      \"Cuisson trop courte: epices crues\",\n      \"Trop d'eau: sauce diluee\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 620,\n      \"protein\": 42,\n      \"carbs\": 34,\n      \"fat\": 34\n    },\n    \"servings\": 2,\n    \"cuisine\": \"antillaise\",\n    \"matchReason\": \"Recette issue de la base culinaire experte.\",\n    \"score\": 95\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade\",\n      \"epices colombo\",\n      \"mijotage progressif\"\n    ]\n  }\n}",
+          "signature": null,
+          "fundamentals": null,
+          "techniques": [
+            "mijoter",
+            "mijoter"
+          ],
+          "timing": {
+            "prep": 25,
+            "cook": 31
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 6,
+        "verdict": "⚠️ MOYEN - À améliorer",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise",
+          "⚠️ Manque signature ou fondamentaux (pas de profondeur)"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"Chef expert - Colombo de poulet antillais\",\n  \"answer\": \"Colombo de poulet antillais (base experte colombo) pour 2 personnes.\\nStructure pro a respecter: marinade • epices colombo • mijotage progressif.\\nPlan debutant pas-a-pas:\\n1) Marine le poulet avec colombo, ail, citron, sel 30 minutes.\\n2) Saisis le poulet dans une cocotte.\\n3) Ajoute oignon, thym, laurier et mouille a hauteur.\\n4) Integre les legumes et laisse mijoter 35 minutes.\\n5) Rectifie l'assaisonnement et sers avec riz blanc.\",\n  \"actions\": [\n    \"Voir recette\",\n    \"Version debutant\",\n    \"Verifier cuisson\"\n  ],\n  \"recipe\": {\n    \"id\": \"colombo-poulet\",\n    \"name\": \"Colombo de poulet antillais\",\n    \"tags\": [\n      \"plat\",\n      \"famille\",\n      \"epice\"\n    ],\n    \"image\": \"/recipes/colombo-poulet.svg\",\n    \"prepMinutes\": 20,\n    \"restMinutes\": 30,\n    \"cookMinutes\": 50,\n    \"difficulty\": \"Intermediaire\",\n    \"ingredients\": [\n      \"1 kg poulet en morceaux\",\n      \"2 c. a soupe poudre a colombo\",\n      \"2 pommes de terre\",\n      \"1 aubergine\",\n      \"1 oignon\",\n      \"2 gousses ail\",\n      \"Thym, laurier, citron vert\"\n    ],\n    \"steps\": [\n      \"Marine le poulet avec colombo, ail, citron, sel 30 minutes.\",\n      \"Saisis le poulet dans une cocotte.\",\n      \"Ajoute oignon, thym, laurier et mouille a hauteur.\",\n      \"Integre les legumes et laisse mijoter 35 minutes.\",\n      \"Rectifie l'assaisonnement et sers avec riz blanc.\"\n    ],\n    \"tips\": [\n      \"Un filet de citron en fin de cuisson reveille le plat\"\n    ],\n    \"mistakes\": [\n      \"Cuisson trop courte: epices crues\",\n      \"Trop d'eau: sauce diluee\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 620,\n      \"protein\": 42,\n      \"carbs\": 34,\n      \"fat\": 34\n    },\n    \"servings\": 2,\n    \"cuisine\": \"antillaise\",\n    \"matchReason\": \"Recette issue de la base culinaire experte.\",\n    \"score\": 95\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade\",\n      \"epices colombo\",\n      \"mijotage progressif\"\n    ]\n  }\n}",
+          "signature": null,
+          "fundamentals": null,
+          "techniques": [
+            "mijoter",
+            "mijoter"
+          ],
+          "timing": {
+            "prep": 34,
+            "cook": 47
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 8,
+        "verdict": "✅ BON - Acceptable",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 33,
+            "cook": 35
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 8,
+        "verdict": "✅ BON - Acceptable",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité francaise"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Quiche lorraine (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Quiche lorraine (Chef Étoilé - 2 pers.) (0.3333333333333333x portions)\\nSignature culinaire: Tarte crémeuse lard croustillant, custard doree, texture legere\\nFondamentaux essentiels:\\n  • fond pate regulier\\n  • lard cuit d'abord\\n  • creme oeuf bien lie\\nTechniques maîtrisées:\\n  • bake: 12 min\\nTiming total: 22 min (Prep: 7min + Cuisson: 12min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Pate foncer sans bulles, piquer fond\\n  ✓ Lard cuire 5 min avant pour croustillant\\nErreurs à éviter absolument:\\n  ✗ Pate pas cuite = soupe dessous\\n  ✗ Lard brule = amertume\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-quiche-lorraine-2\",\n    \"name\": \"Quiche lorraine (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"francaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"tarte-oeufs\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 7,\n    \"cookMinutes\": 12,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"farine\",\n        \"quantity\": 0.33,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oeuf\",\n        \"quantity\": 0.33,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"creme\",\n        \"quantity\": 0.33,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"lard\",\n        \"quantity\": 0.33,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"farine\",\n      \"oeuf\",\n      \"creme\",\n      \"lard\"\n    ],\n    \"steps\": [\n      \"Préparation: 7 min (mise en place des ingrédients)\",\n      \"Technique: bake (12 min)\",\n      \"Pate foncer sans bulles, piquer fond\",\n      \"Lard cuire 5 min avant pour croustillant\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"francaise\",\n      \"tarte-oeufs\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Pate foncer sans bulles, piquer fond\",\n      \"Lard cuire 5 min avant pour croustillant\",\n      \"Creme & oeufs ne JAMAIS bouillir = texture grumeleuse\"\n    ],\n    \"mistakes\": [\n      \"Pate pas cuite = soupe dessous\",\n      \"Lard brule = amertume\",\n      \"Cuisson trop longue = creme seche et caoutchouteuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Quiche lorraine, professional plating, chef level 10, Lorraine\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Quiche lorraine - fond pate regulier • lard cuit d'abord • creme oeuf bien lie\",\n    \"blueprintKey\": \"chef-star-quiche-lorraine\",\n    \"cookingMethod\": \"bake\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"farine\",\n    \"dishFamily\": \"tarte-oeufs\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"fond pate regulier\",\n        \"lard cuit d'abord\",\n        \"creme oeuf bien lie\"\n      ]\n    },\n    \"dishId\": \"quiche-lorraine\",\n    \"dishProfile\": {\n      \"id\": \"quiche-lorraine\",\n      \"name\": \"Quiche lorraine\",\n      \"aliases\": [\n        \"quiche\",\n        \"quiche lorraine\"\n      ],\n      \"cuisine\": \"francaise\",\n      \"region\": \"Lorraine\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"tarte-oeufs\",\n      \"technique\": \"bake\",\n      \"baseFamilies\": [\n        \"farine\",\n        \"oeuf\",\n        \"creme\",\n        \"lard\"\n      ],\n      \"fundamentals\": [\n        \"fond pate regulier\",\n        \"lard cuit d'abord\",\n        \"creme oeuf bien lie\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 35,\n        \"rest\": 8\n      },\n      \"servings\": 6,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Tarte crémeuse lard croustillant, custard doree, texture legere\",\n      \"profTips\": [\n        \"Pate foncer sans bulles, piquer fond\",\n        \"Lard cuire 5 min avant pour croustillant\",\n        \"Creme & oeufs ne JAMAIS bouillir = texture grumeleuse\"\n      ],\n      \"mistakes\": [\n        \"Pate pas cuite = soupe dessous\",\n        \"Lard brule = amertume\",\n        \"Cuisson trop longue = creme seche et caoutchouteuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 7,\n      \"cook\": 12,\n      \"rest\": 3,\n      \"total\": 22\n    },\n    \"portionRatio\": 0.3333333333333333,\n    \"techniques\": [\n      {\n        \"name\": \"bake\",\n        \"timing\": 12,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"\"\n        ],\n        \"risks\": [\n          \"\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"fond pate regulier\",\n      \"lard cuit d'abord\",\n      \"creme oeuf bien lie\"\n    ],\n    \"signature\": \"Tarte crémeuse lard croustillant, custard doree, texture legere\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"fond pate regulier\",\n      \"lard cuit d'abord\",\n      \"creme oeuf bien lie\"\n    ],\n    \"techniques\": [\n      \"bake\"\n    ],\n    \"profTips\": [\n      \"Pate foncer sans bulles, piquer fond\",\n      \"Lard cuire 5 min avant pour croustillant\",\n      \"Creme & oeufs ne JAMAIS bouillir = texture grumeleuse\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [],
+          "timing": {
+            "prep": 10,
+            "cook": 20
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 8,
+        "verdict": "✅ BON - Acceptable",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité mondiale"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 23,
+            "cook": 56
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 10,
+        "verdict": "🏆 EXCELLENT - Niveau chef",
+        "issues": [],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 26,
+            "cook": 23
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 10,
+        "verdict": "🏆 EXCELLENT - Niveau chef",
+        "issues": [],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 26,
+            "cook": 38
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 10,
+        "verdict": "🏆 EXCELLENT - Niveau chef",
+        "issues": [],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 35,
+            "cook": 64
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 6,
+        "verdict": "⚠️ MOYEN - À améliorer",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise",
+          "⚠️ Manque signature ou fondamentaux (pas de profondeur)"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"Chef expert - Bokit classique\",\n  \"answer\": \"Bokit classique (base experte bokit) pour 2 personnes.\\nStructure pro a respecter: pate levee • friture chaude • garniture apres cuisson.\\nPlan debutant pas-a-pas:\\n1) Melange farine, levure et sel, puis ajoute l'eau tiede progressivement.\\n2) Petris 8 minutes jusqu'a une pate souple.\\n3) Laisse reposer 45 minutes couvert.\\n4) Divise en boules et etale en disques epais.\\n5) Fais frire 1 minute par face jusqu'a gonflement dore.\\n6) Ouvre, garnis et sers immediatement.\",\n  \"actions\": [\n    \"Voir recette\",\n    \"Version debutant\",\n    \"Verifier cuisson\"\n  ],\n  \"recipe\": {\n    \"id\": \"bokit-classique\",\n    \"name\": \"Bokit classique\",\n    \"tags\": [\n      \"guadeloupe\",\n      \"street-food\",\n      \"debutant\"\n    ],\n    \"image\": \"/recipes/bokit-classique.svg\",\n    \"prepMinutes\": 25,\n    \"restMinutes\": 45,\n    \"cookMinutes\": 10,\n    \"difficulty\": \"Facile\",\n    \"ingredients\": [\n      \"500 g farine\",\n      \"8 g levure boulangere seche\",\n      \"1 c. a cafe sel\",\n      \"300 ml eau tiede\",\n      \"Huile de friture\",\n      \"Jambon, fromage, crudites pour la garniture\"\n    ],\n    \"steps\": [\n      \"Melange farine, levure et sel, puis ajoute l'eau tiede progressivement.\",\n      \"Petris 8 minutes jusqu'a une pate souple.\",\n      \"Laisse reposer 45 minutes couvert.\",\n      \"Divise en boules et etale en disques epais.\",\n      \"Fais frire 1 minute par face jusqu'a gonflement dore.\",\n      \"Ouvre, garnis et sers immediatement.\"\n    ],\n    \"tips\": [\n      \"Si la pate colle trop, farine legerement tes mains.\",\n      \"Huile chaude mais pas fumante pour eviter un bokit gras.\"\n    ],\n    \"mistakes\": [\n      \"Ne pas respecter le repos: bokit compact.\",\n      \"Huile trop froide: bokit imbibe d'huile.\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 540,\n      \"protein\": 18,\n      \"carbs\": 58,\n      \"fat\": 24\n    },\n    \"servings\": 2,\n    \"cuisine\": \"antillaise\",\n    \"matchReason\": \"Recette issue de la base culinaire experte.\",\n    \"score\": 95\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"pate levee\",\n      \"friture chaude\",\n      \"garniture apres cuisson\"\n    ]\n  }\n}",
+          "signature": null,
+          "fundamentals": null,
+          "techniques": [
+            "frire",
+            "frire"
+          ],
+          "timing": {
+            "prep": 29,
+            "cook": 60
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 6,
+        "verdict": "⚠️ MOYEN - À améliorer",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise",
+          "⚠️ Manque signature ou fondamentaux (pas de profondeur)"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"Chef expert - Colombo de poulet antillais\",\n  \"answer\": \"Colombo de poulet antillais (base experte colombo) pour 2 personnes.\\nStructure pro a respecter: marinade • epices colombo • mijotage progressif.\\nPlan debutant pas-a-pas:\\n1) Marine le poulet avec colombo, ail, citron, sel 30 minutes.\\n2) Saisis le poulet dans une cocotte.\\n3) Ajoute oignon, thym, laurier et mouille a hauteur.\\n4) Integre les legumes et laisse mijoter 35 minutes.\\n5) Rectifie l'assaisonnement et sers avec riz blanc.\",\n  \"actions\": [\n    \"Voir recette\",\n    \"Version debutant\",\n    \"Verifier cuisson\"\n  ],\n  \"recipe\": {\n    \"id\": \"colombo-poulet\",\n    \"name\": \"Colombo de poulet antillais\",\n    \"tags\": [\n      \"plat\",\n      \"famille\",\n      \"epice\"\n    ],\n    \"image\": \"/recipes/colombo-poulet.svg\",\n    \"prepMinutes\": 20,\n    \"restMinutes\": 30,\n    \"cookMinutes\": 50,\n    \"difficulty\": \"Intermediaire\",\n    \"ingredients\": [\n      \"1 kg poulet en morceaux\",\n      \"2 c. a soupe poudre a colombo\",\n      \"2 pommes de terre\",\n      \"1 aubergine\",\n      \"1 oignon\",\n      \"2 gousses ail\",\n      \"Thym, laurier, citron vert\"\n    ],\n    \"steps\": [\n      \"Marine le poulet avec colombo, ail, citron, sel 30 minutes.\",\n      \"Saisis le poulet dans une cocotte.\",\n      \"Ajoute oignon, thym, laurier et mouille a hauteur.\",\n      \"Integre les legumes et laisse mijoter 35 minutes.\",\n      \"Rectifie l'assaisonnement et sers avec riz blanc.\"\n    ],\n    \"tips\": [\n      \"Un filet de citron en fin de cuisson reveille le plat\"\n    ],\n    \"mistakes\": [\n      \"Cuisson trop courte: epices crues\",\n      \"Trop d'eau: sauce diluee\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 620,\n      \"protein\": 42,\n      \"carbs\": 34,\n      \"fat\": 34\n    },\n    \"servings\": 2,\n    \"cuisine\": \"antillaise\",\n    \"matchReason\": \"Recette issue de la base culinaire experte.\",\n    \"score\": 95\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade\",\n      \"epices colombo\",\n      \"mijotage progressif\"\n    ]\n  }\n}",
+          "signature": null,
+          "fundamentals": null,
+          "techniques": [
+            "mijoter",
+            "mijoter"
+          ],
+          "timing": {
+            "prep": 17,
+            "cook": 44
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 8,
+        "verdict": "✅ BON - Acceptable",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 13,
+            "cook": 58
+          }
+        }
+      },
+      {
+        "name": "{",
+        "score": 8,
+        "verdict": "✅ BON - Acceptable",
+        "issues": [
+          "⚠️ Ne correspond pas à l'identité antillaise"
+        ],
+        "raw": {
+          "name": "{",
+          "content": "{\n  \"title\": \"CHEF ÉTOILÉ - Colombo de poulet (Chef Étoilé - 2 pers.)\",\n  \"answer\": \"✦ Colombo de poulet (Chef Étoilé - 2 pers.) (0.5x portions)\\nSignature culinaire: Poulet tendre dans sauce riche epices colombo, légumes fondants\\nFondamentaux essentiels:\\n  • marinade 30min avant\\n  • epices colombo toastees\\n  • mijotage 45min min\\nTechniques maîtrisées:\\n  • braise: 25 min\\nTiming total: 38 min (Prep: 10min + Cuisson: 25min + Repos: 3min)\\nConseils professionnels:\\n  ✓ Toaster les epices colombo 2 min avant pour reveler aromes\\n  ✓ Laisser poulet mariner minimum 30 min avec epices, ail, citron\\nErreurs à éviter absolument:\\n  ✗ Pas toaster epices = gout plat\\n  ✗ Cuisson trop rapide = poulet sec\",\n  \"actions\": [\n    \"Voir recette complète\",\n    \"Fondamentaux culinaires\",\n    \"Erreurs à éviter\"\n  ],\n  \"recipe\": {\n    \"id\": \"chef-star-colombo-poulet-2\",\n    \"name\": \"Colombo de poulet (Chef Étoilé - 2 pers.)\",\n    \"source\": \"chef-star-knowledge\",\n    \"cuisine\": \"antillaise\",\n    \"mode\": \"chef\",\n    \"style\": \"haute-cuisine\",\n    \"dishType\": \"curry-arom\",\n    \"difficulty\": \"3/5\",\n    \"prepMinutes\": 10,\n    \"cookMinutes\": 25,\n    \"restMinutes\": 3,\n    \"servings\": 2,\n    \"ingredientsDetailed\": [\n      {\n        \"name\": \"poulet\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"oignon\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"ail\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"tomate\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      },\n      {\n        \"name\": \"epices\",\n        \"quantity\": 0.5,\n        \"unit\": \"unit\"\n      }\n    ],\n    \"ingredients\": [\n      \"poulet\",\n      \"oignon\",\n      \"ail\",\n      \"tomate\",\n      \"epices\"\n    ],\n    \"steps\": [\n      \"Préparation: 10 min (mise en place des ingrédients)\",\n      \"Technique: braise (25 min)\",\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Finition et vérification\"\n    ],\n    \"tags\": [\n      \"antillaise\",\n      \"curry-arom\",\n      \"level10\",\n      \"2pers\"\n    ],\n    \"tips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ],\n    \"mistakes\": [\n      \"Pas toaster epices = gout plat\",\n      \"Cuisson trop rapide = poulet sec\",\n      \"Trop eau = sauce diluee, pas onctueuse\"\n    ],\n    \"slotHints\": [\n      \"lunch\"\n    ],\n    \"nutrition\": {\n      \"kcal\": 550,\n      \"protein\": 25,\n      \"carbs\": 45,\n      \"fat\": 24\n    },\n    \"imagePrompt\": \"Colombo de poulet, professional plating, chef level 10, Guadeloupe\",\n    \"score\": 95,\n    \"matchReason\": \"Chef Expert: sélection vraie recette Colombo de poulet - marinade 30min avant • epices colombo toastees • mijotage 45min min\",\n    \"blueprintKey\": \"chef-star-colombo-poulet\",\n    \"cookingMethod\": \"braise\",\n    \"proteinFamily\": \"premium\",\n    \"primaryProtein\": \"poulet\",\n    \"dishFamily\": \"curry-arom\",\n    \"flavorBalance\": {\n      \"score\": 90,\n      \"balance\": [\n        \"acid\",\n        \"fat\",\n        \"fresh\"\n      ],\n      \"missing\": [],\n      \"notes\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ]\n    },\n    \"dishId\": \"colombo-poulet\",\n    \"dishProfile\": {\n      \"id\": \"colombo-poulet\",\n      \"name\": \"Colombo de poulet\",\n      \"aliases\": [\n        \"colombo\",\n        \"colombo poulet\",\n        \"colombo de poulet antillais\"\n      ],\n      \"cuisine\": \"antillaise\",\n      \"region\": \"Guadeloupe\",\n      \"slot\": \"lunch\",\n      \"difficulty\": 3,\n      \"minChefLevel\": 3,\n      \"family\": \"curry-arom\",\n      \"technique\": \"braise\",\n      \"baseFamilies\": [\n        \"poulet\",\n        \"oignon\",\n        \"ail\",\n        \"tomate\",\n        \"epices\"\n      ],\n      \"fundamentals\": [\n        \"marinade 30min avant\",\n        \"epices colombo toastees\",\n        \"mijotage 45min min\"\n      ],\n      \"timings\": {\n        \"prep\": 20,\n        \"cook\": 50,\n        \"rest\": 5\n      },\n      \"servings\": 4,\n      \"portionAdaptation\": \"linear\",\n      \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\",\n      \"profTips\": [\n        \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n        \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n        \"Mijoter basse temperature pour viande tendre, pas coriace\"\n      ],\n      \"mistakes\": [\n        \"Pas toaster epices = gout plat\",\n        \"Cuisson trop rapide = poulet sec\",\n        \"Trop eau = sauce diluee, pas onctueuse\"\n      ]\n    },\n    \"adaptedTiming\": {\n      \"prep\": 10,\n      \"cook\": 25,\n      \"rest\": 3,\n      \"total\": 38\n    },\n    \"portionRatio\": 0.5,\n    \"techniques\": [\n      {\n        \"name\": \"braise\",\n        \"timing\": 25,\n        \"heatIntensity\": \"medium\",\n        \"tips\": [\n          \"Brasage: four 160C régulier plutôt cooktop variable\"\n        ],\n        \"risks\": [\n          \"Temperature four trop haute = viande sèche surface\"\n        ]\n      }\n    ],\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"signature\": \"Poulet tendre dans sauce riche epices colombo, légumes fondants\"\n  },\n  \"suggestions\": {\n    \"fundamentals\": [\n      \"marinade 30min avant\",\n      \"epices colombo toastees\",\n      \"mijotage 45min min\"\n    ],\n    \"techniques\": [\n      \"braise\"\n    ],\n    \"profTips\": [\n      \"Toaster les epices colombo 2 min avant pour reveler aromes\",\n      \"Laisser poulet mariner minimum 30 min avec epices, ail, citron\",\n      \"Mijoter basse temperature pour viande tendre, pas coriace\"\n    ]\n  }\n}",
+          "signature": "présente",
+          "fundamentals": null,
+          "techniques": [
+            "Mijoter",
+            "Mijoter",
+            "Mijoter"
+          ],
+          "timing": {
+            "prep": 35,
+            "cook": 25
+          }
+        }
+      }
+    ]
+  },
+  "errors": {
+    "total": 252,
+    "errors": [
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "DOUBLON",
+        "severity": "HIGH",
+        "description": "Même plat généré deux fois: \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      },
+      {
+        "type": "SIMILARITÉ_EXCESSIVE",
+        "severity": "MEDIUM",
+        "description": "Plats trop similaires (similarité: 100%): \"{\" vs \"{\""
+      }
+    ],
+    "bySeverity": {
+      "HIGH": 21,
+      "MEDIUM": 231,
+      "LOW": 0
+    }
+  },
+  "byCategory": {
+    "simple_ingredients": [
+      10,
+      10,
+      10,
+      10
+    ],
+    "complex_ingredients": [
+      8,
+      6,
+      8,
+      8
+    ],
+    "portions": [
+      6,
+      6,
+      6,
+      6
+    ],
+    "cuisines": [
+      8,
+      8,
+      8
+    ],
+    "pieges": [
+      10,
+      10,
+      10
+    ],
+    "chef_special": [
+      6,
+      6,
+      8,
+      8
+    ]
+  },
+  "problematicRecipes": [],
+  "recommendations": [
+    "Corriger 21 erreur(s) critique(s)",
+    "Ameliorer qualite (7 excellentes)"
+  ]
+}

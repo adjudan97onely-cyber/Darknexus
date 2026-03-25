@@ -1,112 +1,89 @@
-# 🔥 ADJ KILLAGAIN IA 2.0
+# Killagain Food
 
-## 🚀 Ton Arme IA Complète pour Créer N'importe Quel Projet
+Application PWA cuisine + nutrition, pensee pour les debutants et les amateurs de cuisine antillaise.
 
-**Génération illimitée de code avec 6 modèles IA experts + Agent Intelligent E1 LITE**
+## Vision produit
 
----
+- Scanner IA d'ingredients (mode mock intelligent)
+- Recommandations recettes creoles selon le frigo
+- Fiches recettes ultra detaillees (etapes, conseils, erreurs a eviter)
+- Assistant IA pedagogique
+- Onglet regime intelligent (objectif poids + plan repas)
+- Favoris sauvegardes localement
+- Section marque createur avec liens Instagram
 
-## ✨ FONCTIONNALITÉS
+## Stack technique
 
-### 🤖 Agent E1 LITE
-- Compréhension profonde du contexte
-- Analyse complète de projets
-- Debugging automatique avancé
-- Gestion multi-fichiers intelligente
-- Architecture et optimisation
+- React 18
+- Vite 5
+- Tailwind CSS
+- vite-plugin-pwa (offline + installable)
+- Architecture modulaire: `components`, `hooks`, `services`, `pages`, `data`
 
-### 💬 Chat IA Live
-- Conversation continue avec l'agent
-- Actions en temps réel
-- Dictée vocale intégrée
-- Historique complet
+## Installation
 
-### 🎯 6 Modèles IA Experts
-- GPT-5.2 (Le plus puissant)
-- GPT-5.1 (Recommandé)
-- Claude 4 Sonnet (Expert code)
-- Claude Sonnet 4.6 (Nouvelle génération)
-- Gemini 2.5 Pro (Très performant)
-- Gemini 3 Flash (Ultra rapide)
-
-### 📦 Types de Projets
-- 🌐 Applications Web
-- 🐍 Scripts Python
-- 📊 Automatisation Excel
-- 🎮 Scripts Jeux Vidéo
-- 🤖 Applications IA
-- 🔌 APIs REST
-
-### 🛠️ Outils Intégrés
-- ✏️ Édition de projets
-- 🔧 Amélioration continue
-- 📥 Téléchargement ZIP
-- 🗑️ Gestion complète
-- 🎤 Dictée vocale partout
-
----
-
-## 🚀 INSTALLATION RAPIDE
-
-### Windows
-```cmd
-1. Double-clique sur install_windows.bat
-2. Édite backend\.env avec ta clé API
-3. Lance start_backend.bat
-4. Lance start_frontend.bat
-5. Ouvre http://localhost:3000
-```
-
-### Mac / Linux
 ```bash
-1. chmod +x install_unix.sh
-2. ./install_unix.sh
-3. Édite backend/.env avec ta clé API
-4. ./start_backend.sh
-5. ./start_frontend.sh (nouveau terminal)
-6. Ouvre http://localhost:3000
+cd killagain-food
+npm install
+npm run dev
 ```
 
-📖 **Documentation complète** : Voir `INSTALLATION_GUIDE.md`
+Application: `http://127.0.0.1:5180`
 
----
+## Lancement ultra simple (Windows)
 
-## 💪 UTILISATION
+Double-cliquer sur `start-app.bat`
 
-### Créer un Projet
-1. Clique "Créer un Projet"
-2. Décris ton projet (texte ou vocal)
-3. Choisis le modèle IA
-4. Génère !
+Le script:
 
-### Utiliser l'Agent E1 LITE
-1. Ouvre un projet
-2. Clique sur "Chat IA Live 💬"
-3. Commandes magiques :
-   - `Analyse mon projet` → Audit complet
-   - `Debug tout` → Correction automatique
-   - `Améliore le design` → Upgrade visuel
-   - `Ajoute [fonctionnalité]` → Implémentation
-   - `Optimise` → Performance boost
+1. installe les dependances si necessaire,
+2. lance le serveur dev,
+3. ouvre le navigateur automatiquement.
 
----
+## Test sur mobile (meme Wi-Fi)
 
-## 🔑 OBTENIR UNE CLÉ API
+1. Double-cliquer sur `start-mobile.bat`
+2. Le script affiche l'adresse du type `http://IP_DU_PC:5180`
+3. Ouvrir cette adresse sur ton telephone (meme reseau Wi-Fi)
 
-### Option 1 : Clé Emergent (Recommandé)
-1. Va sur https://emergent.sh
-2. Profile → Universal Key
-3. Copie ta clé
-4. Ajoute du crédit si nécessaire
+Exemple: `http://192.168.1.25:5180`
 
-### Option 2 : Clé OpenAI
-1. Va sur https://platform.openai.com/api-keys
-2. Crée une clé
-3. Ajoute du crédit
+## Dossier mobile-app
 
----
+Le dossier [mobile-app](mobile-app) contient les guides et scripts mobile:
 
-**BIENVENUE DANS TON ARME IA, MON POTE ! 🚀👑**
+1. [Guide principal](mobile-app/README.md)
+2. [Workflow mobile](mobile-app/workflow-mobile.md)
+3. [Preview production mobile](mobile-app/start-mobile-production.bat)
 
-*ADJ KILLAGAIN IA 2.0 - Powered by E1 LITE*  
-*Made with 🔥 by TOI & MOI*
+## Build production
+
+```bash
+npm run build
+npm run preview
+```
+
+## Deploiement Vercel
+
+Le fichier `vercel.json` est inclus (fallback SPA).
+
+## Structure
+
+```text
+killagain-food/
+	public/
+		icons/
+	src/
+		components/
+		hooks/
+		services/
+		data/
+		pages/
+```
+
+## Suggestions d'amelioration
+
+1. Brancher une vraie API vision (ex: OpenAI Vision ou Roboflow) pour remplacer le scanner mock.
+2. Ajouter auth cloud + synchro favoris multi-appareils.
+3. Ajouter planning hebdo complet avec suivi calories/macro journalier.
+4. Integrer notifications push PWA (rappel hydratation et prep repas).
