@@ -15,6 +15,7 @@ import { FavoritesPage } from "./pages/FavoritesPage";
 import { RecipeDetailPage } from "./pages/RecipeDetailPage";
 import { CreatorPage } from "./pages/CreatorPage";
 import { AdminPage } from "./pages/AdminPage";
+import TestAIPage from "./pages/TestAIPage";
 
 function LocalAdminOnly({ children }) {
   if (!isLocalAdminAllowed()) {
@@ -108,6 +109,7 @@ function AppLayout() {
             }
           />
           <Route path="/createur" element={<CreatorPage />} />
+          <Route path="/test" element={<TestAIPage />} />
           <Route
             path="/admin"
             element={

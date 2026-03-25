@@ -1,8 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bot, MessageCircleMore } from "lucide-react";
 import { askCookingAssistant } from "../services/aiService";
+import { RecipeCard } from "./RecipeCard";
+import { useFavorites } from "../hooks/useFavorites";
 
 export function AssistantPanel({ ingredients }) {
+  const navigate = useNavigate();
+  const { favoriteIds, toggleFavorite } = useFavorites();
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -70,16 +75,36 @@ export function AssistantPanel({ ingredients }) {
       </div>
 
       {response ? (
-        <article className="mt-4 rounded-xl border border-white/20 bg-white/5 p-3 text-sm text-white/90">
-          <h3 className="font-bold text-cyan-200">{response.title}</h3>
-          <p className="mt-2">{response.answer}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {response.actions.map((item) => (
-              <span key={item} className="rounded-full bg-cyan-400/25 px-2 py-1 text-xs text-cyan-100">
-                {item}
-              </span>
-            ))}
+        <article className="mt-4 space-y-4 rounded-xl border border-white/20 bg-white/5 p-3">
+          <div>
+            <h3 className="font-bold text-cyan-200">{response.title}</h3>
+            <p className="mt-2 text-sm text-white/90">{response.answer}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {response.actions?.map((item) => (
+                <span key={item} className="rounded-full bg-cyan-400/25 px-2 py-1 text-xs text-cyan-100">
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
+
+          {/* 🎯 AFFICHER LES RECETTES EN CARTES */}
+          {response.recipes && response.recipes.length > 0 && (
+            <div className="space-y-2 border-t border-white/10 pt-4">
+              <p className="text-xs font-semibold text-white/60">Recettes correspondantes:</p>
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                {response.recipes.map((recipe) => (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    isFavorite={favoriteIds.has(recipe.id)}
+                    onToggleFavorite={toggleFavorite}
+                    onOpen={(item) => navigate(`/recettes/${item.id}`, { state: { recipe: item } })}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </article>
       ) : null}
     </section>
