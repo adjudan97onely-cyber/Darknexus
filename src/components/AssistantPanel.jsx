@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bot, MessageCircleMore } from "lucide-react";
+import { Bot, MessageCircleMore, History, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { askCookingAssistant } from "../services/aiService";
 import { RecipeCard } from "./RecipeCard";
 import { useFavorites } from "../hooks/useFavorites";
+import { saveChatEntry, getChatHistory, clearChatHistory } from "../services/chatHistoryService";
 
 export function AssistantPanel({ ingredients }) {
   const navigate = useNavigate();
@@ -11,6 +12,8 @@ export function AssistantPanel({ ingredients }) {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState(() => getChatHistory());
 
   async function handleAsk() {
     if (!question.trim()) return;
@@ -18,6 +21,8 @@ export function AssistantPanel({ ingredients }) {
     try {
       const result = await askCookingAssistant(question, { ingredients });
       setResponse(result);
+      saveChatEntry(question, result);
+      setHistory(getChatHistory());
     } finally {
       setLoading(false);
     }
@@ -29,9 +34,16 @@ export function AssistantPanel({ ingredients }) {
     try {
       const result = await askCookingAssistant(value, { ingredients });
       setResponse(result);
+      saveChatEntry(value, result);
+      setHistory(getChatHistory());
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleClearHistory() {
+    clearChatHistory();
+    setHistory([]);
   }
 
   return (
@@ -107,6 +119,52 @@ export function AssistantPanel({ ingredients }) {
           )}
         </article>
       ) : null}
+
+      {/* HISTORIQUE CONVERSATIONS */}
+      <div className="mt-4 rounded-xl border border-white/10 bg-white/5">
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-bold text-white/70 transition hover:bg-white/5"
+        >
+          <span className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            Historique ({history.length})
+          </span>
+          {showHistory ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </button>
+        {showHistory && (
+          <div className="border-t border-white/10 px-4 py-3">
+            {history.length === 0 ? (
+              <p className="text-sm text-white/40">Aucune conversation passee.</p>
+            ) : (
+              <>
+                <div className="mb-2 flex justify-end">
+                  <button onClick={handleClearHistory} className="flex items-center gap-1 text-xs text-rose-300 transition hover:text-rose-200">
+                    <Trash2 className="h-3 w-3" /> Effacer
+                  </button>
+                </div>
+                <ul className="max-h-60 space-y-2 overflow-y-auto">
+                  {[...history].reverse().map((entry) => (
+                    <li key={entry.id} className="rounded-lg bg-white/5 px-3 py-2">
+                      <button
+                        onClick={() => quickAsk(entry.question)}
+                        className="w-full text-left"
+                      >
+                        <p className="text-sm font-semibold text-cyan-200">{entry.question}</p>
+                        <p className="mt-0.5 line-clamp-1 text-xs text-white/50">{entry.answer}</p>
+                        <p className="mt-1 text-[10px] text-white/30">
+                          {entry.recipeCount > 0 && `${entry.recipeCount} recette${entry.recipeCount > 1 ? "s" : ""} • `}
+                          {new Date(entry.timestamp).toLocaleDateString("fr")}
+                        </p>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

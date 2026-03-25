@@ -1,15 +1,25 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import { Share2, Copy, Check, ShoppingCart, Timer, TimerOff, Play, Pause, RotateCcw } from "lucide-react";
 import { formatIngredientLine, scaleRecipeForServings } from "../services/aiService";
 import { clearRecipeImage, resolveRecipeImage, setRecipeImage } from "../services/recipeImageService";
 import { recordRecipeSeen } from "../services/userMemoryService";
 import { getRecipeByIdFromAdminLayer } from "../services/adminContentService";
+import { addToShoppingList } from "../services/shoppingListService";
 
 export function RecipeDetailPage() {
   const { recipeId } = useParams();
   const location = useLocation();
   const [imageVersion, setImageVersion] = useState(0);
   const [servings, setServings] = useState(null);
+  const [shareMessage, setShareMessage] = useState(null);
+  const [shoppingMessage, setShoppingMessage] = useState(null);
+
+  // --- TIMER STATE ---
+  const [timerSeconds, setTimerSeconds] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerInitialized, setTimerInitialized] = useState(false);
+  const timerRef = useRef(null);
 
   const recipe = useMemo(() => {
     const fromState = location.state?.recipe;
@@ -58,6 +68,96 @@ export function RecipeDetailPage() {
 
   const imageSrc = resolveRecipeImage(displayedRecipe);
 
+  // --- SHARE ---
+  const shareText = `${displayedRecipe.name}\nPrep: ${displayedRecipe.prepMinutes} min | Cuisson: ${displayedRecipe.cookMinutes} min\n\nIngredients:\n${(displayedRecipe.ingredientsDetailed || []).map(i => formatIngredientLine(i)).join("\n")}\n\n- Killagain Food`;
+
+  async function handleShare() {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: displayedRecipe.name, text: shareText });
+        return;
+      } catch (_) { /* user cancelled or not supported */ }
+    }
+    try {
+      await navigator.clipboard.writeText(shareText);
+      setShareMessage("Copie !");
+      setTimeout(() => setShareMessage(null), 2000);
+    } catch (_) {
+      setShareMessage("Erreur copie");
+      setTimeout(() => setShareMessage(null), 2000);
+    }
+  }
+
+  // --- SHOPPING LIST ---
+  function handleAddToShoppingList() {
+    const items = (displayedRecipe.ingredientsDetailed || []).map(i => formatIngredientLine(i));
+    addToShoppingList(displayedRecipe.name, items);
+    setShoppingMessage("Ajoute a la liste !");
+    setTimeout(() => setShoppingMessage(null), 2500);
+  }
+
+  // --- TIMER ---
+  const totalCookSeconds = (displayedRecipe.cookMinutes || 0) * 60;
+
+  function startTimer() {
+    if (!timerInitialized) {
+      setTimerSeconds(totalCookSeconds);
+      setTimerInitialized(true);
+    }
+    setTimerRunning(true);
+  }
+
+  function pauseTimer() {
+    setTimerRunning(false);
+  }
+
+  function resetTimer() {
+    setTimerRunning(false);
+    setTimerSeconds(totalCookSeconds);
+    setTimerInitialized(false);
+  }
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (timerRunning && timerSeconds > 0) {
+      timerRef.current = setInterval(() => {
+        setTimerSeconds(prev => {
+          if (prev <= 1) {
+            setTimerRunning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [timerRunning, timerSeconds]);
+
+  // Play sound when timer reaches 0
+  useEffect(() => {
+    if (timerInitialized && timerSeconds === 0 && !timerRunning) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.3, 0.6].forEach(delay => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.value = 880;
+          gain.gain.value = 0.3;
+          osc.start(ctx.currentTime + delay);
+          osc.stop(ctx.currentTime + delay + 0.2);
+        });
+      } catch (_) { /* no audio context */ }
+    }
+  }, [timerSeconds, timerInitialized, timerRunning]);
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+
   function onUploadFile(event) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -101,6 +201,25 @@ export function RecipeDetailPage() {
         </button>
         <span className="text-white/70">Astuce: mets tes vraies photos plat par plat ici.</span>
       </div>
+
+      {/* ACTION BAR: Share + Shopping List */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={handleShare}
+          className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/30 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-100 transition hover:bg-cyan-400/20"
+        >
+          {shareMessage ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+          {shareMessage || "Partager"}
+        </button>
+        <button
+          onClick={handleAddToShoppingList}
+          className="inline-flex items-center gap-2 rounded-xl border border-emerald-300/30 bg-emerald-400/10 px-4 py-2.5 text-sm font-bold text-emerald-100 transition hover:bg-emerald-400/20"
+        >
+          {shoppingMessage ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
+          {shoppingMessage || "Liste de courses"}
+        </button>
+      </div>
+
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black">{displayedRecipe.name}</h1>
@@ -122,6 +241,36 @@ export function RecipeDetailPage() {
       <p className="text-sm text-white/80">
         Difficulte: {displayedRecipe.difficulty} | Prep: {displayedRecipe.prepMinutes} min | Repos: {displayedRecipe.restMinutes} min | Cuisson: {displayedRecipe.cookMinutes} min
       </p>
+
+      {/* TIMER CUISINE INTERACTIF */}
+      {totalCookSeconds > 0 && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-300/20 bg-amber-400/5 p-3">
+          <Timer className="h-5 w-5 text-amber-300" />
+          <span className="text-sm font-bold text-amber-100">Timer cuisson</span>
+          <span className={`font-mono text-2xl font-black ${timerInitialized && timerSeconds === 0 ? "animate-pulse text-rose-400" : timerRunning ? "text-emerald-300" : "text-white"}`}>
+            {timerInitialized ? formatTime(timerSeconds) : formatTime(totalCookSeconds)}
+          </span>
+          <div className="flex gap-1.5">
+            {!timerRunning ? (
+              <button onClick={startTimer} className="rounded-lg bg-emerald-400/20 p-2 text-emerald-200 transition hover:bg-emerald-400/30">
+                <Play className="h-4 w-4" />
+              </button>
+            ) : (
+              <button onClick={pauseTimer} className="rounded-lg bg-amber-400/20 p-2 text-amber-200 transition hover:bg-amber-400/30">
+                <Pause className="h-4 w-4" />
+              </button>
+            )}
+            <button onClick={resetTimer} className="rounded-lg bg-white/10 p-2 text-white/70 transition hover:bg-white/20">
+              <RotateCcw className="h-4 w-4" />
+            </button>
+          </div>
+          {timerInitialized && timerSeconds === 0 && (
+            <span className="animate-pulse rounded-full bg-rose-500/20 px-3 py-1 text-xs font-bold text-rose-300">
+              Cuisson terminee !
+            </span>
+          )}
+        </div>
+      )}
 
       <section>
         <h2 className="text-xl font-bold">Ingredients precis pour {displayedRecipe.servings} personne{displayedRecipe.servings > 1 ? "s" : ""}</h2>

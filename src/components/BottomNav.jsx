@@ -1,12 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { Bot, Camera, Heart, Home, Salad, Search } from "lucide-react";
+import { Bot, Camera, Heart, Home, Salad, Search, ShoppingCart } from "lucide-react";
 
 const items = [
   { to: "/", label: "Accueil", icon: Home },
   { to: "/scanner", label: "Scanner", icon: Camera },
   { to: "/recettes", label: "Recettes", icon: Search },
   { to: "/assistant", label: "Assistant", icon: Bot },
-  { to: "/regime", label: "Regime", icon: Salad },
+  { to: "/liste-courses", label: "Courses", icon: ShoppingCart },
   { to: "/favoris", label: "Favoris", icon: Heart },
 ];
 
@@ -18,7 +18,7 @@ export function BottomNav() {
       <ul className="grid grid-cols-6 gap-1">
         {items.map((item) => {
           const ActiveIcon = item.icon;
-          const active = location.pathname === item.to;
+          const active = item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
           return (
             <li key={item.to}>
               <Link
