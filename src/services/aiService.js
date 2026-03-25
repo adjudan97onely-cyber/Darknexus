@@ -11,6 +11,7 @@ import { applyAdminControls, recordGeneratedRecipes } from "./adminContentServic
 import { getDishes, matchByIngredients } from "../core/dishKnowledge";
 import { DEFAULT_CHEF_LEVEL } from "../core/chefLevel";
 import { generateChefStarRecipes } from "../core/chefStarEngine";
+import { chefIA } from "./chefIA.js";
 
 /**
  * Parse une quantité brute d'ingrédient ("800g", "2 cs", "3 branches", "2") 
@@ -1506,93 +1507,51 @@ export async function askCookingAssistant(question, context = {}) {
       };
     }
   }
+}
 
-  // Fallback mode AMÉLIORÉ (Point 7-8): Matching intelligent + tableau de recettes
-  // 🔍 Point 7: Normaliser le type de plat
-  const askedDish = findKnowledgeDish(lower);
-  if (askedDish) {
-    // 🎯 Point 8: Matching intelligent - trouver PLUSIEURS recettes correspondantes
-    const matchedRecipes = findRecipesForDish(askedDish.key || askedDish.aliases?.[0] || lower);
-    
-    if (matchedRecipes && matchedRecipes.length > 0) {
-      // Strategie SIMPLE et PROPRE: cohérence culinaire
-      const baseCuisine = askedDish.cuisine || "antillaise";
-      
-      // Personnaliser et filtrer cohérence
-      const personalizedMatches = personalizeRecipes(matchedRecipes, userProfile);
-      const diversified = diversify(personalizedMatches).filter((recipe) => {
-        return recipe.cuisine === baseCuisine || !baseCuisine;
-      });
-      
-      // Trier par score
-      const sorted = diversified.sort((a, b) => {
-        return (b.score || 0) - (a.score || 0);
-      });
-      
-      // CRITICAL FIX: finalMatches défini
-      const finalMatches = sorted.slice(0, 5);
-      
-      // STRUCTURE PROPRE: pas de mélange alternatives/résultats
-      const answerText = `J'ai trouvé ${finalMatches.length} ${askedDish.key} intéressant(s). Voici ma sélection culinaire personnalisée.`;
-      
-      return {
-        title: `Chef expert - ${askedDish.key?.toUpperCase() || "Selection"}`,
-        recipes: finalMatches,
-        answer: answerText,
-        actions: ["Voir recette", "Version debutant", "Verifier cuisson"],
-      };
-    }
-    
-    // Fallback si pas trouvé avec findRecipesForDish: utiliser l'ancienne méthode
-    const expertRecipe = findExpertRecipeForDish(askedDish, servings, userProfile);
-    if (expertRecipe) {
-      return {
-        title: `Chef expert - ${expertRecipe.name}`,
-        answer: buildPedagogicDishAnswer(expertRecipe, askedDish, servings),
-        actions: ["Voir recette", "Version debutant", "Verifier cuisson"],
-        recipe: expertRecipe,
-        suggestions: {
-          fundamentals: askedDish.fundamentals || [],
-        },
-      };
-    }
-  }
+/**
+ * ======================================
+ * 🔗 EXPERT IA SYSTEM - Wrappers
+ * Connecte chefIA.js aux rôles experts
+ * ======================================
+ */
 
-  if (lower.includes("surprend") || lower.includes("surprise")) {
-    const pick = personalizeRecipes([surpriseBalancedRecipe()], userProfile)[0];
-    return {
-      title: "Mode surprise dynamique",
-      answer: `Je compose ${pick.name}. ${pick.description} Tu peux aussi faire ${pick.alternatives?.[0] || pick.variants?.[0] || "une variation plus legere"}.`,
-      actions: ["Voir recette", ...(pick.variants || []).slice(0, 2)],
-      recipe: pick,
-    };
-  }
+/**
+ * Valide une recette auprès du Chef IA
+ * Vérifie: authenticité, technique, timing, saveur
+ */
+export async function validateRecipeWithChef(recipeData, detailedRecipe = null) {
+  const recipeText = detailedRecipe 
+    ? JSON.stringify(detailedRecipe, null, 2)
+    : JSON.stringify(recipeData, null, 2);
+  
+  return chefIA({
+    role: "chef_antillais",
+    input: `Valide cette recette:\n${recipeText}`,
+    context: { type: "recipe_validation", recipeId: recipeData.id || "unknown" }
+  });
+}
 
-  const cuisine = lower.includes("antill") ? "antillaise" : inferCuisine(lower);
-  const slot = inferSlot(lower);
-  const rankedBase = personalizeRecipes(generateRecipeCandidates(ingredients.length ? ingredients : lower.split(/\s+/), {
-    cuisine,
-    mode: "chef",
-    slot,
-    servings,
-    limit: 6,
-  }), userProfile);
-  const ranked = finalizeRecipeCollection(applyAdminControls(rankedBase, {
-    ingredients: ingredients.length ? ingredients : lower.split(/\s+/),
-    cuisine,
-    query: question,
-  }), 5);
-  recordGeneratedRecipes(rankedBase);
-  const pick = ranked[0] || rankedBase[0] || surpriseBalancedRecipe();
+/**
+ * Valide un régime/plan nutritionnel auprès du Nutritioniste IA
+ * Vérifie: équilibre macros, faisabilité, efficacité
+ */
+export async function validateMealPlanWithNutritionist(mealPlanData) {
+  return chefIA({
+    role: "nutritioniste",
+    input: `Analyse ce plan alimentaire:\n${JSON.stringify(mealPlanData, null, 2)}`,
+    context: { type: "nutrition_validation", dietType: mealPlanData.type || "general" }
+  });
+}
 
-  return {
-    title: "Composition culinaire intelligente",
-    answer: `Je compose ${pick.name} a partir d'un blueprint ${pick.blueprintKey}, avec quantites adaptees, logique ${pick.cookingMethod} et coherence ${pick.cuisine}. ${pick.description} Tu peux aussi faire ${pick.alternatives?.[0] || pick.variants?.[0] || "une autre variante"}.`,
-    actions: ["Voir recette", ...(pick.variants || []).slice(0, 2), ...(pick.substitutions || []).slice(0, 1)],
-    recipe: pick,
-    suggestions: {
-      alternatives: ranked.slice(1, 4).map((item) => item.name),
-      substitutions: pick.substitutions || [],
-    },
-  };
+/**
+ * Demande une recommandation générale à l'Assistant IA
+ * Aide, suggestions, conseils culinaires
+ */
+export async function getGeneralAssistantHelp(userQuestion, context = {}) {
+  return chefIA({
+    role: "assistant_general",
+    input: userQuestion,
+    context: { type: "general_help", ...context }
+  });
 }

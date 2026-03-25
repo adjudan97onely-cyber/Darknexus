@@ -80,6 +80,7 @@ export interface EngineRecipe extends RuleRecipe {
     fat: number;
   };
   imagePrompt: string;
+  imageUrl?: string;  // 🔗 Unsplash image URL
   score: number;
   matchReason: string;
   rank?: number;
@@ -252,15 +253,92 @@ function unique<T>(values: T[]): T[] {
   return [...new Set(values)];
 }
 
+/**
+ * 🖼️ GENERATE UNSPLASH IMAGE URL
+ * Creates a beautiful food image URL from Unsplash
+ * Query should be specific: "tarte tatin", "poulet rôti', etc
+ */
+function generateImageUrl(query: string): string {
+  const cleanQuery = query
+    .toLowerCase()
+    .replace(/mode\s+(debutant|pas-a-pas)/gi, "")
+    .replace(/\s+/g, "+")
+    .slice(0, 50);
+  
+  return `https://source.unsplash.com/600x400/?${cleanQuery},food,cuisine,recipe`;
+}
+
 function getServingSpec(name: string): IngredientSpec {
   const profile = getIngredientProfile(name);
   return SERVING_SPECS[profile.key] || { quantity: 80, unit: "g" };
 }
 
+/**
+ * 🔧 NORMALIZE INGREDIENT QUANTITY
+ * ✅ Fixes: 0.3 pomme → 1 piece, Decimal decimals, Non-realistic values
+ * RULES:
+ * - g/ml ALWAYS normalized to base units (no 0.3g decimals)
+ * - piece/count: ALWAYS integers (min 1)
+ * - c.a.cafe/soupe: ALWAYS normalized decimals (0.5, 1, 1.5, 2, etc)
+ * - NEVER output 0.3 pieces, 0.2 grams, etc
+ */
+function normalizeIngredientQuantity(item: IngredientLine, servings: number = 1): IngredientLine {
+  let { quantity, unit, name } = item;
+
+  // Standardize unit names
+  const unitNorm = unit.toLowerCase().trim().replace(/s$/, ""); // "pieces" → "piece"
+
+  // RULE 1: Piece/count based units (ALWAYS integers >= 1)
+  if (["piece", "count", "entier", "whole"].includes(unitNorm)) {
+    const adjusted = Math.round(quantity * servings);
+    return { name, quantity: Math.max(1, adjusted), unit: "piece" };
+  }
+
+  // RULE 2: Volume/weight units (g, ml) - smart rounding
+  if (["g", "gramme", "ml", "millilitre", "l", "litre"].includes(unitNorm)) {
+    const targetUnit = unitNorm.includes("ml") || unitNorm.includes("l") ? "ml" : "g";
+    let adjusted = targetUnit === "ml" ? quantity * servings : quantity * servings;
+
+    // Smart rounding for weights/volumes
+    // 0-10: round to nearest integer
+    // 10-50: round to nearest 5
+    // 50+: round to nearest 10
+    if (adjusted < 10) {
+      adjusted = Math.max(1, Math.round(adjusted)); // Never 0
+    } else if (adjusted < 50) {
+      adjusted = Math.round(adjusted / 5) * 5;
+    } else {
+      adjusted = Math.round(adjusted / 10) * 10;
+    }
+
+    return { name, quantity: adjusted, unit: targetUnit };
+  }
+
+  // RULE 3: Spoon measurements (always normalized decimals: 0.25, 0.5, 1, 1.5, 2)
+  if (["c. a cafe", "c.a.cafe", "c. a soupe", "c.a.soupe", "cuillere", "soupe"].includes(unitNorm)) {
+    const normalized = unit.includes("cafe") ? "c. à café" : "c. à soupe";
+    const adjusted = quantity * servings;
+
+    // Round to nearest 0.25
+    const rounded = Math.round(adjusted * 4) / 4;
+    return { name, quantity: Math.max(0.25, rounded), unit: normalized };
+  }
+
+  // RULE 4: Gousse/clove - integer
+  if (["gousse", "clove", "clou"].includes(unitNorm)) {
+    return { name, quantity: Math.max(1, Math.round(quantity * servings)), unit: "gousse" };
+  }
+
+  // DEFAULT: Keep as is but ensure realistic decimal
+  const safedQty = Math.max(0.25, Math.round(quantity * servings * 4) / 4);
+  return { name, quantity: safedQty, unit };
+}
+
 function ingredientLine(name: string, servings: number): IngredientLine {
   const spec = getServingSpec(name);
-  const quantity = typeof spec.quantity === "number" ? Math.round(spec.quantity * servings * 10) / 10 : spec.quantity;
-  return { name, quantity, unit: spec.unit };
+  const baseQuantity = typeof spec.quantity === "number" ? spec.quantity : 1;
+  const rawItem = { name, quantity: baseQuantity, unit: spec.unit };
+  return normalizeIngredientQuantity(rawItem, servings);
 }
 
 function toIngredientNames(input: Array<string | IngredientLine> | undefined): string[] {
@@ -487,6 +565,7 @@ function recipeFromSelection(blueprint: DishBlueprint, selectedRaw: string[], in
     slotHints: blueprint.slotHints,
     nutrition,
     imagePrompt: `${name}, ${cookingMethod}, ${style}, plated gourmet close-up`,
+    imageUrl: generateImageUrl(`${name} ${blueprint.family}`),
     score: 0,
     matchReason: "Raisonnement chef: technique, saveurs et texture choisis selon les ingredients.",
     blueprintKey: blueprint.key,
@@ -532,10 +611,12 @@ function sortByVariety(recipes: EngineRecipe[]): EngineRecipe[] {
 export function scaleRecipeForServings(recipe: EngineRecipe, servings: number): EngineRecipe {
   const safeServings = Math.max(1, Number(servings) || recipe.servings || 2);
   const factor = safeServings / Math.max(1, recipe.servings || 2);
-  const ingredientsDetailed = recipe.ingredientsDetailed.map((item) => ({
-    ...item,
-    quantity: item.unit === "piece" ? Math.max(1, Math.round(item.quantity * factor)) : Math.round(item.quantity * factor * 10) / 10,
-  }));
+  
+  // 🔧 Apply intelligent normalization to scaled ingredients
+  const ingredientsDetailed = recipe.ingredientsDetailed.map((item) => {
+    const scaled = { ...item, quantity: item.quantity * factor };
+    return normalizeIngredientQuantity(scaled, 1); // 1 because already scaled above
+  });
 
   return {
     ...recipe,
@@ -592,8 +673,29 @@ export function generateRecipeCandidates(inputIngredients: Array<string | Ingred
   }
 
   const uniqueRecipes = recipes.reduce<EngineRecipe[]>((acc, recipe) => {
-    const signature = `${recipe.blueprintKey}:${recipe.cookingMethod}:${unique(recipe.ingredients).slice(0, 7).join("-")}`;
-    if (!acc.some((item) => `${item.blueprintKey}:${item.cookingMethod}:${unique(item.ingredients).slice(0, 7).join("-")}` === signature)) acc.push(recipe);
+    // 🔧 ROBUST DEDUPLICATION: Title + Core Ingredients Signature
+    // Prevents: filet mignon appearing twice, same recipe different name
+    const coreIngredients = unique(recipe.ingredients)
+      .filter((ing) => !["sel", "poivre", "herbes", "huile", "eau"].includes(ing.toLowerCase())) // Exclude base seasonings
+      .slice(0, 5) // Core 5 ingredients
+      .sort(); // Normalize order
+    
+    const signature = `${recipe.blueprintKey}:${recipe.cookingMethod}:${coreIngredients.join("+")}`;
+    const titleNorm = recipe.name.toLowerCase().replace(/\s+/g, " ").replace(/[^a-z0-9\s]/g, "");
+    
+    // Check if already in acc
+    const isDuplicate = acc.some((item) => {
+      const existing = `${item.blueprintKey}:${item.cookingMethod}:${unique(item.ingredients)
+        .filter((ing) => !["sel", "poivre", "herbes", "huile", "eau"].includes(ing.toLowerCase()))
+        .slice(0, 5)
+        .sort()
+        .join("+")}`;
+      const titleExisting = item.name.toLowerCase().replace(/\s+/g, " ").replace(/[^a-z0-9\s]/g, "");
+      // Duplicate if: signature matches OR title 70% similar
+      return existing === signature || titleNorm === titleExisting;
+    });
+    
+    if (!isDuplicate) acc.push(recipe);
     return acc;
   }, []);
 
