@@ -927,10 +927,20 @@ function mergeRecipeGroup(group) {
 }
 
 function dedupeDishResults(recipes, limit = 5) {
-  const groups = [];
-  const rankedRecipes = [...recipes].sort((a, b) => (b.score || 0) - (a.score || 0));
+  // First: Deduplicate by exact ID
+  const seenIds = new Set();
+  const uniqueById = [];
+  
+  [...recipes].sort((a, b) => (b.score || 0) - (a.score || 0)).forEach((recipe) => {
+    if (!seenIds.has(recipe.id)) {
+      uniqueById.push(recipe);
+      seenIds.add(recipe.id);
+    }
+  });
 
-  rankedRecipes.forEach((recipe) => {
+  // Second: Group similar recipes by baseType for merging
+  const groups = [];
+  uniqueById.forEach((recipe) => {
     const recipeBaseType = resolveBaseType(recipe);
     const recipeIngredients = ingredientSet(recipe);
     const existingGroup = groups.find((group) => group.baseType === recipeBaseType && ingredientSimilarity(group.referenceIngredients, recipeIngredients) >= 0.7);
@@ -951,21 +961,22 @@ function dedupeDishResults(recipes, limit = 5) {
     .map((group) => mergeRecipeGroup(group.items))
     .sort((a, b) => (b.score || 0) - (a.score || 0));
 
+  // Third: Allow up to 2 variants per baseType
   const distinct = [];
-  const remaining = [];
-  const seenBaseTypes = new Set();
+  const baseTypeCount = new Map();
+  const maxVariantsPerType = 2;
 
   merged.forEach((recipe) => {
-    if (seenBaseTypes.has(recipe.baseType)) {
-      remaining.push(recipe);
-      return;
+    const count = baseTypeCount.get(recipe.baseType) || 0;
+    if (count < maxVariantsPerType) {
+      distinct.push(recipe);
+      baseTypeCount.set(recipe.baseType, count + 1);
     }
-    seenBaseTypes.add(recipe.baseType);
-    distinct.push(recipe);
   });
 
-  return [...distinct, ...remaining].slice(0, Math.min(5, Math.max(1, Number(limit) || 5)));
+  return distinct.slice(0, Math.min(limit || 5, 30));
 }
+
 
 function finalizeRecipeCollection(recipes, limit = 5) {
   return attachAlternatives(dedupeDishResults(recipes, limit));
@@ -1303,8 +1314,15 @@ export function smartSearchRecipes(query) {
 
   const askedDish = findKnowledgeDish(q);
   if (askedDish) {
-    const expertRecipe = findExpertRecipeForDish(askedDish, inferServings(q), getUserProfile());
-    if (expertRecipe) return finalizeRecipeCollection([expertRecipe], 1);
+    // FIXED: Find ALL recipes matching this dish, not just one
+    const matchingRecipes = ALL_RECIPES.filter((recipe) => recipeMatchesDish(recipe, askedDish)).map((recipe) =>
+      normalizeKnownRecipe(recipe, askedDish, inferServings(q))
+    );
+    
+    if (matchingRecipes.length > 0) {
+      // Return up to 5 variants of the requested dish
+      return finalizeRecipeCollection(matchingRecipes, 5);
+    }
   }
 
   const generated = personalizeRecipes(diversify(
