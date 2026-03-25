@@ -76,7 +76,7 @@ const CULINARY_KNOWLEDGE = [
   },
   {
     key: "poyo",
-    aliases: ["poyo", "ti nain", "ti-nain", "banane verte", "tinain"],
+    aliases: ["poyo", "ti nain", "ti-nain", "banane verte", "tinain", "poyo lentilles", "poyo poisson"],
     cuisine: "antillaise",
     slot: "lunch",
     fundamentals: ["banane verte bouillie", "accompagnement proteine", "sauce chien ou vinaigrette"],
@@ -84,7 +84,7 @@ const CULINARY_KNOWLEDGE = [
   },
   {
     key: "agoulou",
-    aliases: ["agoulou", "sandwich antillais", "agoulou poulet"],
+    aliases: ["agoulou", "sandwich antillais", "agoulou poulet", "agoulou epice", "agoulou sauce riche"],
     cuisine: "antillaise",
     slot: "snack",
     fundamentals: ["pain croustillant", "sauce chien", "garniture genereuse"],
@@ -108,7 +108,7 @@ const CULINARY_KNOWLEDGE = [
   },
   {
     key: "dombre",
-    aliases: ["dombre", "dombré", "dombre crevettes", "dombré crevettes"],
+    aliases: ["dombre", "dombré", "dombre crevettes", "dombré crevettes", "dombre haricots", "dombré haricots", "dombre poisson", "dombré poisson", "dombre queue de cochon"],
     cuisine: "antillaise",
     slot: "lunch",
     fundamentals: ["pate farinee", "sauce mijotee", "cuisson des dombrés dans la sauce"],
@@ -121,6 +121,38 @@ const CULINARY_KNOWLEDGE = [
     slot: "dinner",
     fundamentals: ["base tomate aromatique", "poisson en fin de cuisson", "mijotage doux"],
     baseIngredients: ["poisson", "tomate", "oignon", "ail", "citron"],
+  },
+  {
+    key: "bebele",
+    aliases: ["bebele", "bébélé", "bebele guadeloupe", "tripes banane verte"],
+    cuisine: "antillaise",
+    slot: "lunch",
+    fundamentals: ["tripes blanchies", "legumes racines", "dombres", "lait de coco"],
+    baseIngredients: ["tripes", "banane verte", "malanga", "giraumon", "farine", "lait de coco"],
+  },
+  {
+    key: "matete-crabe",
+    aliases: ["matete", "matété", "matete crabe", "matété de crabe", "matoutou", "riz au crabe"],
+    cuisine: "antillaise",
+    slot: "lunch",
+    fundamentals: ["crabe colore", "riz cuit par absorption", "lait de coco", "aromates antillais"],
+    baseIngredients: ["crabe", "riz", "lait de coco", "tomate", "oignon", "thym"],
+  },
+  {
+    key: "chodo",
+    aliases: ["chodo", "chaudeau", "chaudeau antillais", "creme antillaise"],
+    cuisine: "antillaise",
+    slot: "dessert",
+    fundamentals: ["creme aux oeufs", "cuisson douce sans ebullition", "parfum amande amere"],
+    baseIngredients: ["lait", "oeuf", "cannelle", "vanille", "citron vert", "amande amere"],
+  },
+  {
+    key: "pate-en-pot",
+    aliases: ["pate en pot", "pâté en pot", "soupe martiniquaise", "soupe de fete"],
+    cuisine: "antillaise",
+    slot: "lunch",
+    fundamentals: ["abats blanchis et mijoter", "legumes racines", "vermicelles", "aromates forts"],
+    baseIngredients: ["abats mouton", "igname", "giraumon", "carotte", "thym", "laurier"],
   },
   {
     key: "gratin",
@@ -1015,6 +1047,17 @@ function findRecipesForDish(dishName) {
     "boucane": ["boucane", "poulet boucane"],
     "riz colle": ["riz colle", "riz-colle"],
     "riz-colle": ["riz colle", "riz-colle"],
+    "dombre": ["dombre", "dombré"],
+    "dombré": ["dombre", "dombré"],
+    "bebele": ["bebele", "bébélé"],
+    "bébélé": ["bebele", "bébélé"],
+    "matete": ["matete", "matété", "matete-crabe", "matoutou", "riz au crabe"],
+    "matété": ["matete", "matété", "matete-crabe", "matoutou"],
+    "matoutou": ["matete", "matété", "matete-crabe", "matoutou"],
+    "chodo": ["chodo", "chaudeau"],
+    "chaudeau": ["chodo", "chaudeau"],
+    "pate en pot": ["pate-en-pot", "pâté en pot"],
+    "pâté en pot": ["pate-en-pot", "pâté en pot"],
   };
   const searchTerms = aliasMap[normalized] || [normalized];
   
@@ -1045,7 +1088,7 @@ export async function askCookingAssistant(question, context = {}) {
     const askedDish = findKnowledgeDish(lower);
     
     // Si plat connu (bokit, agoulou, accras, etc.), utiliser les VRAIES variantes
-    if (askedDish && (askedDish.key === "bokit" || askedDish.key === "accras" || askedDish.key === "agoulou" || askedDish.key === "poyo" || askedDish.key === "colombo" || askedDish.key === "blaff" || askedDish.key === "dombre" || askedDish.key === "court-bouillon" || askedDish.key === "poulet-boucane" || askedDish.key === "riz-colle")) {
+    if (askedDish && (askedDish.key === "bokit" || askedDish.key === "accras" || askedDish.key === "agoulou" || askedDish.key === "poyo" || askedDish.key === "colombo" || askedDish.key === "blaff" || askedDish.key === "dombre" || askedDish.key === "court-bouillon" || askedDish.key === "poulet-boucane" || askedDish.key === "riz-colle" || askedDish.key === "bebele" || askedDish.key === "matete-crabe" || askedDish.key === "chodo" || askedDish.key === "pate-en-pot")) {
       const matchedRecipes = findRecipesForDish(askedDish.key);
       if (matchedRecipes && matchedRecipes.length > 0) {
         const baseCuisine = askedDish.cuisine || "antillaise";

@@ -32,11 +32,13 @@ export function RecipeDetailPage() {
         servings: recipe.servings || 4,
         ingredientsDetailed:
           recipe.ingredientsDetailed ||
-          (recipe.ingredients || []).map((line) => ({
-            name: line,
-            quantity: 1,
-            unit: "",
-          })),
+          (recipe.ingredients || []).map((line) => {
+            const match = line.match(/^(\d+[\d.,/]*)\s*(g|kg|ml|L|cl|c\.\s*[àa]\s*soupe|c\.\s*[àa]\s*cafe|cuilleres?\s*[àa]\s*soupe|cuilleres?\s*[àa]\s*cafe|sachet|pincee|litre|litres)?\s*(.*)$/i);
+            if (match) {
+              return { quantity: parseFloat(match[1].replace(",", ".")), unit: (match[2] || "").trim(), name: match[3].trim() || line };
+            }
+            return { name: line, quantity: null, unit: "" };
+          }),
       },
       servings
     );

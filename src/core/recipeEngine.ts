@@ -553,6 +553,9 @@ export function scaleRecipeForServings(recipe: EngineRecipe, servings: number): 
 }
 
 export function formatIngredientLine(ingredient: IngredientLine): string {
+  if (ingredient.quantity == null || ingredient.quantity === 0) {
+    return `${ingredient.unit ? ingredient.unit + " " : ""}${ingredient.name}`.replace(/\s+/g, " ").trim();
+  }
   return `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`.replace(/\s+/g, " ").trim();
 }
 
