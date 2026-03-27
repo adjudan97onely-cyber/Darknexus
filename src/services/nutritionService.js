@@ -1,33 +1,91 @@
-import { generateWeeklyMealPlan } from "../core/mealPlanner";
+import { recommendRecipesFromIngredients } from "./aiService";
 import {
   calculateDailyNeeds,
   calculateMacroTargets,
   sumDayNutrition,
-} from "../core/nutritionEngine";
-import { recommendRecipesFromIngredients } from "./aiService";
-import { getUserProfile } from "./userProfileService";
-
-export { calculateDailyNeeds, calculateMacroTargets, sumDayNutrition };
+} from "./nutritionEngineService";
 
 export function calculateCalories({ weightKg, heightCm, goal, age = 30, sex = "male", activity = "moderate" }) {
-  const needs = calculateDailyNeeds({ weightKg, heightCm, age, sex, activity, goal });
+  const needs = calculateDailyNeeds({ weightKg, heightCm, goal, age, sex, activity });
   return needs.targetCalories;
 }
 
+const DAILY_COACH_THEMES = [
+  "Jour energie propre",
+  "Jour hydratation et fibres",
+  "Jour performance douce",
+  "Jour digestion legere",
+  "Jour focus mental",
+  "Jour recuperation",
+  "Jour equilibre plaisir",
+];
+
+const DAY_NAMES = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+
+const SLOTS = [
+  { key: "breakfast", label: "Petit-dej", time: "08:00" },
+  { key: "lunch", label: "Midi", time: "12:30" },
+  { key: "snack", label: "Collation", time: "16:00" },
+  { key: "dinner", label: "Soir", time: "19:30" },
+];
+
+function toTimeMinutes(value) {
+  const [h, m] = value.split(":").map(Number);
+  return h * 60 + m;
+}
+
+function formatDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getWeekStart(inputDate = new Date()) {
+  const date = new Date(inputDate);
+  const day = date.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + diff);
+  return date;
+}
+
+function pickWithOffset(items, offset) {
+  if (!items.length) return null;
+  return items[offset % items.length];
+}
+
+function selectDiverse(picks, startOffset = 0) {
+  const safe = picks.length ? picks : recommendRecipesFromIngredients(["oeuf", "riz", "tomate"], 8);
+  return {
+    breakfast: pickWithOffset(safe, startOffset),
+    lunch: pickWithOffset(safe, startOffset + 1),
+    snack1: pickWithOffset(safe, startOffset + 2),
+    dinner: pickWithOffset(safe, startOffset + 3),
+    snack2: pickWithOffset(safe, startOffset + 4),
+    altLunch: pickWithOffset(safe, startOffset + 5),
+    altDinner: pickWithOffset(safe, startOffset + 6),
+  };
+}
+
 export function answerHydrationQuestion(question, goal = "maintain") {
-  const q = String(question || "").toLowerCase();
+  const q = (question || "").toLowerCase();
 
   if (q.includes("coca") || q.includes("soda")) {
     return goal === "lose"
-      ? "Le soir ou a 16h, prefere eau petillante citron. Soda classique exceptionnel seulement."
-      : "Soda zero occasionnel possible, mais l'hydratation principale doit rester eau/infusion.";
+      ? "A 16h, evite le coca classique. Prends eau petillante + citron vert ou the glace sans sucre. Si envie forte: mini canette zero occasionnelle."
+      : "Tu peux prendre un soda zero occasionnel, mais priorite eau, infusion ou eau coco sans sucre ajoute."
   }
 
-  if (q.includes("16h") || q.includes("soif")) {
-    return "A 16h: commence par 300 ml d'eau. Si faim, ajoute fruit + source proteique legere.";
+  if (q.includes("soif") || q.includes("16h")) {
+    return "A 16h: commence par 300-400 ml d'eau. Si faim associee, ajoute une collation simple (fruit + yaourt nature ou oeuf dur).";
   }
 
-  return "Hydrate-toi a chaque repas + entre les repas: objectif 6 a 10 verres selon ton activite.";
+  if (q.includes("boire") || q.includes("boisson")) {
+    return "Boissons recommandées: eau, eau citronnee, infusion menthe, the glace sans sucre, eau coco naturelle en petite portion.";
+  }
+
+  return "Hydrate-toi par petites gorgées toute la journee: eau au reveil, eau avant repas, et boisson sans sucre a 16h.";
 }
 
 export function buildWeeklyNutritionProgram({
@@ -39,77 +97,122 @@ export function buildWeeklyNutritionProgram({
   sex = "male",
   activity = "moderate",
   today = new Date(),
-  servings = 2,
-  cuisine = "all",
-  userProfile,
 }) {
-  const profile = userProfile || getUserProfile();
-  return generateWeeklyMealPlan({
-    ingredients,
-    goal,
-    weightKg,
-    heightCm,
-    age,
-    sex,
-    activity,
-    today,
-    servings,
-    cuisine,
-    userProfile: profile,
-  });
-}
-
-export function getRealtimeCoach(programDay, now = new Date()) {
-  const slots = [
-    { key: "breakfast", label: "Petit-dej", time: "08:00" },
-    { key: "lunch", label: "Midi", time: "12:30" },
-    { key: "snack", label: "Collation", time: "16:00" },
-    { key: "dinner", label: "Soir", time: "19:30" },
-  ];
-
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const values = slots.map((slot) => ({
-    ...slot,
-    minuteValue: Number(slot.time.slice(0, 2)) * 60 + Number(slot.time.slice(3, 5)),
-  }));
-
-  let current = values[0];
-  let next = values[0];
-  for (let i = 0; i < values.length; i += 1) {
-    if (currentMinutes >= values[i].minuteValue) {
-      current = values[i];
-      next = values[i + 1] || values[0];
-    }
-  }
-
-  const delta = next.minuteValue >= currentMinutes ? next.minuteValue - currentMinutes : 24 * 60 - currentMinutes + next.minuteValue;
-
-  return {
-    nowLabel: now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
-    currentSlot: current,
-    nextSlot: next,
-    minutesToNext: delta,
-    message: programDay
-      ? `Maintenant ${current.label}. Prochaine etape dans ${delta} min (${next.label}).`
-      : "Genere ton programme pour activer le coach temps reel.",
-  };
-}
-
-export function buildDietPlan({ ingredients, goal, weightKg, heightCm, age = 30, sex = "male", activity = "moderate" }) {
-  const profile = getUserProfile();
-  const needs = calculateDailyNeeds({ weightKg, heightCm, age, sex, activity, goal });
+  const needs = calculateDailyNeeds({ weightKg, heightCm, goal, age, sex, activity });
   const macroTargets = calculateMacroTargets(needs.targetCalories, goal);
-  const meals = recommendRecipesFromIngredients(ingredients, 6, { cuisine: "all", slot: "lunch", servings: 2, userProfile: profile });
-  const dailyTotals = sumDayNutrition(meals.slice(0, 4));
+  const picks = recommendRecipesFromIngredients(ingredients, 40, { cuisine: "all" });
+  const weekStart = getWeekStart(today);
+
+  const days = Array.from({ length: 7 }).map((_, idx) => {
+    const date = new Date(weekStart);
+    date.setDate(weekStart.getDate() + idx);
+    const offset = idx * 3;
+    const selected = selectDiverse(picks, offset);
+    const dayTheme = DAILY_COACH_THEMES[idx % DAILY_COACH_THEMES.length];
+
+    const meals = {
+      breakfast: selected.breakfast,
+      lunch: selected.lunch,
+      snack: selected.snack1,
+      dinner: selected.dinner,
+      backup: selected.altDinner,
+    };
+
+    const totals = sumDayNutrition([meals.breakfast, meals.lunch, meals.snack, meals.dinner]);
+
+    return {
+      dateKey: formatDateKey(date),
+      dayName: DAY_NAMES[date.getDay()],
+      dateLabel: date.toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" }),
+      theme: dayTheme,
+      calories: needs.targetCalories,
+      meals,
+      dailyTotals: totals,
+      beverage: {
+        morning: "Eau + boisson chaude sans sucre",
+        afternoon: goal === "lose" ? "Eau petillante citron / infusion froide" : "Eau coco nature ou the glace sans sucre",
+        evening: "Infusion menthe/verveine",
+      },
+    };
+  });
 
   return {
     targetCalories: needs.targetCalories,
     maintenanceCalories: needs.maintenanceCalories,
     bmr: needs.bmr,
     macroTargets,
+    weekStart: formatDateKey(weekStart),
+    days,
+  };
+}
+
+export function getRealtimeCoach(programDay, now = new Date()) {
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const slotWithMinutes = SLOTS.map((slot) => ({
+    ...slot,
+    value: toTimeMinutes(slot.time),
+  }));
+
+  let current = slotWithMinutes[0];
+  let next = slotWithMinutes[0];
+
+  for (let i = 0; i < slotWithMinutes.length; i += 1) {
+    const slot = slotWithMinutes[i];
+    if (currentMinutes >= slot.value) {
+      current = slot;
+      next = slotWithMinutes[i + 1] || slotWithMinutes[0];
+    }
+  }
+
+  const nextMinutes = next.value >= currentMinutes ? next.value - currentMinutes : 24 * 60 - currentMinutes + next.value;
+  const isTodayProgram = Boolean(programDay);
+
+  return {
+    nowLabel: now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
+    currentSlot: current,
+    nextSlot: next,
+    minutesToNext: nextMinutes,
+    message: isTodayProgram
+      ? `Maintenant: ${current.label}. Prochaine etape dans ${nextMinutes} min (${next.label} ${next.time}).`
+      : "Genere ton programme pour activer le suivi en direct.",
+  };
+}
+
+export function buildDietPlan({ ingredients, goal, weightKg, heightCm }) {
+  const targetCalories = calculateCalories({ weightKg, heightCm, goal });
+  const picks = recommendRecipesFromIngredients(ingredients, 14, { cuisine: "all" });
+  const offset = new Date().getDay();
+  const meals = selectDiverse(picks, offset);
+  const theme = DAILY_COACH_THEMES[offset];
+  const dailyTotals = sumDayNutrition([meals.breakfast, meals.lunch, meals.snack1, meals.dinner]);
+  const macroTargets = calculateMacroTargets(targetCalories, goal);
+
+  return {
+    targetCalories,
+    macroTargets,
+    dailyTheme: theme,
+    advice:
+      goal === "lose"
+        ? "Priorite deficit doux: garde une assiette dense en legumes et proteines, limite les fritures au weekend." 
+        : goal === "gain"
+          ? "Objectif muscle: ajoute 1 collation proteinee entre 16h et 17h et un diner complet." 
+          : "Objectif maintien: portions stables, hydratation reguliere, constance.",
+    hydration: "Hydratation guidee: eau au reveil, eau avant repas, boisson sans sucre l'apres-midi.",
+    schedule: {
+      breakfast: "07h30 - 08h30",
+      lunch: "12h30 - 13h30",
+      snack: "16h00",
+      dinner: "19h00 - 20h00",
+      lateSnack: "21h30 (optionnel)",
+    },
+    beveragePlan: {
+      morning: "Eau + cafe/the non sucre",
+      at16h: goal === "lose" ? "Eau petillante citron / infusion froide" : "Eau coco ou the glace non sucre",
+      evening: "Infusion menthe/verveine",
+      sodaRule: "Soda classique exceptionnel; prefere soda zero occasionnel et eau majoritaire.",
+    },
     meals,
     dailyTotals,
-    hydration: "Eau reguliere + boisson non sucree a 16h.",
-    coachMessage: answerHydrationQuestion("j'ai soif a 16h", goal),
+    coachMessage: answerHydrationQuestion("j'ai soif a 16h, je peux boire un coca ?", goal),
   };
 }

@@ -1,11 +1,9 @@
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 
-const MotionHeader = motion.header;
-
 export function Header() {
   return (
-    <MotionHeader
+    <motion.header
       className="rounded-3xl border border-white/20 bg-gradient-to-br from-red-500/70 via-yellow-400/60 to-emerald-400/60 p-6 shadow-2xl"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
@@ -21,6 +19,6 @@ export function Header() {
       <p className="mt-3 max-w-3xl text-sm text-white/90 md:text-base">
         Scanner ingredients, generation dynamique francaise/healthy/rapide/monde, calcul calories-macros et planning intelligent.
       </p>
-    </MotionHeader>
+    </motion.header>
   );
 }

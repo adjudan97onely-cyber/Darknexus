@@ -20,6 +20,7 @@ const INGREDIENT_SYNONYMS = {
   haricots: "haricots rouges",
   crevette: "crevettes",
   crevettes: "crevettes",
+  citron: "citron vert",
   lait: "lait coco",
   coco: "lait coco",
   lardons: "lardons",

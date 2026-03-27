@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 
-export function SearchBar({ value, onChange, placeholder = "colombo poulet 4 personnes, poisson leger soir, recette antillaise pro" }) {
+export function SearchBar({ value, onChange, placeholder = "oeufs fromage farine, healthy rapide, cuisine du monde" }) {
   return (
     <label className="relative block">
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/60" />
