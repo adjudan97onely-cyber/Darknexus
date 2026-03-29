@@ -1,89 +1,193 @@
-# Killagain Food
+# 📦 Darknexus - Multi-Apps Suite
 
-Application PWA cuisine + nutrition, pensee pour les debutants et les amateurs de cuisine antillaise.
+Bienvenue dans **Darknexus**, la suite complète d'applications antillaises et de gaming !
 
-## Vision produit
+## 🎯 Structure du Projet
 
-- Scanner IA d'ingredients (mode mock intelligent)
-- Recommandations recettes creoles selon le frigo
-- Fiches recettes ultra detaillees (etapes, conseils, erreurs a eviter)
-- Assistant IA pedagogique
-- Onglet regime intelligent (objectif poids + plan repas)
-- Favoris sauvegardes localement
-- Section marque createur avec liens Instagram
+```
+Darknexus-main/
+├── 📁 apps/                         ← Toutes les applications
+│   ├── 🍽️  killagain-food/          ← App recettes antillaises
+│   │   ├── LANCER_KILLAGAIN_FOOD.bat
+│   │   ├── LANCER_ADJ_KILLAGAIN.bat
+│   │   └── src/
+│   │
+│   ├── ⚔️  warzone/                  ← App script gaming Warzone
+│   │   ├── LANCER_ZEN_HUB_PRO_WARZONE.bat
+│   │   ├── OUVRIR_WARZONE.bat
+│   │   └── src/
+│   │
+│   ├── 🎰 analytics-lottery/        ← App analyse loteries & sports
+│   │   ├── LANCER_ANALYTICS_LOTTERY.bat
+│   │   └── src/
+│   │
+│   └── 👨‍🍳 chef-ia/                  ← App assistant culinaire IA
+│       ├── LANCER_CHEF_IA.bat
+│       └── src/
+│
+├── 📚 docs/                         ← Documentation complète
+│   ├── GUIDE_*.md
+│   ├── INSTALLATION_*.md
+│   └── README*.md
+│
+├── ⚙️  config/                       ← Configuration partagée
+│   ├── vercel.json
+│   ├── vite.config.js
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── ...
+│
+└── 🔧 scripts/                      ← Utilitaires & scripts
 
-## Stack technique
+```
 
-- React 18
-- Vite 5
-- Tailwind CSS
-- vite-plugin-pwa (offline + installable)
-- Architecture modulaire: `components`, `hooks`, `services`, `pages`, `data`
+## 🚀 Démarrage Rapide
 
-## Installation
-
+### **1️⃣ Killagain Food** (Recettes Antillaises)
 ```bash
-cd killagain-food
+# Windows - Double-clic sur:
+apps/killagain-food/LANCER_KILLAGAIN_FOOD.bat
+
+# Ou Terminal:
+cd apps/killagain-food && npm run dev
+```
+
+### **2️⃣ Warzone Script** (Gaming Assistant)
+```bash
+# Windows - Double-clic sur:
+apps/warzone/LANCER_ZEN_HUB_PRO_WARZONE.bat
+
+# Ou Terminal:
+cd apps/warzone && npm run dev
+```
+
+### **3️⃣ Analytics Lottery** (Prédictions & Sports)
+```bash
+# Windows - Double-clic sur:
+apps/analytics-lottery/LANCER_ANALYTICS_LOTTERY.bat
+
+# Ou Terminal:
+cd apps/analytics-lottery && npm run dev
+```
+
+### **4️⃣ Chef IA** (Assistant Culinaire)
+```bash
+# Windows - Double-clic sur:
+apps/chef-ia/LANCER_CHEF_IA.bat
+
+# Ou Terminal:
+cd apps/chef-ia && npm run dev
+```
+
+---
+
+## 📖 Documentation
+
+Tous les guides sont dans le dossier **`docs/`**:
+
+- 🔧 **GUIDE_INSTALLATION_SIMPLE.md** - Installation rapide
+- 📱 **GUIDE_UTILISATION_LOCAL.md** - Utilisation locale
+- 🚀 **GUIDE_DEPLOIEMENT.md** - Déploiement Vercel
+- 🎮 **Guides spécifiques** par application
+
+---
+
+## 💾 Configuration Partagée
+
+Les fichiers de configuration sont centralisés dans **`config/`**:
+
+- `vercel.json` - Config Vercel pour deploy
+- `vite.config.js` - Config bundler
+- `tailwind.config.js` - Design system
+- `package.json` - Dépendances globales (si multimonorepo)
+
+---
+
+## 🌐 URLs
+
+- **Local Dev:** `http://localhost:5173`
+- **Killagain Food:** `http://localhost:5173/killagain-food`
+- **Warzone:** `http://localhost:5173/warzone`
+- **Analytics Lottery:** `http://localhost:5173/analytics`
+- **Chef IA:** `http://localhost:5173/chef-ia`
+
+---
+
+## 📋 Stack Technologique
+
+### Frontend
+- ⚛️ React 18
+- 🎨 Tailwind CSS
+- 🛠️ Vite
+- 📱 Responsive Design
+
+### Backend
+- 🐍 Python/FastAPI
+- 🗄️ MongoDB
+- 🔐 JWT Auth
+- 🚀 Deployed on Vercel
+
+### DevOps
+- 📦 Git + GitHub
+- ☁️ Vercel CI/CD
+- 🐳 Docker (optionnel)
+
+---
+
+## 🤝 Contribution
+
+Pour contribuer aux apps:
+
+1. **Branch:** `feature/nom-feature`
+2. **Commit:** `feat: description courte`
+3. **Push:** vers origin
+4. **PR:** Décris tes changements
+
+---
+
+## 🐛 Troubleshooting
+
+**Node.js non détecté?**
+```bash
+node --version
+npm --version
+```
+
+**Dépendances manquantes?**
+```bash
+cd apps/[app-name]
 npm install
 npm run dev
 ```
 
-Application: `http://127.0.0.1:5180`
-
-## Lancement ultra simple (Windows)
-
-Double-cliquer sur `start-app.bat`
-
-Le script:
-
-1. installe les dependances si necessaire,
-2. lance le serveur dev,
-3. ouvre le navigateur automatiquement.
-
-## Test sur mobile (meme Wi-Fi)
-
-1. Double-cliquer sur `start-mobile.bat`
-2. Le script affiche l'adresse du type `http://IP_DU_PC:5180`
-3. Ouvrir cette adresse sur ton telephone (meme reseau Wi-Fi)
-
-Exemple: `http://192.168.1.25:5180`
-
-## Dossier mobile-app
-
-Le dossier [mobile-app](mobile-app) contient les guides et scripts mobile:
-
-1. [Guide principal](mobile-app/README.md)
-2. [Workflow mobile](mobile-app/workflow-mobile.md)
-3. [Preview production mobile](mobile-app/start-mobile-production.bat)
-
-## Build production
-
+**Port 5173 déjà utilisé?**
 ```bash
-npm run build
-npm run preview
+# Changer le port dans vite.config.js
 ```
 
-## Deploiement Vercel
+---
 
-Le fichier `vercel.json` est inclus (fallback SPA).
+## ✨ Chaque app a ses spécialités:
 
-## Structure
+| App | Focus | Version |
+|-----|-------|---------|
+| 🍽️ **Killagain Food** | Recettes antillaises | v1.2 |
+| ⚔️ **Warzone** | Script gaming | v2.0 |
+| 🎰 **Analytics** | Loteries & prédictions | v1.0 |
+| 👨‍🍳 **Chef IA** | Assistant culinaire IA | v0.9 |
 
-```text
-killagain-food/
-	public/
-		icons/
-	src/
-		components/
-		hooks/
-		services/
-		data/
-		pages/
-```
+---
 
-## Suggestions d'amelioration
+## 📞 Support
 
-1. Brancher une vraie API vision (ex: OpenAI Vision ou Roboflow) pour remplacer le scanner mock.
-2. Ajouter auth cloud + synchro favoris multi-appareils.
-3. Ajouter planning hebdo complet avec suivi calories/macro journalier.
-4. Integrer notifications push PWA (rappel hydratation et prep repas).
+- 📘 Consulte la doc dans `docs/`
+- 🐛 Ouvre une issue sur GitHub
+- 💬 Contacte l'équipe dev
+
+---
+
+**Version:** 3.0 (Multi-Apps Restructured)  
+**Dernière mise à jour:** 29/03/2026  
+**Maintaineur:** adjudan97onely-cyber
+
+🚀 **Bienvenue dans Darknexus!**
