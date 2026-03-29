@@ -306,6 +306,26 @@ export async function askCookingAssistant(question, context = {}) {
   const lower = normalize(question);
   const ingredients = toIngredients(context.ingredients || []);
 
+  // Cherche d'abord si l'utilisateur demande une recette spécifique
+  // Mots-clés indicateurs: "recette de", "prepare", "faire", "comment", "fais", "peux-tu"
+  const searchKeywords = ["recette", "prepare", "faire", "comment", "fais", "pouvoir", "peux"];
+  const isRecipeSearch = searchKeywords.some((kw) => lower.includes(kw));
+
+  if (isRecipeSearch) {
+    // Cherche la recette dans le catalogue
+    const results = smartSearchRecipes(question);
+    if (results && results.length > 0) {
+      const bestMatch = results[0];
+      const timeRange = `${bestMatch.prepMinutes + (bestMatch.restMinutes || 0)} min prep + ${bestMatch.cookMinutes} min cuisson`;
+      return {
+        title: `Recette trouvée: ${bestMatch.name}`,
+        answer: `Je t'ai trouvé la recette du **${bestMatch.name}** (Difficulté: ${bestMatch.difficulty}, ${timeRange}). Profil nutrition: ${bestMatch.nutrition.kcal} kcal, ${bestMatch.nutrition.protein} g proteines, ${bestMatch.nutrition.carbs} g glucides.`,
+        recipe: bestMatch,
+        actions: ["Voir recette complete", "Voir alternatives", "Ajuster portions"],
+      };
+    }
+  }
+
   if (lower.includes("surprendre")) {
     const pick = surpriseBalancedRecipe();
     return {
@@ -336,7 +356,7 @@ export async function askCookingAssistant(question, context = {}) {
   return {
     title: "Coach culinaire intelligent",
     answer:
-      "Donne-moi tes ingredients (ex: oeufs, fromage, farine) et je genere plusieurs recettes francaises, healthy, rapides et du monde, meme hors catalogue.",
+      "Donne-moi tes ingredients (ex: oeufs, fromage, farine) et je genere plusieurs recettes francaises, healthy, rapides et du monde, meme hors catalogue. Tu peux aussi me demander une recette specifique!",
     actions: ["Scanner mes ingredients", "Mode Surprise", "Mode Chef IA"],
   };
 }
