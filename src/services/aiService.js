@@ -238,21 +238,26 @@ export function recommendRecipesFromIngredients(ingredients, limit = 10, options
       score,
       matchReason: `Compatibilite ${score}% avec tes ingredients disponibles.`,
     };
-  });
+  }).sort((a, b) => b.score - a.score);
+
+  // Si on a des bonnes recettes créoles, on les met en avant
+  const creoleFirst = catalog.filter(r => 
+    r.tags && (r.tags.includes("guadeloupe") || r.tags.includes("martinique") || 
+    r.tags.includes("tradition") || r.tags.includes("antillaise"))
+  );
+  
+  const rest = catalog.filter(r => !creoleFirst.find(c => c.id === r.id));
+  const sorted = [...creoleFirst, ...rest];
+
+  // Compléter avec du dynamique seulement si pas assez
+  if (sorted.length >= safeLimit) return sorted.slice(0, safeLimit);
 
   const dynamic = generateDynamicRecipesFromIngredients(list, {
     ...options,
-    limit: safeLimit,
+    limit: safeLimit - sorted.length,
   });
 
-  const merged = [...dynamic, ...catalog]
-    .sort((a, b) => b.score - a.score)
-    .reduce((acc, item) => {
-      if (!acc.find((it) => it.name.toLowerCase() === item.name.toLowerCase())) acc.push(item);
-      return acc;
-    }, []);
-
-  return merged.slice(0, safeLimit);
+  return [...sorted, ...dynamic].slice(0, safeLimit);
 }
 
 export function surpriseBalancedRecipe() {
