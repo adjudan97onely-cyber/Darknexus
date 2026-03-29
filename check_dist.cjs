@@ -1,0 +1,11 @@
+const fs = require('fs');
+const d = fs.readFileSync('dist/assets/index-bRDCHSq1.js', 'utf8');
+console.log('punch-coco in dist:', d.includes('punch-coco'));
+console.log('shrub-groseille:', d.includes('shrub-groseille'));
+console.log('bokit-pate-base:', d.includes('bokit-pate-base'));
+console.log('colombo-poulet:', d.includes('colombo-poulet'));
+console.log('source.unsplash:', d.includes('source.unsplash'));
+console.log('images.unsplash:', d.includes('images.unsplash'));
+const ids = d.match(/id:"[^"]+"/g);
+console.log('Total recipe ids in bundle:', ids ? ids.length : 0);
+if (ids) ids.forEach(id => console.log(' ', id));
