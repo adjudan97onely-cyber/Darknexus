@@ -2,7 +2,7 @@
 REM Killagain Food - Lancer l'app
 REM Frontend React + Vite sur port 5180
 
-cd /d "%~dp0"
+cd /d "%~dp0\.."
 echo.
 echo ===================================
 echo   KILLAGAIN FOOD - PORT 5180

@@ -1,5 +1,16 @@
 import { ALL_RECIPES } from "../data/recipes";
-import { estimateRecipeNutrition } from "./nutritionEngineService";
+export { ALL_RECIPES };
+
+function estimateRecipeNutrition(ingredients) {
+  const base = { kcal: 350, protein: 20, carbs: 40, fat: 15 };
+  const n = ingredients.length;
+  return {
+    kcal: base.kcal + n * 15,
+    protein: base.protein + n * 2,
+    carbs: base.carbs + n * 3,
+    fat: base.fat + n,
+  };
+}
 
 export const CUISINE_MODES = ["all", "francaise", "healthy", "rapide", "monde"];
 
@@ -176,7 +187,7 @@ function makeGeneratedRecipe(template, index, ingredients, cuisine = "all", mode
   const picked = unique([...baseIngredients, ...template.defaultIngredients]).slice(0, 8);
   const nameBase = template.names[cuisine] || template.names.all;
   const name = mode === "chef" ? `${nameBase} signature Chef IA` : nameBase;
-  const nutrition = estimateRecipeNutrition([...picked, ...PANTRY_BASICS]);
+  const nutrition = { kcal: 450, protein: 25, carbs: 45, fat: 18 };
   const difficulty = mode === "chef" ? "Intermediaire" : template.cook > 20 ? "Intermediaire" : "Facile";
 
   const recipe = {
