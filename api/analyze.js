@@ -1,118 +1,89 @@
-// Vercel Serverless Function — Proxy OpenAI GPT-4o Vision
-// Route : POST /api/analyze
-// Body : { image: "base64...", mediaType: "image/jpeg", mode: "vision"|"text"|"recipe", input: "..." }
+// api/analyze.js — Vercel Serverless Function
+// Proxy sécurisé pour OpenAI Vision API (évite le blocage CORS)
 
 export default async function handler(req, res) {
-  // CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  if (!apiKey) return res.status(500).json({ error: "Clé API manquante" });
 
   try {
-    const { image, mediaType, mode, input } = req.body;
+    const { type, image, mediaType, text } = req.body;
+    let body;
 
-    let messages;
-
-    if (mode === "vision" && image) {
-      // Analyse d'image
-      messages = [{
-        role: "user",
-        content: [
-          {
-            type: "image_url",
-            image_url: { url: `data:${mediaType || "image/jpeg"};base64,${image}` },
-          },
-          {
-            type: "text",
-            text: `Tu es un expert en cuisine antillaise et nutritionniste. Analyse cette image et réponds UNIQUEMENT en JSON valide :
+    if (type === "vision" && image) {
+      // Analyse d'image avec GPT-4 Vision
+      body = {
+        model: "gpt-4o",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: { url: `data:${mediaType || "image/jpeg"};base64,${image}` },
+            },
+            {
+              type: "text",
+              text: `Tu es un expert en cuisine antillaise et nutritionniste. Analyse cette image et réponds UNIQUEMENT en JSON valide sans aucun texte avant ou après :
 {
-  "aliments": ["aliment1", "aliment2"],
-  "description": "Ce que tu vois en une phrase naturelle",
+  "aliments": ["liste précise de tous les aliments visibles"],
+  "description": "Ce que tu vois précisément en une phrase naturelle",
   "contexte": "cuisine_antillaise ou cuisine_mondiale",
-  "possibilites": ["5 idées de ce qu'on peut cuisiner"],
-  "conseil_chef": "Un conseil de chef professionnel",
-  "valeur_nutritionnelle": "Valeur nutritionnelle principale"
-}`,
-          },
-        ],
-      }];
-    } else if (mode === "recipe") {
-      // Génération de recette
-      messages = [{
-        role: "user",
-        content: `Tu es un chef cuisinier expert en cuisine antillaise et internationale. Génère une recette ultra détaillée pour : "${input}".
-Réponds UNIQUEMENT en JSON valide :
-{
-  "id": "gen-${Date.now()}",
-  "name": "Nom exact de la recette",
-  "category": "plat ou entree ou dessert ou boisson ou accompagnement",
-  "tags": ["tag1", "tag2", "tag3"],
-  "image": "",
-  "prepMinutes": 15,
-  "restMinutes": 0,
-  "cookMinutes": 30,
-  "difficulty": "Facile ou Intermediaire ou Avance",
-  "description": "Description appétissante en 1-2 phrases",
-  "ingredients": ["quantité + ingrédient précis"],
-  "steps": ["ÉTAPE EN MAJUSCULE : Description détaillée avec techniques."],
-  "tips": ["Conseil de chef"],
-  "mistakes": ["Erreur courante à éviter"],
-  "nutrition": { "kcal": 450, "protein": 25, "carbs": 45, "fat": 18 },
-  "source": "ai-generated"
+  "possibilites": ["5 idées de recettes qu'on peut faire avec ces aliments"],
+  "conseil_chef": "Un conseil de chef professionnel précis",
+  "valeur_nutritionnelle": "Valeur nutritionnelle principale en une phrase"
 }
-Minimum 5 étapes ultra détaillées. Quantités précises en g/ml/unités.`,
-      }];
+Si c'est un frigo, liste TOUS les aliments visibles. Sois très précis.`,
+            },
+          ],
+        }],
+      };
+    } else if (type === "text") {
+      // Coach nutrition / Assistant
+      body = {
+        model: "gpt-4o",
+        max_tokens: 1000,
+        messages: [{
+          role: "system",
+          content: "Tu es un expert en cuisine antillaise ET nutritionniste professionnel pour l'app Killagain Food. Réponds toujours en JSON valide sans texte avant ou après.",
+        }, {
+          role: "user",
+          content: text,
+        }],
+      };
     } else {
-      // Analyse texte
-      messages = [{
-        role: "user",
-        content: `Tu es un expert en cuisine antillaise et nutritionniste. L'utilisateur a tapé : "${input}". Réponds UNIQUEMENT en JSON valide :
-{
-  "aliments": ["aliment1", "aliment2"],
-  "description": "Ce que c'est en une phrase naturelle",
-  "contexte": "cuisine_antillaise ou cuisine_mondiale",
-  "possibilites": ["5 idées de ce qu'on peut cuisiner"],
-  "conseil_chef": "Un conseil de chef professionnel",
-  "valeur_nutritionnelle": "Valeur nutritionnelle principale"
-}`,
-      }];
+      return res.status(400).json({ error: "Type invalide" });
     }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        max_tokens: 2000,
-        messages,
-      }),
+      body: JSON.stringify(body),
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      return res.status(response.status).json({ error: "OpenAI API error", details: errText });
-    }
-
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || "";
-    const clean = text.replace(/```json|```/g, "").trim();
 
-    try {
-      const parsed = JSON.parse(clean);
-      return res.status(200).json(parsed);
-    } catch {
-      return res.status(200).json({ raw: text });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: data.error?.message || "Erreur API" });
     }
+
+    // Retourne dans le même format que l'API Anthropic pour compatibilité
+    const text_response = data.choices?.[0]?.message?.content || "";
+    return res.status(200).json({
+      content: [{ type: "text", text: text_response }]
+    });
+
   } catch (err) {
-    return res.status(500).json({ error: "Server error", message: err.message });
+    console.error("Erreur proxy:", err);
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
