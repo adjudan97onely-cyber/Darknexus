@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd killagain-food && npm install && npm run build",
-  "outputDirectory": "killagain-food/dist",
-  "framework": "vite"
-}
