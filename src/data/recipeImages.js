@@ -7,7 +7,7 @@ export const RECIPE_IMAGES = {
   // ─── BOKITS ──────────────────────────────────────────────────
   "bokit-pate-base":        "https://images.unsplash.com/photo-1509722747041-616f39b57569?w=600&h=400&fit=crop",
   "bokit-jambon-fromage":   "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&h=400&fit=crop",
-  "bokit-poulet":           "https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=600&h=400&fit=crop",
+  "bokit-poulet":           "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&h=400&fit=crop",
   "bokit-thon":             "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=600&h=400&fit=crop",
   "bokit-legumes-avocat":   "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&h=400&fit=crop",
   "bokit-complet":          "https://images.unsplash.com/photo-1553909489-cd47e0907980?w=600&h=400&fit=crop",
@@ -24,13 +24,13 @@ export const RECIPE_IMAGES = {
   "blaff-poisson":          "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&h=400&fit=crop",
   "court-bouillon-poisson": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop",
   "matoutou-crabes":        "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?w=600&h=400&fit=crop",
-  "poulet-boucane":         "https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=600&h=400&fit=crop",
+  "poulet-boucane":         "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=600&h=400&fit=crop",
   "dombre-crevettes":       "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=600&h=400&fit=crop",
   "dombre-haricots-queue-cochon": "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&h=400&fit=crop",
   "dombre-base":            "https://images.unsplash.com/photo-1481931098730-318b6f776db0?w=600&h=400&fit=crop",
   "chatrou-roti":           "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?w=600&h=400&fit=crop",
   "lambi-grille":           "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop",
-  "poyo":                   "https://images.unsplash.com/photo-1544025162-d76538323491?w=600&h=400&fit=crop",
+  "poyo":                   "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=600&h=400&fit=crop",
   "agoulou":                "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop",
 
   // ─── ACCOMPAGNEMENTS ─────────────────────────────────────────

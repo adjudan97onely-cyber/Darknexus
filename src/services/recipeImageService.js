@@ -1,12 +1,6 @@
-const STORAGE_KEY = "killagain-food:recipe-images";
+import { getRecipeImage as getStaticImage, DEFAULT_IMAGE } from "../data/recipeImages";
 
-function normalizeQuery(value) {
-  return String(value || "food")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+const STORAGE_KEY = "killagain-food:recipe-images";
 
 function readMap() {
   try {
@@ -26,16 +20,14 @@ export function getRecipeImage(recipeId, defaultImage) {
   return map[recipeId] || defaultImage;
 }
 
-export function buildRealisticRecipeImageUrl(recipe) {
-  const rawQuery = recipe?.imagePrompt || recipe?.name || "healthy food plate";
-  const query = normalizeQuery(rawQuery);
-  const encoded = encodeURIComponent(`${query},food,meal,realistic,plated`);
-  return `https://source.unsplash.com/960x720/?${encoded}`;
-}
-
 export function resolveRecipeImage(recipe) {
-  const fallback = recipe?.image || buildRealisticRecipeImageUrl(recipe);
-  return getRecipeImage(recipe?.id, fallback);
+  // 1. localStorage override (user-set image)
+  const map = readMap();
+  if (map[recipe?.id]) return map[recipe.id];
+  // 2. recipe.image from data (patched Unsplash URLs)
+  if (recipe?.image) return recipe.image;
+  // 3. Static mapping from recipeImages.js
+  return getStaticImage(recipe?.id, DEFAULT_IMAGE);
 }
 
 export function setRecipeImage(recipeId, dataUrl) {
