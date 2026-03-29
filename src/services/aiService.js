@@ -313,61 +313,66 @@ export function smartSearchRecipes(query) {
 }
 
 export async function askCookingAssistant(question, context = {}) {
-  await new Promise((resolve) => setTimeout(resolve, 450));
-  const lower = normalize(question);
   const ingredients = toIngredients(context.ingredients || []);
 
-  // Cherche d'abord si l'utilisateur demande une recette spécifique
-  // Mots-clés indicateurs: "recette de", "prepare", "faire", "comment", "fais", "peux-tu"
-  const searchKeywords = ["recette", "prepare", "faire", "comment", "fais", "pouvoir", "peux"];
-  const isRecipeSearch = searchKeywords.some((kw) => lower.includes(kw));
+  // 1. Cherche d'abord dans le catalogue local
+  const catalogResults = smartSearchRecipes(question);
+  const topRecipe = catalogResults?.[0] || null;
 
-  if (isRecipeSearch) {
-    // Cherche la recette dans le catalogue
-    const results = smartSearchRecipes(question);
-    if (results && results.length > 0) {
-      const bestMatch = results[0];
-      const timeRange = `${bestMatch.prepMinutes + (bestMatch.restMinutes || 0)} min prep + ${bestMatch.cookMinutes} min cuisson`;
+  // 2. Appel Claude pour une réponse intelligente
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: `Tu es un expert en cuisine antillaise ET nutritionniste professionnel pour l'app Killagain Food.
+
+Question de l'utilisateur : "${question}"
+Ingrédients disponibles : ${ingredients.length > 0 ? ingredients.join(", ") : "non précisés"}
+${topRecipe ? `Recette trouvée dans le catalogue : ${topRecipe.name}` : "Aucune recette trouvée dans le catalogue."}
+
+Réponds en JSON valide UNIQUEMENT :
+{
+  "title": "Titre court et accrocheur",
+  "answer": "Réponse complète, précise, utile. Si c'est une question nutrition (perdre du poids, prendre de la masse, calories...) donne un vrai plan d'action concret. Si c'est une recette, donne les points clés. Si c'est un conseil, sois précis et actionnable. MAX 4 phrases percutantes.",
+  "conseil_bonus": "Un conseil bonus surprenant que l'utilisateur n'attend pas",
+  "actions": ["Action 1", "Action 2", "Action 3"]
+}`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || "";
+    const clean = text.replace(/```json|```/g, "").trim();
+    const result = JSON.parse(clean);
+
+    return {
+      title: result.title,
+      answer: result.answer,
+      conseil_bonus: result.conseil_bonus,
+      recipe: topRecipe,
+      actions: result.actions || ["Voir recette", "Alternatives", "Mode Chef IA"],
+    };
+
+  } catch {
+    // Fallback si l'API échoue
+    if (topRecipe) {
       return {
-        title: `Recette trouvée: ${bestMatch.name}`,
-        answer: `Je t'ai trouvé la recette du **${bestMatch.name}** (Difficulté: ${bestMatch.difficulty}, ${timeRange}). Profil nutrition: ${bestMatch.nutrition.kcal} kcal, ${bestMatch.nutrition.protein} g proteines, ${bestMatch.nutrition.carbs} g glucides.`,
-        recipe: bestMatch,
-        actions: ["Voir recette complete", "Voir alternatives", "Ajuster portions"],
+        title: `Recette : ${topRecipe.name}`,
+        answer: `${topRecipe.name} — ${topRecipe.difficulty}, ${topRecipe.prepMinutes + topRecipe.cookMinutes} min, ${topRecipe.nutrition?.kcal} kcal. ${topRecipe.description || ""}`,
+        recipe: topRecipe,
+        actions: ["Voir recette complète", "Alternatives", "Mode Chef IA"],
       };
     }
-  }
-
-  if (lower.includes("surprendre")) {
-    const pick = surpriseBalancedRecipe();
     return {
-      title: "Mode Surprise active",
-      answer: `Je te propose ${pick.name}: ${pick.nutrition.kcal} kcal avec P ${pick.nutrition.protein} g / G ${pick.nutrition.carbs} g / L ${pick.nutrition.fat} g.`,
-      actions: ["Voir recette", "Regenerer une surprise"],
+      title: "Coach Killagain",
+      answer: "Pose-moi une question sur la cuisine antillaise ou la nutrition — je suis là pour t'aider !",
+      actions: ["Scanner mes ingrédients", "Mode Surprise", "Mode Chef IA"],
     };
   }
-
-  if (lower.includes("chef")) {
-    const pick = generateDynamicRecipesFromIngredients(ingredients, { limit: 1, mode: "chef" })[0];
-    return {
-      title: "Chef IA - recette creative",
-      answer: `Avec ${ingredients.join(", ") || "peu d'ingredients"}, je t'ai cree ${pick.name}. C'est une recette originale et equilibree, faisable rapidement.`,
-      actions: ["Voir recette", "Version plus rapide", "Version plus healthy"],
-    };
-  }
-
-  if (ingredients.length > 0) {
-    const top = recommendRecipesFromIngredients(ingredients, 1, { cuisine: "all" })[0];
-    return {
-      title: "Idee immediate avec ton frigo",
-      answer: `Je te recommande ${top.name}. Profil nutrition: ${top.nutrition.kcal} kcal, ${top.nutrition.protein} g proteines.`,
-      actions: ["Voir recette", "Afficher alternatives", "Mode Chef IA"],
-    };
-  }
-
-  return {
-    title: "Coach culinaire intelligent",
-    answer:
-      "Donne-moi tes ingredients (ex: oeufs, fromage, farine) et je genere plusieurs recettes francaises, healthy, rapides et du monde, meme hors catalogue. Tu peux aussi me demander une recette specifique!",
-    actions: ["Scanner mes ingredients", "Mode Surprise", "Mode Chef IA"],
-  };
 }
