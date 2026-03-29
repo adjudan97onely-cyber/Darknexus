@@ -1,4 +1,5 @@
 import { ALL_RECIPES } from "../data/recipes";
+import { validateIngredients } from "./chefIA";
 export { ALL_RECIPES };
 
 function estimateRecipeNutrition(ingredients) {
@@ -10,6 +11,11 @@ function estimateRecipeNutrition(ingredients) {
     carbs: base.carbs + n * 3,
     fat: base.fat + n,
   };
+}
+
+// Arrondit les quantités d'ingrédients pour éviter les valeurs irréalistes
+function roundIngredientQuantities(ingredients) {
+  return validateIngredients(ingredients);
 }
 
 export const CUISINE_MODES = ["all", "francaise", "healthy", "rapide", "monde"];
@@ -201,7 +207,7 @@ function makeGeneratedRecipe(template, index, ingredients, cuisine = "all", mode
     restMinutes: 0,
     cookMinutes: template.cook,
     difficulty,
-    ingredients: [...picked, ...PANTRY_BASICS.slice(0, 2)],
+    ingredients: roundIngredientQuantities([...picked, ...PANTRY_BASICS.slice(0, 2)]),
     steps: buildSteps(name, picked),
     tips: [
       "Garde une source de proteines + legumes pour l'equilibre.",
@@ -319,48 +325,21 @@ export async function askCookingAssistant(question, context = {}) {
   const catalogResults = smartSearchRecipes(question);
   const topRecipe = catalogResults?.[0] || null;
 
-  // 2. Appel Claude pour une réponse intelligente
+  // 2. Appel Claude via le système Chef IA
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [{
-          role: "user",
-          content: `Tu es un expert en cuisine antillaise ET nutritionniste professionnel pour l'app Killagain Food.
+    const { askChef } = await import("./chefIA");
+    const result = await askChef(question, { ingredients, recipe: topRecipe, goal: context.goal });
 
-Question de l'utilisateur : "${question}"
-Ingrédients disponibles : ${ingredients.length > 0 ? ingredients.join(", ") : "non précisés"}
-${topRecipe ? `Recette trouvée dans le catalogue : ${topRecipe.name}` : "Aucune recette trouvée dans le catalogue."}
-
-Réponds en JSON valide UNIQUEMENT :
-{
-  "title": "Titre court et accrocheur",
-  "answer": "Réponse complète, précise, utile. Si c'est une question nutrition (perdre du poids, prendre de la masse, calories...) donne un vrai plan d'action concret. Si c'est une recette, donne les points clés. Si c'est un conseil, sois précis et actionnable. MAX 4 phrases percutantes.",
-  "conseil_bonus": "Un conseil bonus surprenant que l'utilisateur n'attend pas",
-  "actions": ["Action 1", "Action 2", "Action 3"]
-}`
-        }]
-      })
-    });
-
-    const data = await response.json();
-    const text = data.content?.[0]?.text || "";
-    const clean = text.replace(/```json|```/g, "").trim();
-    const result = JSON.parse(clean);
-
-    return {
-      title: result.title,
-      answer: result.answer,
-      conseil_bonus: result.conseil_bonus,
-      recipe: topRecipe,
-      actions: result.actions || ["Voir recette", "Alternatives", "Mode Chef IA"],
-    };
-
-  } catch {
-    // Fallback si l'API échoue
+    if (result.success) {
+      return {
+        title: result.name || result.title || "Chef Killagain",
+        answer: result.description || result.answer || "",
+        conseil_bonus: result.conseil_bonus || (result.tips?.[0] || ""),
+        recipe: topRecipe,
+        actions: result.actions || ["Voir recette", "Alternatives", "Mode Chef IA"],
+      };
+    }
+    // Fallback du Chef IA
     if (topRecipe) {
       return {
         title: `Recette : ${topRecipe.name}`,
@@ -369,10 +348,21 @@ Réponds en JSON valide UNIQUEMENT :
         actions: ["Voir recette complète", "Alternatives", "Mode Chef IA"],
       };
     }
-    return {
-      title: "Coach Killagain",
-      answer: "Pose-moi une question sur la cuisine antillaise ou la nutrition — je suis là pour t'aider !",
-      actions: ["Scanner mes ingrédients", "Mode Surprise", "Mode Chef IA"],
-    };
+  } catch {
+    // API indisponible, fallback local
+    if (topRecipe) {
+      return {
+        title: `Recette : ${topRecipe.name}`,
+        answer: `${topRecipe.name} — ${topRecipe.difficulty}, ${topRecipe.prepMinutes + topRecipe.cookMinutes} min, ${topRecipe.nutrition?.kcal} kcal. ${topRecipe.description || ""}`,
+        recipe: topRecipe,
+        actions: ["Voir recette complète", "Alternatives", "Mode Chef IA"],
+      };
+    }
   }
+
+  return {
+    title: "Coach Killagain",
+    answer: "Pose-moi une question sur la cuisine antillaise ou la nutrition — je suis là pour t'aider !",
+    actions: ["Scanner mes ingrédients", "Mode Surprise", "Mode Chef IA"],
+  };
 }

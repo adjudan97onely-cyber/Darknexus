@@ -75,8 +75,8 @@ export function RecipeDetailPage() {
       <section>
         <h2 className="text-xl font-bold">Ingredients</h2>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-white/90">
-          {recipe.ingredients.map((item) => (
-            <li key={item}>{item}</li>
+          {recipe.ingredients.map((item, i) => (
+            <li key={i}>{item}</li>
           ))}
         </ul>
       </section>
@@ -84,8 +84,8 @@ export function RecipeDetailPage() {
       <section>
         <h2 className="text-xl font-bold">Etapes ultra detaillees</h2>
         <ol className="mt-2 list-decimal space-y-2 pl-5 text-white/90">
-          {recipe.steps.map((step) => (
-            <li key={step}>{step}</li>
+          {recipe.steps.map((step, i) => (
+            <li key={i}>{step}</li>
           ))}
         </ol>
       </section>
@@ -94,16 +94,16 @@ export function RecipeDetailPage() {
         <div className="rounded-xl bg-white/5 p-3">
           <h3 className="font-bold text-emerald-200">Conseils pratiques</h3>
           <ul className="mt-1 list-disc pl-5 text-sm text-white/85">
-            {recipe.tips.map((tip) => (
-              <li key={tip}>{tip}</li>
+            {recipe.tips.map((tip, i) => (
+              <li key={i}>{tip}</li>
             ))}
           </ul>
         </div>
         <div className="rounded-xl bg-white/5 p-3">
           <h3 className="font-bold text-rose-200">Erreurs a eviter</h3>
           <ul className="mt-1 list-disc pl-5 text-sm text-white/85">
-            {recipe.mistakes.map((mistake) => (
-              <li key={mistake}>{mistake}</li>
+            {recipe.mistakes.map((mistake, i) => (
+              <li key={i}>{mistake}</li>
             ))}
           </ul>
         </div>
