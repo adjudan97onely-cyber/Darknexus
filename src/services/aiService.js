@@ -1,5 +1,5 @@
 import { ALL_RECIPES } from "../data/recipes";
-import { validateIngredients } from "./chefIA";
+import { validateIngredients, askChef } from "./chefIA";
 export { ALL_RECIPES };
 
 function estimateRecipeNutrition(ingredients) {
@@ -327,7 +327,6 @@ export async function askCookingAssistant(question, context = {}) {
 
   // 2. Appel Claude via le système Chef IA
   try {
-    const { askChef } = await import("./chefIA");
     const result = await askChef(question, { ingredients, recipe: topRecipe, goal: context.goal });
 
     if (result.success) {

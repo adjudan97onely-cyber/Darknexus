@@ -1,0 +1,19 @@
+{
+  "name": "Killagain Food",
+  "short_name": "Killagain",
+  "description": "Cuisine antillaise intelligente et nutrition adaptée à ton frigo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b2b45",
+  "theme_color": "#0b2b45",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "lifestyle", "health"]
+}
