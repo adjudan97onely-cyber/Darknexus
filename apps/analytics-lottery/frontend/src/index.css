@@ -1,0 +1,327 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background:
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 24%),
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.2), transparent 22%),
+    linear-gradient(180deg, #020617 0%, #081123 100%);
+  color: #e2e8f0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+#root {
+  isolation: isolate;
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  width: 290px;
+  min-height: 100vh;
+  flex-direction: column;
+  border-right: 1px solid rgba(148, 163, 184, 0.08);
+  background: rgba(2, 6, 23, 0.86);
+  backdrop-filter: blur(28px);
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  background: rgba(2, 6, 23, 0.55);
+  padding: 1.2rem 1.6rem;
+  backdrop-filter: blur(20px);
+}
+
+.premium-shell {
+  padding: 1.6rem;
+}
+
+.premium-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 2rem;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.72)),
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.16), transparent 32%);
+  box-shadow: 0 24px 80px rgba(3, 10, 28, 0.45);
+  padding: 1.6rem;
+}
+
+.premium-panel {
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 2rem;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.74));
+  box-shadow: 0 24px 80px rgba(3, 10, 28, 0.3);
+  backdrop-filter: blur(18px);
+}
+
+.premium-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1;
+  color: white;
+}
+
+.premium-subtitle {
+  margin-top: 0.85rem;
+  max-width: 60ch;
+  color: #94a3b8;
+}
+
+.premium-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.premium-badge,
+.premium-tag,
+.premium-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
+.premium-tag-hot {
+  background: rgba(249, 115, 22, 0.16);
+  color: #fdba74;
+}
+
+.premium-tag-cold {
+  background: rgba(59, 130, 246, 0.16);
+  color: #93c5fd;
+}
+
+.premium-number-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.18), rgba(99, 102, 241, 0.14));
+  color: white;
+  font-weight: 800;
+}
+
+.premium-number-chip-sm {
+  min-width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.85rem;
+  font-size: 0.85rem;
+}
+
+.premium-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.premium-field span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.premium-field input,
+.premium-field select {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.84);
+  color: #e2e8f0;
+  outline: none;
+  padding: 0.9rem 1rem;
+}
+
+.premium-field input:focus,
+.premium-field select:focus {
+  border-color: rgba(34, 211, 238, 0.36);
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.08);
+}
+
+.premium-button,
+.premium-button-secondary {
+  border: 0;
+  border-radius: 1rem;
+  cursor: pointer;
+  padding: 0.9rem 1.2rem;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.premium-button {
+  background: linear-gradient(135deg, #22d3ee, #6366f1);
+  color: #020617;
+  font-weight: 800;
+}
+
+.premium-button-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.premium-button:hover,
+.premium-button-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.premium-error {
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  border-radius: 1.25rem;
+  background: rgba(127, 29, 29, 0.22);
+  color: #fecaca;
+  padding: 1rem 1.1rem;
+}
+
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.premium-table th,
+.premium-table td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  padding: 0.95rem 0.75rem;
+  text-align: left;
+}
+
+.premium-table th {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.premium-table td {
+  color: #e2e8f0;
+  font-size: 0.92rem;
+}
+
+.premium-pill-pending {
+  color: #fcd34d;
+}
+
+.premium-pill-won {
+  color: #6ee7b7;
+}
+
+.premium-pill-lost {
+  color: #fca5a5;
+}
+
+.premium-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1.35rem;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(99, 102, 241, 0.35));
+  color: white;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.premium-status-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: #34d399;
+  box-shadow: 0 0 0 10px rgba(52, 211, 153, 0.08);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Charts */
+.recharts-wrapper {
+  outline: none !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.7);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.9);
+}
+
+@media (max-width: 768px) {
+  .premium-shell {
+    padding: 1rem;
+  }
+
+  .premium-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
