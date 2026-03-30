@@ -36,17 +36,24 @@ export function getAllRecipesWithDynamic() {
   return [...ALL_RECIPES, ...getDynamicCatalog()];
 }
 
+// ─── HELPER : PARSE RÉPONSE PROXY ────────────────────────────
+function parseProxyResponse(data) {
+  if (data.error) throw new Error(data.error);
+  const text = data.content?.[0]?.text || "";
+  const clean = text.replace(/```json|```/g, "").trim();
+  return JSON.parse(clean);
+}
+
 // ─── ANALYSE IMAGE VIA PROXY OPENAI VISION ──────────────────
 export async function analyzeImageWithClaude(imageBase64, mediaType = "image/jpeg") {
   try {
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "vision", image: imageBase64, mediaType }),
+      body: JSON.stringify({ type: "vision", image: imageBase64, mediaType }),
     });
     const data = await response.json();
-    if (data.error) throw new Error(data.error);
-    return data;
+    return parseProxyResponse(data);
   } catch (err) {
     console.error("Erreur Vision IA:", err);
     return null;
@@ -56,14 +63,22 @@ export async function analyzeImageWithClaude(imageBase64, mediaType = "image/jpe
 // ─── ANALYSE TEXTE (fallback si pas d'image) ─────────────────
 export async function analyzeTextWithClaude(input) {
   try {
+    const prompt = `L'utilisateur a tapé : "${input}". Réponds UNIQUEMENT en JSON valide :
+{
+  "aliments": ["aliment1", "aliment2"],
+  "description": "Ce que c'est en une phrase naturelle",
+  "contexte": "cuisine_antillaise ou cuisine_mondiale",
+  "possibilites": ["5 idées de recettes possibles"],
+  "conseil_chef": "Un conseil de chef professionnel",
+  "valeur_nutritionnelle": "Valeur nutritionnelle principale"
+}`;
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "text", input }),
+      body: JSON.stringify({ type: "text", text: prompt }),
     });
     const data = await response.json();
-    if (data.error) throw new Error(data.error);
-    return data;
+    return parseProxyResponse(data);
   } catch {
     return {
       aliments: input.split(/[,\s]+/).filter(Boolean),
@@ -80,13 +95,31 @@ export async function analyzeTextWithClaude(input) {
 export async function generateRecipeWithClaude(aliments, nomRecette = null) {
   const sujet = nomRecette || aliments.join(", ");
   try {
+    const prompt = `Tu es un chef cuisinier expert en cuisine antillaise et internationale. Génère une recette ultra détaillée pour : "${sujet}".
+Réponds UNIQUEMENT en JSON valide :
+{
+  "id": "gen-${Date.now()}",
+  "name": "Nom exact de la recette",
+  "category": "plat ou entree ou dessert ou boisson ou accompagnement",
+  "tags": ["tag1", "tag2"],
+  "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=400&fit=crop",
+  "prepMinutes": 15, "restMinutes": 0, "cookMinutes": 30,
+  "difficulty": "Facile ou Intermediaire ou Avance",
+  "description": "Description appétissante en 1-2 phrases",
+  "ingredients": ["quantité + ingrédient précis"],
+  "steps": ["ÉTAPE : Description détaillée. Minimum 5 étapes."],
+  "tips": ["Conseil de chef précis"],
+  "mistakes": ["Erreur courante à éviter"],
+  "nutrition": { "kcal": 450, "protein": 25, "carbs": 45, "fat": 18 },
+  "source": "ai-generated"
+}`;
     const response = await fetch("/api/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "recipe", input: sujet }),
+      body: JSON.stringify({ type: "text", text: prompt }),
     });
-    const recipe = await response.json();
-    if (recipe.error) throw new Error(recipe.error);
+    const data = await response.json();
+    const recipe = parseProxyResponse(data);
     recipe.source = "ai-generated";
     recipe.generatedAt = new Date().toISOString();
     saveToDynamicCatalog(recipe);
