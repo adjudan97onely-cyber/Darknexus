@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env["CLÉ_API_OPENAI"] || process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "Clé API manquante" });
 
   try {
@@ -30,16 +30,16 @@ export default async function handler(req, res) {
             },
             {
               type: "text",
-              text: `Tu es un expert en cuisine antillaise et nutritionniste. Analyse cette image et réponds UNIQUEMENT en JSON valide sans aucun texte avant ou après :
+              text: `Analyse cette image avec précision. Réponds UNIQUEMENT en JSON valide :
 {
-  "aliments": ["liste précise de tous les aliments visibles"],
-  "description": "Ce que tu vois précisément en une phrase naturelle",
+  "aliments": ["liste EXACTE de ce que tu vois réellement dans l'image"],
+  "description": "Décris précisément ce que tu vois en une phrase",
   "contexte": "cuisine_antillaise ou cuisine_mondiale",
-  "possibilites": ["5 idées de recettes qu'on peut faire avec ces aliments"],
-  "conseil_chef": "Un conseil de chef professionnel précis",
-  "valeur_nutritionnelle": "Valeur nutritionnelle principale en une phrase"
+  "possibilites": ["5 recettes réalistes avec ces aliments"],
+  "conseil_chef": "Conseil professionnel précis sur ces aliments",
+  "valeur_nutritionnelle": "Valeur nutritionnelle principale"
 }
-Si c'est un frigo, liste TOUS les aliments visibles. Sois très précis.`,
+IMPORTANT: Décris UNIQUEMENT ce que tu vois réellement. Ne suppose rien. Si tu vois du pain, dis pain. Si tu vois du poulet cru, dis poulet cru.`,
             },
           ],
         }],
