@@ -1,14 +1,15 @@
 // ═══════════════════════════════════════════════════════════════
 // KILLAGAIN FOOD — Scanner IA Intelligent
-// Appelle /api/analyze (Vercel Function proxy OpenAI Vision)
-// - Analyse photo réelle du frigo/aliment
+// - Analyse photo via Claude Vision API
 // - Pioche dans le catalogue en priorité
-// - Génère et sauvegarde si absent
+// - Si absent : génère ET sauvegarde pour enrichir le catalogue
+// - Parle de TOUT ce qu'on peut faire avec l'aliment détecté
 // ═══════════════════════════════════════════════════════════════
 
-import { ALL_RECIPES } from "../data/recipes";
+import { ALL_RECIPES, CREOLE_RECIPES } from "../data/recipes";
 
 // ─── CATALOGUE DYNAMIQUE ─────────────────────────────────────
+// Les recettes générées sont ajoutées ici pour enrichir l'app
 let DYNAMIC_CATALOG = [];
 
 export function getDynamicCatalog() {
@@ -24,7 +25,7 @@ function saveToDynamicCatalog(recipe) {
     const existing = getDynamicCatalog();
     const alreadyExists = existing.find(r => r.id === recipe.id);
     if (!alreadyExists) {
-      const updated = [recipe, ...existing].slice(0, 50);
+      const updated = [recipe, ...existing].slice(0, 50); // max 50 recettes dynamiques
       localStorage.setItem("killagain_dynamic_recipes", JSON.stringify(updated));
       DYNAMIC_CATALOG = updated;
     }
@@ -35,110 +36,57 @@ export function getAllRecipesWithDynamic() {
   return [...ALL_RECIPES, ...getDynamicCatalog()];
 }
 
-// ─── APPEL PROXY /api/analyze ─────────────────────────────────
-const API_URL = "/api/analyze";
-
-async function callProxy(payload) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Erreur proxy");
-  const text = data.content?.[0]?.text || "";
-  const clean = text.replace(/```json|```/g, "").trim();
-  return JSON.parse(clean);
-}
-
-// ─── ANALYSE IMAGE (Vision) ───────────────────────────────────
-export async function analyzeImageWithVision(imageBase64, mediaType = "image/jpeg") {
+// ─── ANALYSE IMAGE VIA PROXY OPENAI VISION ──────────────────
+export async function analyzeImageWithClaude(imageBase64, mediaType = "image/jpeg") {
   try {
-    return await callProxy({ type: "vision", image: imageBase64, mediaType });
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "vision", image: imageBase64, mediaType }),
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
+    return data;
   } catch (err) {
-    console.error("Erreur Vision:", err);
+    console.error("Erreur Vision IA:", err);
     return null;
   }
 }
 
-// ─── ANALYSE TEXTE ────────────────────────────────────────────
-export async function analyzeTextWithAI(input) {
+// ─── ANALYSE TEXTE (fallback si pas d'image) ─────────────────
+export async function analyzeTextWithClaude(input) {
   try {
-    const prompt = `L'utilisateur a tapé : "${input}". Réponds UNIQUEMENT en JSON valide :
-{
-  "aliments": ["aliment1", "aliment2"],
-  "description": "Ce que c'est en une phrase naturelle",
-  "contexte": "cuisine_antillaise ou cuisine_mondiale",
-  "possibilites": ["5 idées de recettes possibles"],
-  "conseil_chef": "Un conseil de chef professionnel",
-  "valeur_nutritionnelle": "Valeur nutritionnelle principale"
-}`;
-    return await callProxy({ type: "text", text: prompt });
-  } catch {
-    // Fallback local intelligent
-    const mots = (input || "").toLowerCase().split(/[\s,]+/).filter(Boolean);
-    const mapping = {
-      "frigo": ["oeuf", "fromage", "tomate", "lait"],
-      "poulet": ["poulet"], "poisson": ["poisson"],
-      "banane": ["banane"], "avocat": ["avocat"],
-      "morue": ["morue"], "crevettes": ["crevettes"],
-      "riz": ["riz"], "tomate": ["tomate"],
-      "oeuf": ["oeuf"], "oeufs": ["oeuf"],
-      "fromage": ["fromage"], "farine": ["farine"],
-      "pizza": ["pate", "tomate", "fromage"],
-      "crepe": ["farine", "oeuf", "lait"],
-    };
-
-    let aliments = [];
-    mots.forEach(m => {
-      if (mapping[m]) aliments.push(...mapping[m]);
-      else if (m.length > 2) aliments.push(m);
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "text", input }),
     });
-    if (!aliments.length) aliments = ["oeuf", "tomate", "fromage"];
-
+    const data = await response.json();
+    if (data.error) throw new Error(data.error);
+    return data;
+  } catch {
     return {
-      aliments: [...new Set(aliments)],
-      description: `Ingrédients : ${aliments.join(", ")}`,
-      contexte: "cuisine_antillaise",
-      possibilites: [
-        "Omelette créole aux herbes",
-        "Salade fraîche du frigo",
-        "Plat rapide selon les ingrédients",
-        "Recette antillaise maison",
-        "Improvisation du chef",
-      ],
-      conseil_chef: "Utilise ce que tu as pour créer quelque chose de savoureux !",
-      valeur_nutritionnelle: "Varie les sources de protéines et légumes.",
+      aliments: input.split(/[,\s]+/).filter(Boolean),
+      description: input,
+      contexte: "cuisine_mondiale",
+      possibilites: ["Recherche dans le catalogue..."],
+      conseil_chef: "Explore les recettes disponibles.",
+      valeur_nutritionnelle: "Information non disponible.",
     };
   }
 }
 
-// ─── GÉNÉRATION DE RECETTE ────────────────────────────────────
-export async function generateRecipeWithAI(aliments, nomRecette = null) {
+// ─── GÉNÉRATION DE RECETTE VIA IA ────────────────────────────
+export async function generateRecipeWithClaude(aliments, nomRecette = null) {
   const sujet = nomRecette || aliments.join(", ");
   try {
-    const prompt = `Tu es un chef cuisinier expert en cuisine antillaise et internationale. Génère une recette ultra détaillée pour : "${sujet}".
-Réponds UNIQUEMENT en JSON valide :
-{
-  "id": "gen-${Date.now()}",
-  "name": "Nom exact de la recette",
-  "category": "plat ou entree ou dessert ou boisson ou accompagnement",
-  "tags": ["tag1", "tag2"],
-  "image": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&h=400&fit=crop",
-  "prepMinutes": 15,
-  "restMinutes": 0,
-  "cookMinutes": 30,
-  "difficulty": "Facile ou Intermediaire ou Avance",
-  "description": "Description appétissante en 1-2 phrases",
-  "ingredients": ["quantité + ingrédient précis"],
-  "steps": ["ÉTAPE : Description détaillée avec techniques, températures, durées. Minimum 5 étapes."],
-  "tips": ["Conseil de chef précis"],
-  "mistakes": ["Erreur courante à éviter"],
-  "nutrition": { "kcal": 450, "protein": 25, "carbs": 45, "fat": 18 },
-  "source": "ai-generated"
-}`;
-
-    const recipe = await callProxy({ type: "text", text: prompt });
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "recipe", input: sujet }),
+    });
+    const recipe = await response.json();
+    if (recipe.error) throw new Error(recipe.error);
     recipe.source = "ai-generated";
     recipe.generatedAt = new Date().toISOString();
     saveToDynamicCatalog(recipe);
@@ -188,28 +136,28 @@ export function searchInCatalog(aliments, description = "") {
 export async function scanAndRecommend(input, imageBase64 = null, mediaType = "image/jpeg") {
   let analysis = null;
 
-  // 1. Vision si image fournie
+  // 1. Analyse via Vision IA si image fournie
   if (imageBase64) {
-    analysis = await analyzeImageWithVision(imageBase64, mediaType);
+    analysis = await analyzeImageWithClaude(imageBase64, mediaType);
   }
 
-  // 2. Texte si pas d'image ou si vision échoue
+  // 2. Analyse texte si pas d'image ou si vision échoue
   if (!analysis) {
-    analysis = await analyzeTextWithAI(input || "frigo");
+    analysis = await analyzeTextWithClaude(input || "frigo");
   }
 
-  const aliments = analysis?.aliments || [];
+  const aliments = analysis.aliments || [];
 
-  // 3. Cherche dans le catalogue (priorité absolue)
-  const catalogResults = searchInCatalog(aliments, analysis?.description || input || "");
+  // 3. Cherche dans le catalogue (priorité)
+  const catalogResults = searchInCatalog(aliments, analysis.description || input || "");
 
-  // 4. Génère avec l'IA si pas assez de résultats
+  // 4. Si pas assez de résultats → génère avec l'IA
   let generatedRecipe = null;
   if (catalogResults.length < 3 && aliments.length > 0) {
-    generatedRecipe = await generateRecipeWithAI(aliments, input);
+    generatedRecipe = await generateRecipeWithClaude(aliments, input);
   }
 
-  // 5. Combine
+  // 5. Combine les résultats
   const allResults = [
     ...catalogResults,
     ...(generatedRecipe ? [{ ...generatedRecipe, score: 95, isNew: true }] : []),
