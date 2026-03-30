@@ -26,20 +26,25 @@ export default async function handler(req, res) {
           content: [
             {
               type: "image_url",
-              image_url: { url: `data:${mediaType || "image/jpeg"};base64,${image}` },
+              image_url: { url: `data:${mediaType || "image/jpeg"};base64,${image}`, detail: "high" },
             },
             {
               type: "text",
-              text: `Analyse cette image avec précision. Réponds UNIQUEMENT en JSON valide :
+              text: `Regarde cette image TRÈS attentivement. Identifie EXACTEMENT ce que tu vois. Réponds UNIQUEMENT en JSON valide :
 {
-  "aliments": ["liste EXACTE de ce que tu vois réellement dans l'image"],
-  "description": "Décris précisément ce que tu vois en une phrase",
+  "aliments": ["liste EXACTE de ce que tu vois - sois littéral et précis"],
+  "description": "Décris EXACTEMENT ce que montre la photo, rien d'autre",
   "contexte": "cuisine_antillaise ou cuisine_mondiale",
-  "possibilites": ["5 recettes réalistes avec ces aliments"],
-  "conseil_chef": "Conseil professionnel précis sur ces aliments",
+  "possibilites": ["5 recettes réalistes avec ces aliments exacts"],
+  "conseil_chef": "Conseil professionnel sur ces aliments précis",
   "valeur_nutritionnelle": "Valeur nutritionnelle principale"
 }
-IMPORTANT: Décris UNIQUEMENT ce que tu vois réellement. Ne suppose rien. Si tu vois du pain, dis pain. Si tu vois du poulet cru, dis poulet cru.`,
+RÈGLES STRICTES :
+- Si c'est du PAIN ou de la BRIOCHE, dis "pain" ou "brioche", pas "poulet"
+- Si c'est DORÉ au four, ce n'est pas forcément de la viande
+- Regarde la TEXTURE, la FORME et le CONTEXTE (plaque de cuisson = boulangerie)
+- Ne devine PAS, décris ce que tu VOIS réellement
+- En cas de doute, dis "aliment non identifié avec certitude"`,
             },
           ],
         }],
