@@ -9,7 +9,7 @@ echo.
 echo Redirection vers projects/killagain-food/...
 echo.
 
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 if exist ".\projects\killagain-food\LANCER_KILLAGAIN_FOOD.bat" (
   call ".\projects\killagain-food\LANCER_KILLAGAIN_FOOD.bat"

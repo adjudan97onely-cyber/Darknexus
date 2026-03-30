@@ -1,6 +1,6 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 if exist ".\projects\warzone\LANCER_WARZONE.bat" (
   echo Lancement Warzone depuis projects/warzone/...

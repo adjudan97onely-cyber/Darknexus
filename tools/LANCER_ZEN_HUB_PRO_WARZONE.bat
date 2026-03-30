@@ -1,6 +1,6 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 if exist ".\projects\warzone\LANCER_ZEN_HUB_PRO_WARZONE.bat" (
   echo Lancement Zen Hub Pro Warzone depuis projects/warzone/...
