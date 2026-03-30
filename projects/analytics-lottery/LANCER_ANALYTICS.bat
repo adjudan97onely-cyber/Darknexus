@@ -43,7 +43,7 @@ timeout /t 3 /nobreak
 REM Start frontend dev server
 cd frontend
 echo Démarrage du frontend (port 5173)...
-start "Frontend - Analytics" npm run dev
+start "Frontend - Analytics" cmd /k "timeout /t 4 /nobreak >nul 2>&1 && start http://localhost:5173 && npm run dev"
 cd ..
 
 echo.
