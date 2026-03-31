@@ -10,6 +10,7 @@ import logging
 from typing import Dict, Any, List, Optional
 from openai import AsyncOpenAI
 from datetime import datetime
+from emergentintegrations.llm.chat import LlmChat
 
 logger = logging.getLogger(__name__)
 

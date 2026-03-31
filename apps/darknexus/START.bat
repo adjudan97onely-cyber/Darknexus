@@ -31,9 +31,9 @@ echo [2/3] Demarrage Backend FastAPI sur port 5000...
 start "Darknexus - Backend" cmd /k "cd /d %BACKEND_DIR% && %PYTHON% server.py"
 timeout /t 4 /nobreak >nul
 
-REM Lancer Frontend
+REM Lancer Frontend (NODE_OPTIONS pour compatibilite Node v24+)
 echo [3/3] Demarrage Frontend React sur port 3000...
-start "Darknexus - Frontend" cmd /k "cd /d %FRONTEND_DIR% && npm start"
+start "Darknexus - Frontend" cmd /k "cd /d %FRONTEND_DIR% && set NODE_OPTIONS=--openssl-legacy-provider && npm start"
 
 REM Attendre et ouvrir navigateur
 echo.
