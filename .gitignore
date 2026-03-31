@@ -18,6 +18,13 @@ dist-ssr
 .idea
 .DS_Store
 *.suo
+
+# Project structure - ignore embedded repos internals
+projects/*/.git
+projects/*/node_modules/
+projects/*/dist/
+projects/*/.venv/
+projects/**/__pycache__/
 *.ntvs*
 *.njsproj
 *.sln
