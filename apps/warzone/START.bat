@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 echo.
 echo =============================================
 echo   Warzone (Machine de Guerre) - Demarrage
-echo   Backend: http://localhost:5002
+echo   Backend: http://localhost:5001
 echo   Frontend: http://localhost:5174
 echo =============================================
 echo.
@@ -21,8 +21,8 @@ if not exist "%PYTHON%" (
 )
 
 REM Tuer anciens processus sur les ports
-echo [1/3] Nettoyage des ports 5002 et 5174...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr :5002 2^>nul') do taskkill /F /PID %%a >nul 2>nul
+echo [1/3] Nettoyage des ports 5001 et 5174...
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :5001 2^>nul') do taskkill /F /PID %%a >nul 2>nul
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr :5174 2^>nul') do taskkill /F /PID %%a >nul 2>nul
 timeout /t 1 /nobreak >nul
 
@@ -33,6 +33,10 @@ timeout /t 3 /nobreak >nul
 
 REM Lancer Frontend
 echo [3/3] Demarrage Frontend React sur port 5174...
+if not exist "%FRONTEND_DIR%\node_modules" (
+    echo [i] Installation des dependances frontend Warzone...
+    call npm --prefix "%FRONTEND_DIR%" install
+)
 start "Warzone - Frontend" cmd /k "cd /d %FRONTEND_DIR% && npm run dev"
 
 REM Attendre et ouvrir navigateur
