@@ -143,7 +143,7 @@ export default function HubPage() {
 
       {/* CONTENT AREA */}
       <div className="min-h-[600px]">
-        {mode === 'play' && <PlayMode onPlayPrediction={handlePlayPrediction} saving={savingPrediction} />}
+        {mode === 'play' && <PlayMode onPlayPrediction={handlePlayPrediction} saving={savingPrediction} matches={predictions} matchesLoading={predictionsLoading} matchesError={predictionsError} />}
         {mode === 'results' && <ResultsMode />}
         {mode === 'analysis' && <AnalysisMode />}
       </div>
@@ -152,7 +152,7 @@ export default function HubPage() {
 }
 
 // MODE 1: JE VEUX JOUER
-function PlayMode({ onPlayPrediction, saving }) {
+function PlayMode({ onPlayPrediction, saving, matches = [], matchesLoading = false, matchesError = null }) {
   return (
     <div className="space-y-8">
       {/* SECTION KENO/LOTO */}
@@ -241,7 +241,7 @@ function PlayMode({ onPlayPrediction, saving }) {
             </div>
           ) : (
             matches.map((match, idx) => (
-              <SportsMatchCard key={idx} match={match} onPlay={onPlayPrediction} saving={savingPrediction} />
+              <SportsMatchCard key={idx} match={match} onPlay={onPlayPrediction} saving={saving} />
             ))
           )}
         </div>
@@ -252,6 +252,8 @@ function PlayMode({ onPlayPrediction, saving }) {
 
 // MODE 2: MES RÉSULTATS
 function ResultsMode() {
+  const results = [];
+  const systemAccuracy = {};
   return (
     <div className="space-y-8">
       <section className="premium-panel p-8">

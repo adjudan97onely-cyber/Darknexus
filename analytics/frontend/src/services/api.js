@@ -121,10 +121,10 @@ export const lotteryAPI = {
 export const sportsAPI = {
   getLeagues: () => api.get('/api/sports/leagues'),
   getUpcomingMatches: (params = {}) => api.get('/api/sports/matches', { params }),
-  predictMatch: (homeTeam, awayTeam) => 
-    api.get(`/api/sports/matches/${homeTeam}/vs/${awayTeam}/prediction`),
-  predictMultiple: (matches) => 
-    api.post('/api/sports/matches/predict', matches),
+  predictMatch: (homeTeam, awayTeam) =>
+    api.post('/api/sports/matches/predict', { matches: [{ home_team: homeTeam, away_team: awayTeam }] }),
+  predictMultiple: (matches) =>
+    api.post('/api/sports/matches/predict', { matches }),
   getTeamForm: (teamName) => 
     api.get(`/api/sports/team/${teamName}/form`),
   getSportsStatistics: () => 

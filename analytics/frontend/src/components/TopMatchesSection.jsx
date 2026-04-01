@@ -5,19 +5,19 @@ import React from 'react';
  * À ajouter au SportsAnalyzer
  */
 export default function TopMatchesSection({ matches = [] }) {
-  // Mock data - remplacer par vraies données
-  const topMatches = [
-    { id: 1, time: '20h', team1: 'PSG', team2: 'OM', league: 'Ligue 1', prediction: 'PSG', confidence: 82 },
-    { id: 2, time: '21h', team1: 'Monaco', team2: 'Rennes', league: 'Ligue 1', prediction: 'Nul', confidence: 65 },
-    { id: 3, time: '19h', team1: 'Real Madrid', team2: 'Barcelona', league: 'La Liga', prediction: 'Real', confidence: 78 },
-    { id: 4, time: '20h30', team1: 'Liverpool', team2: 'Man City', league: 'Premier', prediction: 'Man City', confidence: 72 },
-    { id: 5, time: '21h', team1: 'Bayern', team2: 'Dortmund', league: 'Bundesliga', prediction: 'Bayern', confidence: 88 },
-    { id: 6, time: '20h', team1: 'Juventus', team2: 'AC Milan', league: 'Série A', prediction: 'Juve', confidence: 71 },
-    { id: 7, time: '20h30', team1: 'Rangers', team2: 'Celtic', league: 'Écosse', prediction: 'Nul', confidence: 68 },
-    { id: 8, time: '19h30', team1: 'Ajax', team2: 'PSV', league: 'Pays-Bas', prediction: 'PSV', confidence: 75 },
-    { id: 9, time: '21h', team1: 'Lyon', team2: 'Marseille', league: 'Ligue 1', prediction: 'Lyon', confidence: 69 },
-    { id: 10, time: '20h', team1: 'Lille', team2: 'Lens', league: 'Ligue 1', prediction: 'Lens', confidence: 64 },
-  ];
+  // Transformer les recommandations reçues en format d'affichage
+  const topMatches = matches.slice(0, 10).map((m, idx) => {
+    const parts = (m.match || '').split(' vs ');
+    return {
+      id: m.prediction_id || idx,
+      time: '',
+      team1: parts[0] || '?',
+      team2: parts[1] || '?',
+      league: m.league || '',
+      prediction: m.best_bet || m.prediction || '?',
+      confidence: m.confidence || 0,
+    };
+  });
 
   const getConfidenceColor = (conf) => {
     if (conf >= 80) return 'text-emerald-400 bg-emerald-500/10';
@@ -26,10 +26,12 @@ export default function TopMatchesSection({ matches = [] }) {
     return 'text-slate-400 bg-slate-500/10';
   };
 
+  if (topMatches.length === 0) return null;
+
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-6 mt-8">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-white">🔥 Top 10 Matchs du Jour</h2>
+        <h2 className="text-xl font-bold text-white">Top Matchs — Signaux Fiables</h2>
         <p className="text-sm text-slate-400 mt-1">Classés par fiabilité • Les meilleures prédictions</p>
       </div>
 
@@ -39,7 +41,6 @@ export default function TopMatchesSection({ matches = [] }) {
             <div className="flex-1">
               <div className="flex items-center gap-3">
                 <div className="text-xs font-semibold text-slate-400 w-8">{idx + 1}.</div>
-                <div className="text-xs text-slate-500 w-12">{match.time}</div>
                 <div className="flex-1">
                   <div className="font-bold text-white text-sm">{match.team1} vs {match.team2}</div>
                   <div className="text-xs text-slate-500">{match.league}</div>

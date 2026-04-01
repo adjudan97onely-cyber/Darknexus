@@ -160,9 +160,25 @@ async def dashboard_overview():
         },
         "models": [
             {"name": "Frequency", "weight": 0.40, "accuracy": 0.72},
-            {"name": "Overdue", "weight": 0.35, "accuracy": 0.68},
-            {"name": "Trend", "weight": 0.25, "accuracy": 0.65},
+            {"name": "Overdue",   "weight": 0.35, "accuracy": 0.68},
+            {"name": "Trend",     "weight": 0.25, "accuracy": 0.65},
         ],
+        "recent_results": [
+            {"id": "r1", "lottery_type": "Keno",         "draw_date": "01/04/2026", "numbers": [5, 12, 18, 27, 33, 44]},
+            {"id": "r2", "lottery_type": "EuroMillions",  "draw_date": "29/03/2026", "numbers": [7, 15, 22, 38, 45]},
+            {"id": "r3", "lottery_type": "Loto",          "draw_date": "28/03/2026", "numbers": [3, 11, 24, 36, 42, 49]},
+        ],
+        "recent_predictions": [
+            {"id": "p1", "subtype": "keno",         "status": "validée", "confidence": 78, "score": 3},
+            {"id": "p2", "subtype": "football",     "status": "validée", "confidence": 82, "score": 1},
+            {"id": "p3", "subtype": "euromillions", "status": "en attente", "confidence": 65, "score": 0},
+            {"id": "p4", "subtype": "loto",         "status": "validée", "confidence": 71, "score": 2},
+        ],
+        "sports_statistics": {
+            "total_matches": 150,
+            "btts_rate": 0.48,
+            "over_2_5_rate": 0.54,
+        },
     }
 
 @stub_router.get("/api/performance")
@@ -251,6 +267,78 @@ async def subscription_plans():
 @stub_router.get("/api/subscriptions/current")
 async def subscription_current():
     return {"plan": "free", "status": "active"}
+
+@stub_router.get("/api/rapport/lottery/{subtype}")
+async def rapport_lottery(subtype: str, limit: int = 20):
+    configs = {
+        "keno":         {"baseline": 20, "numbers": 20, "pool": 70},
+        "euromillions": {"baseline": 10, "numbers": 5,  "pool": 50},
+        "loto":         {"baseline": 10, "numbers": 6,  "pool": 49},
+    }
+    cfg = configs.get(subtype, {"baseline": 15, "numbers": 6, "pool": 49})
+    baseline = cfg["baseline"]
+
+    # Tirages de démonstration réalistes
+    from datetime import datetime, timedelta
+    import random
+    rows = []
+    for i in range(min(limit, 5)):
+        pred_date = (datetime.now() - timedelta(days=(i + 1) * 3)).strftime("%d/%m/%Y")
+        draw_date = (datetime.now() - timedelta(days=i * 3)).strftime("%d/%m/%Y")
+        predicted = sorted(random.sample(range(1, cfg["pool"] + 1), cfg["numbers"]))
+        actual    = sorted(random.sample(range(1, cfg["pool"] + 1), cfg["numbers"]))
+        matched   = [n for n in predicted if n in actual]
+        score     = round(len(matched) / cfg["numbers"] * 100)
+        rows.append({
+            "id": f"{subtype}_{i+1}",
+            "prediction_date": pred_date,
+            "draw_date": draw_date,
+            "status": "won" if len(matched) >= 2 else "lost",
+            "score": score,
+            "matched_count": len(matched),
+            "predicted_count": cfg["numbers"],
+            "predicted": predicted,
+            "actual": actual,
+            "matched": matched,
+        })
+
+    avg_score = round(sum(r["score"] for r in rows) / len(rows)) if rows else 0
+    gain = avg_score - baseline
+    return {
+        "subtype": subtype,
+        "verdict": (
+            f"Sur {len(rows)} tirages analysés, l'IA obtient en moyenne {avg_score}% de numéros corrects "
+            f"contre {baseline}% pour le hasard pur. "
+            + ("L'IA est meilleure que le hasard." if gain > 0 else "Performance proche du hasard — données insuffisantes.")
+        ),
+        "total_evaluated": len(rows),
+        "avg_score_pct": avg_score,
+        "random_baseline_pct": baseline,
+        "ai_better_than_random": gain > 0,
+        "gain_vs_random_pct": gain,
+        "rows": rows,
+    }
+
+@stub_router.post("/api/learning/predict")
+async def learning_predict(data: dict):
+    import uuid
+    return {
+        "success": True,
+        "prediction_id": str(uuid.uuid4()),
+        "message": "Prédiction enregistrée"
+    }
+
+@stub_router.post("/api/learning/result")
+async def learning_result(data: dict):
+    return {"success": True, "message": "Résultat enregistré"}
+
+@stub_router.get("/api/learning/predictions")
+async def learning_predictions():
+    return []
+
+@stub_router.get("/api/learning/stats")
+async def learning_stats():
+    return {"total": 0, "accuracy": 0}
 
 app.include_router(stub_router)
 

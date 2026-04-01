@@ -68,8 +68,13 @@ export default function SportsAnalyzer() {
 
   async function handleSelectMatch(match) {
     setSelectedMatch(match);
-    const response = await sportsAPI.predictMatch(match.home_team, match.away_team);
-    setPrediction({ ...response.data, league: match.league, country: match.country });
+    try {
+      const response = await sportsAPI.predictMatch(match.home_team, match.away_team);
+      const pred = response.data?.predictions?.[0] || response.data;
+      setPrediction({ ...pred, league: match.league, country: match.country });
+    } catch (err) {
+      console.error('Prediction error:', err);
+    }
   }
 
   const chartData = [
