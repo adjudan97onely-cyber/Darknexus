@@ -8,7 +8,7 @@ import { Sparkles, Lock, Mail, Loader2, Shield } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = 'http://localhost:5000';
 const API = `${BACKEND_URL}/api`;
 
 const LoginPage = () => {
@@ -149,15 +149,15 @@ const LoginPage = () => {
               disabled={isLoading}
             >
               {isLoading ? (
-                <>
+                <span style={{display:'flex',alignItems:'center'}}>
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Connexion en cours...
-                </>
+                </span>
               ) : (
-                <>
+                <span style={{display:'flex',alignItems:'center'}}>
                   <Lock className="w-5 h-5 mr-2" />
                   Se Connecter
-                </>
+                </span>
               )}
             </Button>
           </form>

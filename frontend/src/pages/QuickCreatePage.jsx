@@ -13,7 +13,7 @@ import { useToast } from '../hooks/use-toast';
 import WhisperVoiceInput from '../components/WhisperVoiceInput';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = 'http://localhost:5000';
 
 const QuickCreatePage = () => {
   const navigate = useNavigate();

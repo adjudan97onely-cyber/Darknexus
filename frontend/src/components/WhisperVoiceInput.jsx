@@ -85,7 +85,7 @@ const WhisperVoiceInput = ({ onTranscript, disabled = false, showTranscript = fa
 
   const transcribeAudio = async (audioBlob) => {
     try {
-      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      const API_URL = 'http://localhost:5000' || '';
       
       // Créer FormData pour envoyer le fichier
       const formData = new FormData();

@@ -5,7 +5,7 @@ import { Mic, X, Send, Loader2, Volume2, StopCircle, Minimize2, Maximize2 } from
 import VoiceInput from './VoiceInput';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = 'http://localhost:5000';
 
 /**
  * ASSISTANT VOCAL FLOTTANT - Style WhatsApp

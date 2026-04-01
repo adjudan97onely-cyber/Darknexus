@@ -58,7 +58,7 @@ const AdminSettingsPage = () => {
     setLoading(true);
 
     try {
-      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      const API_URL = 'http://localhost:5000';
       const token = localStorage.getItem('token');
 
       // Vérifier d'abord l'ancien mot de passe en tentant une connexion

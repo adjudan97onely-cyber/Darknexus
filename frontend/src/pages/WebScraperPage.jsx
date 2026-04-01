@@ -10,7 +10,7 @@ import { ArrowLeft, Globe, Loader2, CheckCircle2, XCircle, Table, FileText, Link
 import { useToast } from '../hooks/use-toast';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = 'http://localhost:5000';
 
 const WebScraperPage = () => {
   const navigate = useNavigate();
