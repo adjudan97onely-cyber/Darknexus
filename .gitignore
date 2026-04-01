@@ -1,3 +1,9 @@
+# Environnement - NE PAS VERSIONNER
+.env
+.env.local
+.env.*.local
+*.env
+
 # Logs
 logs
 *.log
