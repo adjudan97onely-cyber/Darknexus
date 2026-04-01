@@ -1,0 +1,121 @@
+═══════════════════════════════════════════════════════════════
+  SETUP DARKNEXUS - PC PORTABLE (QUICK START)
+═══════════════════════════════════════════════════════════════
+
+Tu es sur ton PC PORTABLE et tu veux cloner Darknexus complet.
+
+AVANT DE COMMENCER
+─────────────────
+✓ Installe : Git, Python 3.11+, Node.js 18+
+  - Git : https://git-scm.com/download/win
+  - Python : https://www.python.org/downloads/
+  - Node.js : https://nodejs.org/
+
+Vérifie dans Terminal/PowerShell:
+  git --version
+  python --version
+  npm --version
+
+
+ÉTAPE 1 : CLONE AUTO (RECOMMANDÉ)
+─────────────────────────────────
+Double-click ce fichier :
+  → SETUP_PORTABLE_AUTO.bat
+
+Il va :
+  ✓ Cloner le repo depuis GitHub
+  ✓ Setup venv Python backend + Warzone
+  ✓ Install npm packages (frontend + Warzone)
+  ✓ Tout fait automatiquement
+
+⏱ Prend ~5-10 minutes selon vitesse internet
+
+
+ÉTAPE 2 : COPIE TES FICHIERS .ENV
+──────────────────────────────────
+Après SETUP_PORTABLE_AUTO.bat, tu dois avoir tes fichiers .env :
+
+Option A - Depuis PC Bureau en Réseau (si PC Bureau accessible):
+  → Double-click : SYNC_ENV_FROM_BUREAU.bat
+  → Entre le chemin du PC Bureau (ex: \\BUREAU\C$\Darknexus-main)
+
+Option B - Manuellement via USB/Cloud:
+  1. Sur PC Bureau, copie ces fichiers :
+     - C:\Darknexus-main\backend\.env
+     - C:\Darknexus-main\frontend\.env.local
+     - C:\Darknexus-main\warzone\backend\.env
+     - C:\Darknexus-main\warzone\frontend\.env.local
+
+  2. Colle-les dans les mêmes chemins sur PC Portable
+
+Option C - Je t'envoie par email/Discord les .env (plus sûr):
+  Attends, je te les génère ou les envoie
+
+
+ÉTAPE 3 : LANCE LES APPS
+────────────────────────
+Double-click sur les batch scripts (au choix):
+
+WARZONE (AI Chat Gaming):
+  → LANCER_WARZONE.bat
+  → Ouvre http://localhost:3000
+
+LOTTERY (Prédictions & Sports):
+  → LANCER_LOTTERY.bat
+  → Ouvre http://localhost:5173
+
+KILLAGAIN FOOD (Admin Restaurant):
+  → LANCER_KILLAGAIN_FOOD.bat
+  → Ouvre http://localhost:5173/killagain
+
+Tout tourne en local sur ton portable! 🎉
+
+
+TROUBLESHOOT
+────────────
+
+❌ "ModuleNotFoundError: No module named X"
+   → Venv pas activé ou pip install échoué
+   → Réouvre SETUP_PORTABLE_AUTO.bat
+
+❌ "npm ERR! code ERESOLVE"
+   → Efface node_modules/ et package-lock.json
+   → npm install
+
+❌ Blank page frontend
+   → Ctrl+F12 (DevTools)
+   → Onglet Console : cherche erreurs
+   → Vérifie VITE_API_URL dans .env.local
+
+❌ Backend 404 / "Cannot GET"
+   → Backend pas lancé
+   → Vérifie http://localhost:5000/api/health
+
+
+SYNC ENTRE BUREAU ET PORTABLE
+──────────────────────────────
+Tu codes sur PORTABLE:
+  1. git add .
+  2. git commit -m "..."
+  3. git push origin main
+
+Tu reviens au BUREAU:
+  1. git pull origin main
+  2. Test que tout tourne
+
+(Ou l'inverse)
+
+
+BESOIN D'AIDE?
+──────────────
+Consulte :
+  → SETUP_PC_PORTABLE.md (guide complet)
+  → docs/INSTALL_GUIDE.md
+  → docs/START_HERE.md
+
+
+═══════════════════════════════════════════════════════════════
+
+À toi de jouer! Lance SETUP_PORTABLE_AUTO.bat quand prêt. 🚀
+
+═══════════════════════════════════════════════════════════════
