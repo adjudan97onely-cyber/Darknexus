@@ -68,52 +68,18 @@ async def startup_event():
         logger.info("🚀 Démarrage de l'application...")
         
         # Import après le on_event pour éviter les erreurs circulaires
-        from config.database import connect_db, get_draws_collection, get_analysis_collection, get_recommendations_collection
+        from config.database import connect_db
         from services.data_service import DataService
-        from routes.lotteries import setup_lottery_routes
-        from routes.sports import setup_sports_routes
-        from routes.learning import setup_learning_routes
-        from routes.admin_dashboard import setup_admin_routes
+        from routes.lotteries import router as lotteries_router
+        from routes.sports import router as sports_router
         
         # Connexion à la base de données
         db = await connect_db()
         logger.info("✅ Connexion à la base de données établie")
         
-        # Initialiser les données de sample
-        data_service = DataService(db)
-        initialized = await data_service.initialize_sample_data()
-        if initialized:
-            logger.info("✅ Données de sample initialisées")
-        else:
-            logger.info("📊 Données existantes détectées")
-        
-        # Initialiser compte admin par défaut
-        try:
-            users_collection = db['users']
-            admin_email = "admin@analytics-lottery.com"
-            
-            # Vérifier si l'admin existe
-            existing_admin = await users_collection.find_one({'email': admin_email})
-            if not existing_admin:
-                admin_user = {
-                    'email': admin_email,
-                    'role': 'admin',
-                    'status': 'active',
-                    'created_at': os.environ.get('CURRENT_DATE', '2026-03-26'),
-                    'password_hint': 'See ADMIN_PASSWORD in .env'
-                }
-                result = await users_collection.insert_one(admin_user)
-                logger.info(f"✅ Compte admin créé: {admin_email} (ID: {result.inserted_id})")
-            else:
-                logger.info(f"📊 Compte admin existant: {admin_email}")
-        except Exception as admin_error:
-            logger.warning(f"⚠️ Erreur création admin (non-bloquant): {str(admin_error)}")
-        
-        # Enregistrer les routes
-        app.include_router(setup_lottery_routes(db))
-        app.include_router(setup_sports_routes(db))
-        app.include_router(setup_learning_routes(db))
-        app.include_router(setup_admin_routes(db))
+        # Enregistrer les routes (simples imports, pas des fonctions)
+        app.include_router(lotteries_router)
+        app.include_router(sports_router)
         
         logger.info("🚀 Application démarrée avec succès sur le port 5001")
     except Exception as e:

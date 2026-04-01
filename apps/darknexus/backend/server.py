@@ -4,7 +4,7 @@ from starlette.middleware.cors import CORSMiddleware
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field
 from typing import List
 import uuid
 from datetime import datetime, timezone
@@ -33,8 +33,6 @@ api_router = APIRouter(prefix="/api")
 
 # Define Models
 class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -119,9 +117,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    await close_client()
+# Shutdown event disabled due to Pydantic v1 compatibility
+# @app.on_event("shutdown")
+# async def shutdown_db_client():
+#     await close_client()
 
 if __name__ == "__main__":
     import uvicorn
