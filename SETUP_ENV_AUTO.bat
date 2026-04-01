@@ -70,7 +70,7 @@ if "%COMPUTERNAME_LOWER%"=="DESKTOP-AL96PS2" (
 )
 
 REM PC PORTABLE
-if "%COMPUTERNAME_LOWER%"=="DESKTOP-PG9OU8" (
+if "%COMPUTERNAME_LOWER%"=="DESKTOP-PG9OUJ8" (
     echo ✅ PC PORTABLE détecté!
     echo Création des fichiers .env pour le PC Portable...
     echo.
