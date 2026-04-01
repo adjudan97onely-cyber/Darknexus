@@ -1,88 +1,92 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
+cd /d "%~dp0"
+set "PYTHON=%~dp0_publish\Darknexus-full\analytics-lottery\backend\venv\Scripts\python.exe"
 
 echo.
-echo ═══════════════════════════════════════════════════════════
-echo              DARKNEXUS - Menu de lancement  
-echo ═══════════════════════════════════════════════════════════
+echo ============================================================
+echo   DARKNEXUS - Menu principal
+echo ============================================================
 echo.
-echo   [1] Analytics Lottery   (backend 5001 / frontend 5173)
-echo   [2] Killagain Food      (frontend 5180)
-echo   [3] Warzone DEV ⭐      (ta version mise a jour)
-echo   [4] Warzone Stable      (version pour utilisateurs)
-echo   [5] Darknexus Platform  (backend 5000 / frontend 3000)
-echo   [6] Lancer TOUT
+echo   [1] Darknexus principal   (backend 5000 / frontend 3000)
+echo   [2] Analytics             (backend 5001 / frontend 5173)
+echo   [3] Warzone               (backend 5003 / frontend 3001)
+echo   [4] Killagain Food        (backend 5002 / frontend 5180)
+echo   [5] Lancer TOUT
+echo   [6] Arreter TOUT
 echo   [0] Quitter
 echo.
-set /p CHOIX=Ton choix:
+set /p CHOIX=Ton choix: 
 
-if "%CHOIX%"=="1" goto :lottery
-if "%CHOIX%"=="2" goto :food
-if "%CHOIX%"=="3" goto :warzone_dev
-if "%CHOIX%"=="4" goto :warzone_stable
-if "%CHOIX%"=="5" goto :darknexus
-if "%CHOIX%"=="6" goto :all
+if "%CHOIX%"=="1" goto :darknexus
+if "%CHOIX%"=="2" goto :analytics
+if "%CHOIX%"=="3" goto :warzone
+if "%CHOIX%"=="4" goto :food
+if "%CHOIX%"=="5" goto :all
+if "%CHOIX%"=="6" goto :stop
 if "%CHOIX%"=="0" exit /b 0
+
 echo Choix invalide.
 pause
-goto :eof
-
-:lottery
-echo.
-echo [1/6] Lancement ANALYTICS LOTTERY...
-start "" "%~dp0projects\analytics-lottery\START.bat"
-goto :eof
-
-:food
-echo.
-echo [2/6] Lancement KILLAGAIN FOOD...
-start "" "%~dp0killagain-food\start-app.bat"
-goto :eof
-
-:warzone_dev
-echo.
-echo [3/6] Lancement WARZONE DEV (ta mise a jour)...
-start "" "%~dp0projects\warzone-DEV\START.bat"
-goto :eof
-
-:warzone_stable
-echo.
-echo [4/6] Lancement WARZONE STABLE (utilisateurs)...
-start "" "%~dp0projects\warzone\START.bat"
-goto :eof
+exit /b 1
 
 :darknexus
-echo.
-echo [5/6] Lancement DARKNEXUS PLATFORM...
-start "" "%~dp0apps\darknexus\START.bat"
-goto :eof
+start "Darknexus Backend" cmd /k "cd /d ""%~dp0backend"" && ""%PYTHON%"" server.py"
+timeout /t 3 /nobreak >nul
+start "Darknexus Frontend" cmd /k "cd /d ""%~dp0frontend"" && set REACT_APP_BACKEND_URL=http://localhost:5000 && set BROWSER=none && npm start"
+timeout /t 5 /nobreak >nul
+start "" "http://localhost:3000"
+exit /b 0
+
+:analytics
+start "Analytics Backend" cmd /k "cd /d ""%~dp0analytics\backend"" && ""%PYTHON%"" -m uvicorn main:app --host 0.0.0.0 --port 5001"
+timeout /t 3 /nobreak >nul
+start "Analytics Frontend" cmd /k "cd /d ""%~dp0analytics\frontend"" && set VITE_API_URL=http://localhost:5001 && npm run dev"
+timeout /t 5 /nobreak >nul
+start "" "http://localhost:5173"
+exit /b 0
+
+:warzone
+start "Warzone Backend" cmd /k "cd /d ""%~dp0warzone\backend"" && ""%PYTHON%"" -m uvicorn server:app --host 0.0.0.0 --port 5003"
+timeout /t 3 /nobreak >nul
+start "Warzone Frontend" cmd /k "cd /d ""%~dp0warzone\frontend"" && set REACT_APP_BACKEND_URL=http://localhost:5003 && set PORT=3001 && set BROWSER=none && npm start"
+timeout /t 5 /nobreak >nul
+start "" "http://localhost:3001"
+exit /b 0
+
+:food
+start "Killagain Food Backend" cmd /k "cd /d ""%~dp0killagain-food\backend 2"" && ""%PYTHON%"" start_simple.py"
+timeout /t 3 /nobreak >nul
+start "Killagain Food Frontend" cmd /k "cd /d ""%~dp0killagain-food"" && npm run dev"
+timeout /t 5 /nobreak >nul
+start "" "http://localhost:5180"
+exit /b 0
 
 :all
-echo.
-echo ╔═════════════════════════════════════════════════════════╗
-echo ║     Lancement de TOUTES les applications...            ║
-echo ╚═════════════════════════════════════════════════════════╝
-echo.
+echo Demarrage de tous les backends...
+start "Darknexus Backend"     cmd /k "cd /d ""%~dp0backend""             && ""%PYTHON%"" server.py"
+start "Analytics Backend"     cmd /k "cd /d ""%~dp0analytics\backend""   && ""%PYTHON%"" -m uvicorn main:app --host 0.0.0.0 --port 5001"
+start "Warzone Backend"       cmd /k "cd /d ""%~dp0warzone\backend""      && ""%PYTHON%"" -m uvicorn server:app --host 0.0.0.0 --port 5003"
+start "Killagain Backend"     cmd /k "cd /d ""%~dp0killagain-food\backend 2"" && ""%PYTHON%"" start_simple.py"
+echo Attente 6 secondes...
+timeout /t 6 /nobreak >nul
+echo Demarrage de tous les frontends...
+start "Darknexus Frontend"    cmd /k "cd /d ""%~dp0frontend""             && set REACT_APP_BACKEND_URL=http://localhost:5000 && set BROWSER=none && npm start"
+start "Analytics Frontend"    cmd /k "cd /d ""%~dp0analytics\frontend""   && set VITE_API_URL=http://localhost:5001 && npm run dev"
+start "Warzone Frontend"      cmd /k "cd /d ""%~dp0warzone\frontend""      && set REACT_APP_BACKEND_URL=http://localhost:5003 && set PORT=3001 && set BROWSER=none && npm start"
+start "Killagain Frontend"    cmd /k "cd /d ""%~dp0killagain-food"" && npm run dev"
+echo Attente 10 secondes avant ouverture des navigateurs...
+timeout /t 10 /nobreak >nul
+start "" "http://localhost:3000"
+start "" "http://localhost:5173"
+start "" "http://localhost:3001"
+start "" "http://localhost:5180"
+exit /b 0
 
-echo [1/4] Lancement Analytics Lottery...
-start "" "%~dp0projects\analytics-lottery\START.bat"
-timeout /t 3 /nobreak >nul
-
-echo [2/4] Lancement Killagain Food...
-start "" "%~dp0killagain-food\start-app.bat"
-timeout /t 3 /nobreak >nul
-
-echo [3/4] Lancement Warzone DEV...
-start "" "%~dp0projects\warzone-DEV\START.bat"
-timeout /t 3 /nobreak >nul
-
-echo [4/4] Lancement Darknexus Platform...
-start "" "%~dp0apps\darknexus\START.bat"
-
-echo.
-echo =======================================================
-echo  ✅ Toutes les apps ont ete lancees!
-echo =======================================================
-echo.
+:stop
+echo Arret de tous les processus Python et Node...
+taskkill /f /im python.exe >nul 2>&1
+taskkill /f /im node.exe >nul 2>&1
+echo Tout arrete.
 pause
-goto :eof
+exit /b 0
