@@ -122,11 +122,12 @@ async def get_sports_recommendations(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/matches/predict")
-async def predict_matches(matches: List[Dict]):
-    """Prédit plusieurs matchs"""
+async def predict_matches(payload: Dict):
+    """Prédit plusieurs matchs — accepte {"matches": [...]} ou une liste directe via wrapper"""
     try:
+        matches = payload.get("matches", [payload] if "home" in payload else [])
         predictions = []
-        
+
         for match in matches:
             try:
                 # Utiliser football_brain pour vraie IA

@@ -500,7 +500,7 @@ async def chat_with_ai(request: ChatRequest):
         api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         if not api_key:
             raise HTTPException(status_code=500, detail="AI service not configured")
-        llm_model = os.environ.get('LLM_MODEL', 'gpt-4.1-mini')
+        llm_model = os.environ.get('LLM_MODEL', 'gpt-4o-mini')
         
         # Get chat history for context
         history = await db.chat_messages.find(
@@ -587,7 +587,7 @@ async def generate_master_script():
     master_script = SavedScript(
         title=f"ZEN_COMPLETE_MODS_{version_str} - {len(weapons)} Armes",
         code=full_script,
-        weapon_ids=[w['id'] for w in weapons],
+        weapon_ids=[w.get('id', '') for w in weapons],
         script_type="master"
     )
     await db.scripts.insert_one(master_script.model_dump())
@@ -618,7 +618,7 @@ async def generate_ultimate_master_script():
     master_script = SavedScript(
         title=f"ZEN_ULTIMATE_ADT_{version_str} - Master v6.0",
         code=full_script,
-        weapon_ids=[w['id'] for w in weapons],
+        weapon_ids=[w.get('id', '') for w in weapons],
         script_type="ultimate"
     )
     await db.scripts.insert_one(master_script.model_dump())

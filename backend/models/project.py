@@ -12,7 +12,7 @@ class CodeFile(BaseModel):
 
 class ProjectCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
-    description: str = Field(..., min_length=20, max_length=5000)
+    description: str = Field(..., min_length=1, max_length=5000)
     type: str  # Accept any project type
     tech_stack: Optional[str] = None
     ai_model: Optional[str] = Field(default='gpt-5.1', description="Modèle IA à utiliser")
