@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { bilanAPI } from '../services/api';
+import { bilanAPI } from '../services/apiService';
 
 const LOTTERY_OPTIONS = [
   { value: 'keno', label: 'Keno', icon: 'K', color: 'from-cyan-500 to-blue-600' },

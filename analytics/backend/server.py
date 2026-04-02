@@ -26,6 +26,7 @@ from routes.football_real import router as football_real_router
 from routes.predictions_enriched import router as predictions_enriched_router
 from routes.sports import router as sports_router
 from routes.lotteries import router as lotteries_router
+from routes.keno_engine_routes import router as keno_engine_router
 
 
 ROOT_DIR = Path(__file__).parent
@@ -139,6 +140,9 @@ app.include_router(sports_router)
 
 # Include Lotteries router
 app.include_router(lotteries_router)
+
+# Include Keno Engine router (moteur statistique sérieux)
+app.include_router(keno_engine_router)
 
 # ── Stub routes for frontend pages that expect these endpoints ──
 stub_router = APIRouter(tags=["Stubs"])

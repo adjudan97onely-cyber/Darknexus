@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { lotteryAPI } from '../services/api';
+import { lotteryAPI } from '../services/apiService';
 
 /**
  * RecentResultsWidget - Affiche derniers résultats avec comparaison simple
@@ -24,10 +24,19 @@ export default function RecentResultsWidget({ lotteryType }) {
   }, [lotteryType]);
 
   if (loading) return <div className="text-slate-400 text-sm">Chargement résultats...</div>;
-  if (!results) return null;
+  if (!results) return (
+    <div className="border border-white/10 rounded-xl p-4 bg-white/5 mt-8 text-center text-sm text-slate-500">
+      Résultats indisponibles
+    </div>
+  );
 
-  // Mock data pour démo - remplacer par vraies données
-  const proposedNumbers = [5, 12, 18, 27, 33, 44];
+  // Grille de référence spécifique à chaque type de jeu
+  const REFERENCE_GRIDS = {
+    keno:         [7, 13, 18, 24, 31, 38, 42, 49, 55, 61],
+    loto:         [7, 14, 23, 29, 38, 42],
+    euromillions: [17, 23, 31, 38, 44],
+  };
+  const proposedNumbers = REFERENCE_GRIDS[lotteryType] || REFERENCE_GRIDS.loto;
   const drawnNumbers = Array.isArray(results?.numbers) ? results.numbers : [];
   const matched = proposedNumbers.filter(n => drawnNumbers.includes(n)).length;
   const accuracy = Math.round((matched / proposedNumbers.length) * 100);

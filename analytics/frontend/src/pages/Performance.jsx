@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, LineChart, Line } from 'recharts';
-import { dashboardAPI } from '../services/api';
+import { dashboardAPI } from '../services/apiService';
 import StatCard from '../components/StatCard';
 
 export default function Performance() {

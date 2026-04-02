@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import fastapi, motor, jose, openai; print\\('OK - deps OK'\\)\")",
+      "Bash(python -c ':*)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(/c/Darknexus-main/_publish/Darknexus-full/analytics-lottery/backend/venv/Scripts/python.exe:*)",
+      "Bash(xargs wc:*)",
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :5001)",
+      "Bash(wmic process:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd:*)",
+      "Bash(powershell:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:forum.excel-pratique.com)",
+      "WebFetch(domain:www.urlquery.net)",
+      "WebFetch(domain:www.sto.api.fdj.fr)",
+      "WebFetch(domain:forum.pcsoft.fr)",
+      "WebFetch(domain:www.webrankinfo.com)",
+      "Bash(unzip -o keno_202010.zip)",
+      "Bash(unzip -o keno_old.zip)",
+      "Bash(unzip -o keno_201811.zip)",
+      "Bash(unzip -o keno_gagnant.zip)",
+      "Bash(pkill -f \"analytics/backend/server.py\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(grep:*)",
+      "Bash(node:*)"
+    ]
+  }
+}

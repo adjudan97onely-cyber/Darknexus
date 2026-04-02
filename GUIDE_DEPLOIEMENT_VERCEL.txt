@@ -1,0 +1,73 @@
+====================================================
+  GUIDE DEPLOIEMENT VERCEL — À COLLER POUR CLAUDE
+====================================================
+
+Bonjour, je veux déployer une nouvelle application sur Vercel.
+Voici le contexte pour que tu m'aides correctement :
+
+---
+
+MON PROFIL :
+- Je parle uniquement français
+- Explique-moi ce que tu fais AVANT de le faire
+- Mon GitHub : adjudan97onely-cyber
+- Mes projets sont déployés sur Vercel (compte adjudan97onely-6632)
+
+---
+
+MA STACK HABITUELLE :
+- Frontend : Expo React Native (web) avec Expo Router
+- Backend : FastAPI Python (déployé sur Railway)
+- Build frontend : npx expo export --platform web → dossier dist/
+- Déploiement : Vercel (auto-déploiement depuis GitHub)
+
+---
+
+STRUCTURE TYPIQUE DE MON PROJET :
+projet/
+├── frontend/
+│   ├── app/           ← pages Expo Router
+│   ├── assets/        ← images, fonts
+│   ├── public/        ← fichiers statiques (manifest, sw, icônes PWA)
+│   ├── app.json       ← config Expo
+│   ├── package.json
+│   └── vercel.json    ← config déploiement
+└── backend/
+    ├── server.py
+    └── requirements.txt
+
+---
+
+RÈGLES IMPORTANTES QUE TU DOIS RESPECTER :
+
+1. PWA — ICÔNES :
+   La règle SPA "/(.*) → index.html" bloque les images si elles sont
+   dans /assets/images/. Les icônes du manifest.json DOIVENT être
+   dans frontend/public/ (ex: icon-192.png, icon-512.png) pour être
+   accessibles directement.
+
+2. PWA — FICHIERS REQUIS :
+   - public/manifest.json (nom, icônes, couleurs, display: standalone)
+   - public/sw.js (service worker avec install + fetch handlers)
+   - public/icon-192.png et icon-512.png
+   - Dans app/+html.tsx : <link rel="manifest" href="/manifest.json" />
+     et le script d'enregistrement du SW
+
+3. DÉPLOIEMENT :
+   - Je pousse sur GitHub (branche main)
+   - Vercel redéploie automatiquement (~2 min)
+   - URL format : nom-projet.vercel.app
+
+4. POUSSER LES CHANGEMENTS :
+   Je clone localement, tu fais les modifications, et je pousse avec :
+   git push origin main
+
+---
+
+CE QUE TU DOIS FAIRE POUR MOI :
+- Cloner le repo depuis GitHub
+- Faire toutes les modifications nécessaires
+- Créer un commit clair
+- Me donner la commande exacte pour pousser
+
+====================================================

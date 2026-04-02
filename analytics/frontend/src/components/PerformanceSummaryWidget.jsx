@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { dashboardAPI } from '../services/api';
+import { dashboardAPI } from '../services/apiService';
 
 /**
  * PerformanceSummaryWidget - Affiche % réussite global + derniers résultats

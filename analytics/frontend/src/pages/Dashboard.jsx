@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BarChart, Bar, CartesianGrid, LineChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { dashboardAPI } from '../services/api';
+import { dashboardAPI } from '../services/apiService';
 import { activePredictionsService } from '../services/realDataService';
 import StatCard from '../components/StatCard';
 import PerformanceSummaryWidget from '../components/PerformanceSummaryWidget';

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { authAPI, getApiErrorMessage } from '../services/api';
+import { authAPI, getApiErrorMessage } from '../services/apiService';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');

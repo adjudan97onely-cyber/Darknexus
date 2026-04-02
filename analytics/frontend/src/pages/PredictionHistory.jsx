@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { dashboardAPI } from '../services/api';
+import { dashboardAPI } from '../services/apiService';
 
 export default function PredictionHistory() {
   const [items, setItems] = useState([]);

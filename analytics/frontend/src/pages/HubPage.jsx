@@ -232,8 +232,8 @@ function PlayMode({ onPlayPrediction, saving, matches = [], matchesLoading = fal
               ⏳ Chargement des matchs réels...
             </div>
           ) : matchesError ? (
-            <div className="text-center py-8 text-red-400">
-              ❌ Erreur: {matchesError}
+            <div className="text-center py-8 text-slate-400">
+              ℹ️ Matchs temporairement indisponibles — réessaie dans quelques instants
             </div>
           ) : matches.length === 0 ? (
             <div className="text-center py-8 text-slate-400">

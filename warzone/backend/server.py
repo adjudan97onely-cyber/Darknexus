@@ -552,7 +552,25 @@ async def chat_with_ai(request: ChatRequest):
         
     except Exception as e:
         logging.error(f"Chat error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+        error_str = str(e)
+        if "401" in error_str or "invalid_api_key" in error_str or "Incorrect API key" in error_str:
+            # Clé invalide : retourner un vrai 200 avec message lisible plutôt qu'un crash 500
+            fallback_msg = (
+                "⚠️ Clé OpenAI invalide ou expirée.\n\n"
+                "Pour réactiver l'IA :\n"
+                "1. Va sur https://platform.openai.com/api-keys\n"
+                "2. Crée une nouvelle clé\n"
+                "3. Mets-la dans warzone/backend/.env → OPENAI_API_KEY=sk-...\n"
+                "4. Redémarre le backend"
+            )
+            await db.chat_messages.insert_one(ChatMessage(
+                session_id=request.session_id, role="user", content=request.message
+            ).model_dump())
+            await db.chat_messages.insert_one(ChatMessage(
+                session_id=request.session_id, role="assistant", content=fallback_msg
+            ).model_dump())
+            return ChatResponse(response=fallback_msg, session_id=request.session_id)
+        raise HTTPException(status_code=500, detail=f"AI service error: {error_str}")
 
 @api_router.get("/chat/{session_id}", response_model=List[ChatMessage])
 async def get_chat_history(session_id: str):

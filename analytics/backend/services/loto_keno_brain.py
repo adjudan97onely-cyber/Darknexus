@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 # =========================
 
 GAME_CONFIG = {
-    "KENO": {"min_num": 1, "max_num": 80, "draw_count": 20},
+    "KENO": {"min_num": 1, "max_num": 70, "draw_count": 20},
     "LOTO": {"min_num": 1, "max_num": 49, "draw_count": 6},
     "EUROMILLIONS": {"min_num": 1, "max_num": 50, "draw_count": 5}
 }

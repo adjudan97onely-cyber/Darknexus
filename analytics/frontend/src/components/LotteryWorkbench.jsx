@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { lotteryAPI } from '../services/api';
+import { lotteryAPI } from '../services/apiService';
 import StatCard from './StatCard';
 import RecentResultsWidget from './RecentResultsWidget';
 

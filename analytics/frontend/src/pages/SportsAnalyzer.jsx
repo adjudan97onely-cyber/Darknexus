@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { BarChart, Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { sportsAPI } from '../services/api';
+import { sportsAPI } from '../services/apiService';
 import StatCard from '../components/StatCard';
 import QuickActionBar from '../components/QuickActionBar';
 import TopMatchesSection from '../components/TopMatchesSection';

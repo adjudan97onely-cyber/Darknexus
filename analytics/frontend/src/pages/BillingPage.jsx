@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { subscriptionAPI, getApiErrorMessage } from '../services/api';
+import { subscriptionAPI, getApiErrorMessage } from '../services/apiService';
 
 export default function BillingPage() {
   const [plans, setPlans] = useState([]);

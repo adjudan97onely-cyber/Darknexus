@@ -14,6 +14,7 @@ const AuthPage = lazy(() => import('./pages/AuthPage'));
 const BillingPage = lazy(() => import('./pages/BillingPage'));
 const BilanIA = lazy(() => import('./pages/BilanIA'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const KenoEngine = lazy(() => import('./pages/KenoEngine'));
 
 const NAV_ITEMS = [
   { to: '/hub', label: '🎯 Hub', icon: '★' },
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { to: '/auth', label: 'Compte', icon: 'U' },
   { to: '/billing', label: 'Abonnement', icon: '$' },
   { to: '/admin', label: '🔐 Admin', icon: '🔑' },
+  { to: '/keno-engine', label: '🔬 Keno Engine', icon: 'K2' },
   { to: '/keno', label: 'Keno', icon: 'K' },
   { to: '/euromillions', label: 'EuroMillions', icon: 'E' },
   { to: '/loto', label: 'Loto', icon: 'L' },
@@ -87,6 +89,7 @@ export default function App() {
                 <Route path="/billing" element={<BillingPage />} />
                 <Route path="/bilan" element={<BilanIA />} />
                 <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/keno-engine" element={<KenoEngine />} />
                 <Route path="/keno" element={<KenoAnalyzer />} />
                 <Route path="/euromillions" element={<EuroMillionsAnalyzer />} />
                 <Route path="/loto" element={<LotoAnalyzer />} />

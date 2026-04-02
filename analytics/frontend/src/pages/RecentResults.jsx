@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { dashboardAPI, lotteryAPI } from '../services/api';
+import { dashboardAPI, lotteryAPI } from '../services/apiService';
 
 export default function RecentResults() {
   const [latest, setLatest] = useState([]);
