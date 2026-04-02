@@ -1,5 +1,11 @@
 @echo off
 setlocal
+echo.
+echo 🧹 Nettoyage des anciens process...
+taskkill /F /IM python.exe >nul 2>&1
+taskkill /F /IM node.exe >nul 2>&1
+echo ✅ Clean terminé !
+echo.
 cd /d "%~dp0"
 set "PYTHON=%~dp0_publish\Darknexus-full\analytics-lottery\backend\venv\Scripts\python.exe"
 

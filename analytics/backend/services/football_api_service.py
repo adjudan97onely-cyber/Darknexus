@@ -1,285 +1,231 @@
 """
-Service Football - TEMPS RÉEL
-Récupère MATCHS ACTUELS, du JOUR et FUTURS
-Utilise football-data.org API (matchs actuels/futurs UNIQUEMENT)
+Service Football — football-data.org v4
+Couvre : Ligue 1, Premier League, La Liga, Serie A, Bundesliga
 """
 
 import httpx
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from dotenv import load_dotenv
 
-# Charge les variables d'environnement
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# API football-data.org - Temps réel
-FOOTBALL_DATA_API = "https://api.football-data.org/v4"
+FOOTBALL_DATA_KEY  = os.getenv("FOOTBALL_DATA_KEY", "")
+FOOTBALL_DATA_BASE = "https://api.football-data.org/v4"
 
-# Clé API chargée depuis .env
-FOOTBALL_DATA_KEY = os.getenv("FOOTBALL_DATA_KEY", "PLACEHOLDER_API_KEY")
-if FOOTBALL_DATA_KEY == "PLACEHOLDER_API_KEY":
+HEADERS = {
+    "X-Auth-Token": FOOTBALL_DATA_KEY,
+}
+
+if not FOOTBALL_DATA_KEY:
     logger.warning("⚠️ FOOTBALL_DATA_KEY non configurée dans .env")
 
-# Ligues actuelles
-LEAGUES = {
-    'bundesliga': {'id': 'BL1', 'name': 'Bundesliga', 'country': 'Germany'},
-    'ligue1': {'id': 'FL1', 'name': 'Ligue 1', 'country': 'France'},
-    'premier': {'id': 'PL', 'name': 'Premier League', 'country': 'England'},
-    'serie-a': {'id': 'SA', 'name': 'Serie A', 'country': 'Italy'},
-    'la-liga': {'id': 'PD', 'name': 'La Liga', 'country': 'Spain'},
+# Codes des ligues cibles sur football-data.org
+TARGET_COMPETITIONS = {
+    "PL":  {"name": "Premier League", "country": "England"},
+    "FL1": {"name": "Ligue 1",        "country": "France"},
+    "PD":  {"name": "Primera Division", "country": "Spain"},
+    "SA":  {"name": "Serie A",        "country": "Italy"},
+    "BL1": {"name": "Bundesliga",     "country": "Germany"},
+}
+
+# Alias de compatibilité
+LEAGUES = TARGET_COMPETITIONS
+
+# Alias pour normaliser les noms de ligue
+LEAGUE_ALIASES = {
+    "primera division": "La Liga",
+    "primera división": "La Liga",
+    "pd": "La Liga",
 }
 
 
-async def get_live_matches() -> List[dict]:
-    """Récupère les matchs EN COURS (LIVE)"""
+def _normalize_league(name: str) -> str:
+    return LEAGUE_ALIASES.get(name.lower(), name)
+
+
+def _format_match(match: dict, competition_code: str) -> Optional[dict]:
+    """Convertit un match football-data.org en format interne."""
     try:
-        headers = {"X-Auth-Token": FOOTBALL_DATA_KEY}
-        
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            url = f"{FOOTBALL_DATA_API}/matches?status=LIVE"
-            response = await client.get(url, headers=headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                matches = data.get('matches', [])
-                
-                formatted = [_format_match(m) for m in matches]
-                live_matches = [m for m in formatted if m]
-                
-                logger.info(f"✅ {len(live_matches)} matchs EN COURS")
-                return live_matches
-            
-            logger.warning(f"⚠️ Erreur API LIVE: {response.status_code}")
-            return []
-    
+        home = match.get("homeTeam", {}) or {}
+        away = match.get("awayTeam", {}) or {}
+        competition = match.get("competition", {}) or {}
+        area = match.get("area", {}) or {}
+
+        utc_date = match.get("utcDate", "")
+        if not utc_date:
+            return None
+
+        match_dt = datetime.fromisoformat(utc_date.replace("Z", "+00:00"))
+
+        status_raw = match.get("status", "TIMED")
+        if status_raw in ("IN_PLAY", "PAUSED", "HALFTIME"):
+            display_status = "live"
+        elif status_raw == "FINISHED":
+            display_status = "finished"
+        else:
+            display_status = "scheduled"
+
+        score_home = score_away = None
+        if display_status in ("live", "finished"):
+            score = match.get("score", {}) or {}
+            full = score.get("fullTime", {}) or {}
+            score_home = full.get("home")
+            score_away = full.get("away")
+
+        league_name = _normalize_league(competition.get("name", "Unknown"))
+        country = area.get("name", TARGET_COMPETITIONS.get(competition_code, {}).get("country", "Unknown"))
+
+        return {
+            "id":            match.get("id"),
+            "homeTeam":      home.get("name", "Unknown"),
+            "awayTeam":      away.get("name", "Unknown"),
+            "league":        league_name,
+            "country":       country,
+            "matchDateTime": match_dt.isoformat(),
+            "time":          match_dt.strftime("%H:%M"),
+            "date":          match_dt.strftime("%Y-%m-%d"),
+            "status":        display_status,
+            "goalsHome":     score_home,
+            "goalsAway":     score_away,
+            "tournamentId":  competition.get("id"),
+            "confidence":    85,
+        }
     except Exception as e:
-        logger.error(f"❌ Erreur matchs live: {e}")
+        logger.warning(f"⚠️ Erreur formatage match: {e}")
+        return None
+
+
+async def _fetch_competition_matches(code: str, date_from: str, date_to: str, status: str = "SCHEDULED,TIMED") -> List[dict]:
+    """Récupère les matchs d'une compétition entre deux dates."""
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            url = f"{FOOTBALL_DATA_BASE}/competitions/{code}/matches"
+            params = {"dateFrom": date_from, "dateTo": date_to, "status": status}
+            resp = await client.get(url, headers=HEADERS, params=params)
+
+            if resp.status_code == 200:
+                data = resp.json()
+                matches = data.get("matches", [])
+                formatted = [_format_match(m, code) for m in matches]
+                return [m for m in formatted if m]
+
+            logger.warning(f"⚠️ football-data.org {code}: HTTP {resp.status_code}")
+            return []
+
+    except Exception as e:
+        logger.error(f"❌ Erreur fetch {code}: {e}")
         return []
+
+
+async def get_live_matches() -> List[dict]:
+    """Matchs EN COURS dans les ligues cibles."""
+    all_matches: List[dict] = []
+    seen_ids = set()
+
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    for code in TARGET_COMPETITIONS:
+        matches = await _fetch_competition_matches(code, today, today, status="IN_PLAY,PAUSED,HALFTIME")
+        for m in matches:
+            mid = m.get("id")
+            if mid not in seen_ids:
+                seen_ids.add(mid)
+                all_matches.append(m)
+
+    logger.info(f"✅ {len(all_matches)} matchs LIVE (ligues cibles)")
+    return all_matches
 
 
 async def get_todays_matches() -> List[dict]:
-    """Récupère les matchs du JOUR"""
-    today = datetime.now().strftime('%Y-%m-%d')
-    
-    try:
-        headers = {"X-Auth-Token": FOOTBALL_DATA_KEY}
-        
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            url = f"{FOOTBALL_DATA_API}/matches?dateFrom={today}&dateTo={today}"
-            response = await client.get(url, headers=headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                matches = data.get('matches', [])
-                
-                formatted = [_format_match(m) for m in matches]
-                today_matches = [m for m in formatted if m]
-                
-                logger.info(f"✅ {len(today_matches)} matchs AUJOURD'HUI")
-                return today_matches
-            
-            logger.warning(f"⚠️ Erreur API aujourd'hui: {response.status_code}")
-            return []
-    
-    except Exception as e:
-        logger.error(f"❌ Erreur matchs du jour: {e}")
-        return []
+    """Matchs du jour dans les ligues cibles."""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    all_matches: List[dict] = []
+    seen_ids = set()
+
+    for code in TARGET_COMPETITIONS:
+        matches = await _fetch_competition_matches(code, today, today, status="SCHEDULED,TIMED,IN_PLAY,PAUSED")
+        for m in matches:
+            mid = m.get("id")
+            if mid not in seen_ids:
+                seen_ids.add(mid)
+                all_matches.append(m)
+
+    logger.info(f"✅ {len(all_matches)} matchs AUJOURD'HUI (ligues cibles)")
+    return all_matches
 
 
 async def get_upcoming_matches(days: int = 7) -> List[dict]:
-    """Récupère les matchs des X prochains jours"""
-    today = datetime.now().strftime('%Y-%m-%d')
-    future = (datetime.now() + timedelta(days=days)).strftime('%Y-%m-%d')
-    
-    try:
-        headers = {"X-Auth-Token": FOOTBALL_DATA_KEY}
-        
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            url = f"{FOOTBALL_DATA_API}/matches?status=SCHEDULED&dateFrom={today}&dateTo={future}"
-            response = await client.get(url, headers=headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                matches = data.get('matches', [])
-                
-                formatted = [_format_match(m) for m in matches]
-                upcoming = [m for m in formatted if m]
-                
-                logger.info(f"✅ {len(upcoming)} matchs à venir (7j)")
-                return upcoming
-            
-            logger.warning(f"⚠️ Erreur API futurs: {response.status_code}")
-            return []
-    
-    except Exception as e:
-        logger.error(f"❌ Erreur matchs futurs: {e}")
-        return []
+    """Matchs des X prochains jours dans les ligues cibles."""
+    date_from = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    date_to   = (datetime.now(timezone.utc) + timedelta(days=days)).strftime("%Y-%m-%d")
+
+    all_matches: List[dict] = []
+    seen_ids = set()
+
+    for code in TARGET_COMPETITIONS:
+        matches = await _fetch_competition_matches(code, date_from, date_to, status="SCHEDULED,TIMED")
+        for m in matches:
+            if m.get("status") == "finished":
+                continue
+            mid = m.get("id")
+            if mid not in seen_ids:
+                seen_ids.add(mid)
+                all_matches.append(m)
+
+    all_matches.sort(key=lambda m: m.get("matchDateTime", ""))
+    logger.info(f"✅ {len(all_matches)} matchs à venir ({days}j, ligues cibles)")
+    return all_matches
 
 
 async def get_all_current_matches() -> List[dict]:
-    """Récupère TOUS les matchs actuels/futurs"""
+    """Live + aujourd'hui + prochains 14 jours, dédupliqués."""
     try:
-        live = await get_live_matches()
-        today = await get_todays_matches()
+        live     = await get_live_matches()
+        today    = await get_todays_matches()
         upcoming = await get_upcoming_matches(days=14)
-        
-        # Combiner et dédupliquer par ID
-        all_matches = live + today + upcoming
+
         seen_ids = set()
-        unique_matches = []
-        
-        for match in all_matches:
-            match_id = match.get('id')
-            if match_id not in seen_ids:
-                seen_ids.add(match_id)
-                unique_matches.append(match)
-        
-        unique_matches.sort(key=lambda m: m.get('matchDateTime', ''))
-        logger.info(f"✅ Total: {len(unique_matches)} matchs actuels/futurs")
-        
-        return unique_matches
-    
+        unique: List[dict] = []
+        for m in live + today + upcoming:
+            mid = m.get("id")
+            if mid not in seen_ids:
+                seen_ids.add(mid)
+                unique.append(m)
+
+        unique.sort(key=lambda m: m.get("matchDateTime", ""))
+        logger.info(f"✅ Total: {len(unique)} matchs actuels/futurs")
+        return unique
+
     except Exception as e:
-        logger.error(f"❌ Erreur collecte matchs: {e}")
+        logger.error(f"❌ Erreur collecte: {e}")
         return []
 
 
 async def search_by_league(league_filter: str) -> List[dict]:
-    """Recherche matchs ACTUELS/FUTURS d'une ligue spécifique"""
-    league_filter = league_filter.lower().strip()
-    
-    league_info = None
-    for key, l in LEAGUES.items():
-        if league_filter in [key, l['name'].lower()]:
-            league_info = l
-            break
-    
-    if not league_info:
-        logger.warning(f"⚠️ Ligue non trouvée: {league_filter}")
-        return []
-    
-    try:
-        headers = {"X-Auth-Token": FOOTBALL_DATA_KEY}
-        today = datetime.now().strftime('%Y-%m-%d')
-        future = (datetime.now() + timedelta(days=14)).strftime('%Y-%m-%d')
-        
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            url = f"{FOOTBALL_DATA_API}/competitions/{league_info['id']}/matches?status=SCHEDULED,LIVE,TIMED,FINISHED&dateFrom={today}&dateTo={future}"
-            response = await client.get(url, headers=headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                matches = data.get('matches', [])
-                
-                # Filtrer: garder seulement LIVE, SCHEDULED, TIMED (pas FINISHED)
-                matches = [m for m in matches if m.get('status') in ['LIVE', 'SCHEDULED', 'TIMED']]
-                
-                formatted = [_format_match(m, league_info['country']) for m in matches]
-                league_matches = [m for m in formatted if m]
-                
-                logger.info(f"✅ {len(league_matches)} matchs {league_filter} (actuels/futurs)")
-                return league_matches
-            
-            logger.warning(f"⚠️ Erreur API {league_filter}: {response.status_code}")
-            return []
-    
-    except Exception as e:
-        logger.error(f"❌ Erreur recherche ligue {league_filter}: {e}")
-        return []
+    """Matchs à venir d'une ligue spécifique."""
+    league_lower = league_filter.lower().strip()
+    matches = await get_upcoming_matches(days=14)
+    result = [
+        m for m in matches
+        if league_lower in m.get("league", "").lower()
+        or league_lower in m.get("country", "").lower()
+    ]
+    logger.info(f"✅ {len(result)} matchs pour '{league_filter}'")
+    return result
 
 
 async def search_by_country(country_filter: str) -> List[dict]:
-    """Recherche matchs ACTUELS/FUTURS d'un pays"""
-    country_filter = country_filter.lower().strip()
-    
-    matching = [
-        l for l in LEAGUES.values()
-        if country_filter in l['country'].lower()
+    """Matchs à venir d'un pays spécifique."""
+    country_lower = country_filter.lower().strip()
+    matches = await get_upcoming_matches(days=14)
+    result = [
+        m for m in matches
+        if country_lower in m.get("country", "").lower()
     ]
-    
-    if not matching:
-        logger.warning(f"⚠️ Pays non trouvé: {country_filter}")
-        return []
-    
-    all_matches = []
-    for league_info in matching:
-        try:
-            headers = {"X-Auth-Token": FOOTBALL_DATA_KEY}
-            today = datetime.now().strftime('%Y-%m-%d')
-            future = (datetime.now() + timedelta(days=14)).strftime('%Y-%m-%d')
-            
-            async with httpx.AsyncClient(timeout=10.0) as client:
-                url = f"{FOOTBALL_DATA_API}/competitions/{league_info['id']}/matches?status=SCHEDULED,LIVE,TIMED,FINISHED&dateFrom={today}&dateTo={future}"
-                response = await client.get(url, headers=headers)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    matches = data.get('matches', [])
-                    
-                    for m in matches:
-                        fm = _format_match(m, league_info['country'])
-                        if fm:
-                            all_matches.append(fm)
-        
-        except Exception as e:
-            logger.warning(f"⚠️ Erreur {league_info['name']}: {e}")
-    
-    all_matches.sort(key=lambda m: m.get('matchDateTime', ''))
-    logger.info(f"✅ {len(all_matches)} matchs pays {country_filter} (actuels/futurs)")
-    
-    return all_matches
-
-
-def _format_match(match: dict, country: str = 'Unknown') -> Optional[dict]:
-    """Formate un match football-data.org en format standardisé"""
-    try:
-        status = match.get('status', 'TIMED')
-        utc_date = match.get('utcDate', '')
-        
-        if not utc_date:
-            return None
-        
-        # Parser la date ISO
-        match_date = datetime.fromisoformat(utc_date.replace('Z', '+00:00'))
-        
-        # Extraire équipes
-        home = match.get('homeTeam', {})
-        away = match.get('awayTeam', {})
-        
-        # Déterminer le statut pour le frontend
-        if status == 'LIVE':
-            display_status = 'live'
-        elif status == 'FINISHED':
-            display_status = 'finished'
-        else:
-            display_status = 'scheduled'
-        
-        # Extraire résultats si disponibles
-        score = match.get('score', {})
-        goals_home = score.get('fullTime', {}).get('home')
-        goals_away = score.get('fullTime', {}).get('away')
-        
-        # Créer la réponse formatée
-        return {
-            'id': match.get('id'),
-            'homeTeam': home.get('name', 'Unknown'),
-            'awayTeam': away.get('name', 'Unknown'),
-            'league': match.get('competition', {}).get('name', 'Unknown'),
-            'country': country,
-            'matchDateTime': match_date.isoformat(),
-            'time': match_date.strftime('%H:%M'),
-            'date': match_date.strftime('%Y-%m-%d'),
-            'status': display_status,
-            'matchday': match.get('season', {}).get('currentMatchday'),
-            'goalsHome': goals_home,
-            'goalsAway': goals_away,
-            'confidence': 92 if status == 'LIVE' else 85
-        }
-    
-    except Exception as e:
-        logger.warning(f"⚠️ Erreur formatage match: {e}")
-        return None
+    logger.info(f"✅ {len(result)} matchs pour pays '{country_filter}'")
+    return result
