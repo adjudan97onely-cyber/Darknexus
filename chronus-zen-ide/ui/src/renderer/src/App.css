@@ -95,6 +95,12 @@ body {
   flex-shrink:     0;
 }
 
+.panel-header-actions {
+  display:    flex;
+  align-items: center;
+  gap:         4px;
+}
+
 .slots-list {
   padding: 6px;
   display: flex;
@@ -237,6 +243,19 @@ body {
   transition:    border-color 0.1s;
 }
 .create-input:focus { border-color: var(--accent); }
+
+/* Renommage inline dans ScriptList */
+.rename-input {
+  flex:          1;
+  background:    var(--bg);
+  border:        1px solid var(--accent);
+  border-radius: var(--radius);
+  color:         var(--text);
+  font-size:     13px;
+  padding:       3px 8px;
+  outline:       none;
+  font-family:   var(--font-ui);
+}
 
 .create-actions {
   display: flex;

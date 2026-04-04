@@ -102,6 +102,29 @@ export default function App() {
     }
   }, [selectedScript, loadScripts, loadSlots, flash]);
 
+  const handleRenameScript = useCallback(async (id, name) => {
+    try {
+      const updated = await window.api.scripts.rename(id, name);
+      if (selectedScript?.id === id) setSelectedScript(updated);
+      await loadScripts();
+      flash(`Script renommé en "${name}".`);
+    } catch (err) {
+      flash(`Erreur : ${err.message}`);
+    }
+  }, [selectedScript, loadScripts, flash]);
+
+  const handleImportGpc = useCallback(async () => {
+    try {
+      const res = await window.api.scripts.importGpc();
+      if (!res.ok) return;
+      await loadScripts();
+      const count = res.scripts.length;
+      flash(`${count} script${count > 1 ? 's' : ''} importé${count > 1 ? 's' : ''}.`);
+    } catch (err) {
+      flash(`Erreur import : ${err.message}`);
+    }
+  }, [loadScripts, flash]);
+
   // ── Actions slots ────────────────────────────────────────────────────────
 
   const handleAssignToSlot = useCallback(async (slotNumber, scriptId) => {
@@ -141,6 +164,8 @@ export default function App() {
           onSelect={handleSelectScript}
           onCreate={handleCreateScript}
           onDelete={handleDeleteScript}
+          onRename={handleRenameScript}
+          onImport={handleImportGpc}
         />
 
         <div className="main-panel">

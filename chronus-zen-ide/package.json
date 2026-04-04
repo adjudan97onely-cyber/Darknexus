@@ -1,6 +1,6 @@
 {
   "name": "chronus-zen-ide",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "IDE personnel pour scripts Chronus Zen (langage GPC) — fondation core",
   "type": "module",
   "main": "index.js",

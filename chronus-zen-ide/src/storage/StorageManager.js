@@ -11,9 +11,9 @@
  * Ce module ne connaît pas les modèles — il manipule uniquement du JSON brut.
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
-import { join, dirname }                                       from 'path';
-import { fileURLToPath }                                       from 'url';
+import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from 'fs';
+import { join, dirname }                                                   from 'path';
+import { fileURLToPath }                                                   from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -61,13 +61,17 @@ class StorageManager {
   }
 
   /**
-   * Sauvegarde des données dans un fichier JSON.
+   * Sauvegarde des données dans un fichier JSON — écriture atomique.
+   * On écrit dans un fichier .tmp puis on le renomme, ce qui évite
+   * la corruption si l'app est tuée pendant l'écriture.
    * @param {string} filename
    * @param {*}      data
    */
   save(filename, data) {
     const filepath = this._resolvePath(filename);
-    writeFileSync(filepath, JSON.stringify(data, null, 2), 'utf-8');
+    const tmpPath  = filepath + '.tmp';
+    writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+    renameSync(tmpPath, filepath);
   }
 }
 

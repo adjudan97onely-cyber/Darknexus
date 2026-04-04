@@ -1,0 +1,14 @@
+# Dépendances
+node_modules/
+ui/node_modules/
+
+# Build Electron
+ui/out/
+
+# Données utilisateur — NE PAS VERSIONNER
+# Chaque installation a ses propres scripts locaux
+src/storage/data/
+
+# Logs
+*.log
+npm-debug.log*

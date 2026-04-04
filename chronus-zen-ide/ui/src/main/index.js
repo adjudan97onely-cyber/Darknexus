@@ -47,6 +47,11 @@ function registerIpc() {
     return script.toJSON();
   });
 
+  ipcMain.handle('scripts:rename', (_, { id, name }) => {
+    const script = projectManager.renameScript(id, name);
+    return script.toJSON();
+  });
+
   ipcMain.handle('scripts:delete', (_, { id }) => {
     projectManager.deleteScript(id);
     return { ok: true };
@@ -89,6 +94,27 @@ function registerIpc() {
 
     fs.writeFileSync(filePath, script.content, 'utf8');
     return { ok: true, filePath };
+  });
+
+  // ── Import .gpc ───────────────────────────────────────────────────────────
+  ipcMain.handle('scripts:importGpc', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title:       'Importer un script GPC',
+      filters:     [{ name: 'Fichier GPC', extensions: ['gpc', 'txt'] }],
+      properties:  ['openFile', 'multiSelections'],
+    });
+
+    if (canceled || filePaths.length === 0) return { ok: false, error: 'Annulé' };
+
+    const imported = [];
+    for (const fp of filePaths) {
+      const content  = fs.readFileSync(fp, 'utf8');
+      const baseName = require('path').basename(fp, require('path').extname(fp));
+      const script   = projectManager.createScript(baseName, content);
+      imported.push(script.toJSON());
+    }
+
+    return { ok: true, scripts: imported };
   });
 }
 

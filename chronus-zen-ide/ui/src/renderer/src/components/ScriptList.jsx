@@ -1,25 +1,11 @@
 import { useState } from 'react';
 
-/**
- * ScriptList
- *
- * Affiche la liste des scripts avec :
- *  - sélection d'un script (→ Editor)
- *  - création rapide (nom → backend)
- *  - suppression avec confirmation visuelle (hover)
- *  - drag-and-drop vers les slots
- *
- * Props :
- *  - scripts   : Script[]
- *  - selectedId: string | undefined
- *  - onSelect  : (script) => void
- *  - onCreate  : (name) => void
- *  - onDelete  : (id) => void
- */
-export default function ScriptList({ scripts, selectedId, onSelect, onCreate, onDelete }) {
+export default function ScriptList({ scripts, selectedId, onSelect, onCreate, onDelete, onRename, onImport }) {
   const [creating,   setCreating]   = useState(false);
   const [newName,    setNewName]    = useState('');
   const [draggingId, setDraggingId] = useState(null);
+  const [renamingId, setRenamingId] = useState(null);
+  const [renameVal,  setRenameVal]  = useState('');
 
   const handleDragStart = (e, script) => {
     setDraggingId(script.id);
@@ -30,6 +16,22 @@ export default function ScriptList({ scripts, selectedId, onSelect, onCreate, on
   };
 
   const handleDragEnd = () => setDraggingId(null);
+
+  const startRename = (s) => {
+    setRenamingId(s.id);
+    setRenameVal(s.name);
+  };
+
+  const commitRename = () => {
+    if (renameVal.trim()) onRename(renamingId, renameVal.trim());
+    setRenamingId(null);
+    setRenameVal('');
+  };
+
+  const handleRenameKey = (e) => {
+    if (e.key === 'Enter')  commitRename();
+    if (e.key === 'Escape') { setRenamingId(null); setRenameVal(''); }
+  };
 
   const handleCreate = () => {
     const name = newName.trim();
@@ -48,13 +50,22 @@ export default function ScriptList({ scripts, selectedId, onSelect, onCreate, on
     <section className="script-list">
       <div className="panel-header">
         Scripts
-        <button
-          className="btn-icon"
-          title="Nouveau script"
-          onClick={() => setCreating(c => !c)}
-        >
-          ＋
-        </button>
+        <div className="panel-header-actions">
+          <button
+            className="btn-icon"
+            title="Importer un fichier .gpc"
+            onClick={onImport}
+          >
+            ⬆
+          </button>
+          <button
+            className="btn-icon"
+            title="Nouveau script"
+            onClick={() => setCreating(c => !c)}
+          >
+            ＋
+          </button>
+        </div>
       </div>
 
       {creating && (
@@ -88,14 +99,26 @@ export default function ScriptList({ scripts, selectedId, onSelect, onCreate, on
             className={`script-item ${selectedId === s.id ? 'selected' : ''} ${draggingId === s.id ? 'dragging' : ''}`}
             title="Glisser vers un slot pour assigner"
           >
-            <button
-              className="script-name-btn"
-              onClick={() => onSelect(s)}
-              title={s.name}
-            >
-              <span className="script-icon drag-handle">⠿</span>
-              <span className="script-label">{s.name}</span>
-            </button>
+            {renamingId === s.id ? (
+              <input
+                className="rename-input"
+                value={renameVal}
+                onChange={e => setRenameVal(e.target.value)}
+                onKeyDown={handleRenameKey}
+                onBlur={commitRename}
+                autoFocus
+              />
+            ) : (
+              <button
+                className="script-name-btn"
+                onClick={() => onSelect(s)}
+                onDoubleClick={() => startRename(s)}
+                title="Clic: sélectionner — Double-clic: renommer"
+              >
+                <span className="script-icon drag-handle">⠿</span>
+                <span className="script-label">{s.name}</span>
+              </button>
+            )}
 
             <button
               className="script-delete"

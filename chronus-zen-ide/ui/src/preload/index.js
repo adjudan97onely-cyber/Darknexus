@@ -24,6 +24,10 @@ contextBridge.exposeInMainWorld('api', {
     update: (id, content) =>
       ipcRenderer.invoke('scripts:update', { id, content }),
 
+    /** @returns {Promise<Script>} */
+    rename: (id, name) =>
+      ipcRenderer.invoke('scripts:rename', { id, name }),
+
     /** @returns {Promise<{ok: boolean}>} */
     delete: (id) =>
       ipcRenderer.invoke('scripts:delete', { id }),
@@ -31,6 +35,10 @@ contextBridge.exposeInMainWorld('api', {
     /** @returns {Promise<{ok: boolean, filePath?: string, error?: string}>} */
     exportGpc: (id) =>
       ipcRenderer.invoke('scripts:exportGpc', { id }),
+
+    /** @returns {Promise<{ok: boolean, scripts?: Script[], error?: string}>} */
+    importGpc: () =>
+      ipcRenderer.invoke('scripts:importGpc'),
   },
 
   slots: {

@@ -148,10 +148,18 @@ assert(issueCodes.includes('E002'), 'E002 détecté (point-virgule manquant)');
 assert(issueCodes.includes('W001'), 'W001 détecté (TODO)');
 assert(result3.success === false,   'Script avec erreur → success=false');
 
-// Script sans bloc combo → E004
+// Script sans bloc combo → E004 (warning, pas erreur)
 const noBlock = { id: 'z', name: 'SansBloc', content: 'set_val(BUTTON_R2, 100);' };
 const result4 = compiler.analyze(noBlock);
-assert(result4.issues.some(i => i.code === 'E004'), 'E004 détecté (aucun bloc combo/init)');
+const e004 = result4.issues.find(i => i.code === 'E004');
+assert(e004 !== undefined,             'E004 détecté (aucun bloc combo/init/main)');
+assert(e004?.severity === 'warning',   'E004 est un warning (non bloquant, peut être un fragment)');
+assert(result4.success === true,       'Script sans bloc → success=true (warning seulement)');
+
+// Script avec main { } → doit être reconnu comme bloc valide
+const mainScript = { id: 'm', name: 'MainBloc', content: `main {\n  set_val(BUTTON_R2, 100);\n}` };
+const resultMain = compiler.analyze(mainScript);
+assert(resultMain.issues.every(i => i.code !== 'E004'), 'main {} reconnu — pas de E004');
 
 // Script avec mot suspect → W002 (dans une instruction, pas un commentaire)
 const suspectScript = { id: 'w', name: 'Suspect', content: `combo test {\n  set_val(BUTTON_R2, undefined);\n}` };
@@ -213,8 +221,30 @@ try {
   ok(`getScriptAnalysis(id inexistant) → erreur attendue : ${e.message}`);
 }
 
-// ─── Résumé ───────────────────────────────────────────────────────────────────
+// ─── 9. renameScript() ───────────────────────────────────────────────────────
 
+section('9. renameScript()');
+
+const toRename = projectManager.createScript('Nom Initial', 'combo x {}');
+assert(toRename.name === 'Nom Initial', 'Script créé avec "Nom Initial"');
+
+const renamed = projectManager.renameScript(toRename.id, 'Nouveau Nom');
+assert(renamed.name === 'Nouveau Nom',          'Nom mis à jour');
+assert(renamed.updatedAt > renamed.createdAt,   'updatedAt avancé après rename');
+
+// Confirmer persistance via getAllScripts
+const fromList = projectManager.getScriptById(toRename.id);
+assert(fromList?.name === 'Nouveau Nom',         'Persisté correctement');
+
+// Nom vide → erreur attendue
+try {
+  projectManager.renameScript(toRename.id, '  ');
+  fail('renameScript("  ") aurait dû lever une erreur');
+} catch (e) {
+  ok(`renameScript("  ") → erreur attendue : ${e.message}`);
+}
+
+// ─── Résumé ───────────────────────────────────────────────────────────────────
 section('RÉSUMÉ');
 if (process.exitCode === 1) {
   console.error('\n  Certains tests ont échoué.\n');

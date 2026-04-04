@@ -101,6 +101,26 @@ class ProjectManager {
   }
 
   /**
+   * Renomme un script.
+   * @param {string} id
+   * @param {string} newName
+   * @returns {Script}
+   */
+  renameScript(id, newName) {
+    if (!newName || typeof newName !== 'string' || newName.trim() === '') {
+      throw new Error('Le nouveau nom est obligatoire.');
+    }
+    const script = this._findScriptOrThrow(id);
+    script.name      = newName.trim();
+    script.updatedAt = new Date().toISOString();
+    this._saveScripts();
+    // Invalider le cache (le nom apparaît dans le rapport d'analyse)
+    this._analysisCache.delete(id);
+
+    return script;
+  }
+
+  /**
    * Supprime un script.
    * Les slots qui référençaient ce script sont automatiquement libérés.
    * @param {string} id
