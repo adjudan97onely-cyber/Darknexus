@@ -27,6 +27,10 @@ contextBridge.exposeInMainWorld('api', {
     /** @returns {Promise<{ok: boolean}>} */
     delete: (id) =>
       ipcRenderer.invoke('scripts:delete', { id }),
+
+    /** @returns {Promise<{ok: boolean, filePath?: string, error?: string}>} */
+    exportGpc: (id) =>
+      ipcRenderer.invoke('scripts:exportGpc', { id }),
   },
 
   slots: {

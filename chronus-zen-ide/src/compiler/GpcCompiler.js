@@ -77,12 +77,25 @@ class GpcCompiler {
         return;
       }
 
-      // ── Détection de blocs combo/init ─────────────────────────────────────
-      if (/^(combo|init)\s+\w+\s*\{/.test(line)) {
+      // ── Détection de blocs combo/init/main ─────────────────────────────────────────────────
+      // Supporte : "combo foo {" | "init foo {" | "main {" | inline "combo foo {}"
+      const isInlineBlock  = /^(combo|init)\s+\w+\s*\{\s*\}$/.test(line);
+      const isBlockHeader  = /^(combo\s+\w+|init\s+\w+|main)\s*\{/.test(line);
+      if (isBlockHeader) {
         hasBlock = true;
-        inEmptyCombo   = true;
-        emptyComboLine = lineNum;
-        comboBodyLines = 0;
+        if (!isInlineBlock) {
+          inEmptyCombo   = true;
+          emptyComboLine = lineNum;
+          comboBodyLines = 0;
+        } else {
+          // W003 : bloc inline vide
+          issues.push({
+            line:     lineNum,
+            code:     'W003',
+            severity: 'warning',
+            message:  `Ligne ${lineNum} : bloc combo/init vide détecté.`,
+          });
+        }
       }
 
       // ── Fermeture de bloc ─────────────────────────────────────────────────
@@ -108,10 +121,13 @@ class GpcCompiler {
       }
 
       // ── E002 : Point-virgule manquant ─────────────────────────────────────
-      const isBlockDelimiter = line.endsWith('{') || line === '}';
+      // Exclure : ouvrants/fermants, inline {}, préprocesseur, else, return seul
+      const isBlockDelimiter = line.endsWith('{') || line === '}' || /\{\s*\}$/.test(line);
       const isPreprocessor   = line.startsWith('#');
+      const isElseBranch     = /^(else|else\s+if\s*\()/.test(line);
+      const isReturnBreak    = /^(return|break|continue)$/.test(line);
 
-      if (!isBlockDelimiter && !isPreprocessor && !line.endsWith(';')) {
+      if (!isBlockDelimiter && !isPreprocessor && !isElseBranch && !isReturnBreak && !line.endsWith(';')) {
         issues.push({
           line:     lineNum,
           code:     'E002',
@@ -155,13 +171,13 @@ class GpcCompiler {
       });
     }
 
-    // ── E004 : Aucun bloc combo/init ──────────────────────────────────────
+    // ── E004 : Aucun bloc combo/init/main (avertissement — peut être un fragment) ──────
     if (!hasBlock) {
       issues.push({
         line:     null,
         code:     'E004',
-        severity: 'error',
-        message:  'Structure incohérente : aucun bloc "combo" ou "init" trouvé dans le script.',
+        severity: 'warning',
+        message:  'Aucun bloc «combo», «init» ou «main» trouvé — vérifiez la structure du script.',
       });
     }
 

@@ -11,9 +11,10 @@
  * Flux : Renderer → Preload (contextBridge) → IPC → ici → ProjectManager
  */
 
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path                             = require('path');
-const { pathToFileURL }                = require('url');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const path                                      = require('path');
+const { pathToFileURL }                         = require('url');
+const fs                                        = require('fs');
 
 // ── Backend ───────────────────────────────────────────────────────────────────
 // __dirname en dev/build = ui/out/main/
@@ -72,6 +73,23 @@ function registerIpc() {
   ipcMain.handle('analysis:get', (_, { scriptId }) =>
     projectManager.getScriptAnalysis(scriptId)
   );
+
+  // ── Export .gpc ───────────────────────────────────────────────────────────
+  ipcMain.handle('scripts:exportGpc', async (_, { id }) => {
+    const script = projectManager.getScriptById(id);
+    if (!script) return { ok: false, error: 'Script introuvable' };
+
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title:       'Exporter le script GPC',
+      defaultPath: `${script.name}.gpc`,
+      filters:     [{ name: 'Fichier GPC', extensions: ['gpc'] }],
+    });
+
+    if (canceled || !filePath) return { ok: false, error: 'Annulé' };
+
+    fs.writeFileSync(filePath, script.content, 'utf8');
+    return { ok: true, filePath };
+  });
 }
 
 // ── Window ────────────────────────────────────────────────────────────────────

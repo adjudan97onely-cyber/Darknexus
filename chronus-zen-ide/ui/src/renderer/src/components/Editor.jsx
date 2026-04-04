@@ -16,8 +16,9 @@ import { useState, useEffect } from 'react';
  *  - onSave : (content: string) => void
  */
 export default function Editor({ script, onSave }) {
-  const [content, setContent] = useState('');
-  const [dirty,   setDirty]   = useState(false);
+  const [content,      setContent]      = useState('');
+  const [dirty,        setDirty]        = useState(false);
+  const [exportStatus, setExportStatus] = useState(null); // null | 'ok' | 'err'
 
   // Réinitialiser quand le script sélectionné change
   useEffect(() => {
@@ -33,6 +34,12 @@ export default function Editor({ script, onSave }) {
   const handleSave = () => {
     onSave(content);
     setDirty(false);
+  };
+
+  const handleExport = async () => {
+    const res = await window.api.scripts.exportGpc(script.id);
+    setExportStatus(res.ok ? 'ok' : 'err');
+    setTimeout(() => setExportStatus(null), 2500);
   };
 
   const handleKeyDown = (e) => {
@@ -81,6 +88,15 @@ export default function Editor({ script, onSave }) {
           title="Ctrl+S"
         >
           {dirty ? '● Sauvegarder' : '✓ Sauvegardé'}
+        </button>
+        <button
+          className="btn-export"
+          onClick={handleExport}
+          title="Exporter en fichier .gpc (importable dans Zen Studio)"
+        >
+          {exportStatus === 'ok'  ? '✓ Exporté !'
+         : exportStatus === 'err' ? '✗ Erreur'
+         : '⬇ Export .gpc'}
         </button>
       </div>
 

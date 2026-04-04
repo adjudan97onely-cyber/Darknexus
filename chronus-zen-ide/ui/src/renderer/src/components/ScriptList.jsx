@@ -7,6 +7,7 @@ import { useState } from 'react';
  *  - sélection d'un script (→ Editor)
  *  - création rapide (nom → backend)
  *  - suppression avec confirmation visuelle (hover)
+ *  - drag-and-drop vers les slots
  *
  * Props :
  *  - scripts   : Script[]
@@ -16,8 +17,19 @@ import { useState } from 'react';
  *  - onDelete  : (id) => void
  */
 export default function ScriptList({ scripts, selectedId, onSelect, onCreate, onDelete }) {
-  const [creating, setCreating] = useState(false);
-  const [newName,  setNewName]  = useState('');
+  const [creating,   setCreating]   = useState(false);
+  const [newName,    setNewName]    = useState('');
+  const [draggingId, setDraggingId] = useState(null);
+
+  const handleDragStart = (e, script) => {
+    setDraggingId(script.id);
+    e.dataTransfer.effectAllowed = 'move';
+    // Transporter l'id du script — lu par SlotSidebar au drop
+    e.dataTransfer.setData('application/chronus-script-id', script.id);
+    e.dataTransfer.setData('text/plain', script.name);
+  };
+
+  const handleDragEnd = () => setDraggingId(null);
 
   const handleCreate = () => {
     const name = newName.trim();
@@ -70,14 +82,18 @@ export default function ScriptList({ scripts, selectedId, onSelect, onCreate, on
         {scripts.map(s => (
           <li
             key={s.id}
-            className={`script-item ${selectedId === s.id ? 'selected' : ''}`}
+            draggable
+            onDragStart={e => handleDragStart(e, s)}
+            onDragEnd={handleDragEnd}
+            className={`script-item ${selectedId === s.id ? 'selected' : ''} ${draggingId === s.id ? 'dragging' : ''}`}
+            title="Glisser vers un slot pour assigner"
           >
             <button
               className="script-name-btn"
               onClick={() => onSelect(s)}
               title={s.name}
             >
-              <span className="script-icon">⬡</span>
+              <span className="script-icon drag-handle">⠿</span>
               <span className="script-label">{s.name}</span>
             </button>
 

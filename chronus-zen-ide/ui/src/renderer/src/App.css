@@ -389,6 +389,21 @@ body {
 .btn-save.dirty             { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 .btn-save.dirty:hover       { background: var(--accent); color: #000; }
 
+.btn-export {
+  background:    none;
+  border:        1px solid #4a90d9;
+  color:         #4a90d9;
+  border-radius: var(--radius);
+  padding:       4px 12px;
+  font-size:     12px;
+  cursor:        pointer;
+  white-space:   nowrap;
+  transition:    all 0.12s;
+  font-family:   var(--font-ui);
+  margin-left:   6px;
+}
+.btn-export:hover   { background: #4a90d9; color: #fff; }
+
 .editor-textarea {
   flex:        1;
   background:  var(--bg);
@@ -467,3 +482,48 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ══ Drag-and-drop ═══════════════════════════════════════════════════════════ */
+
+/* Script en cours de drag → opacité réduite */
+.script-item.dragging {
+  opacity:    0.45;
+  background: var(--bg-active);
+}
+
+/* Rendre le li draggable dans Chromium/Electron */
+.script-item[draggable='true'] {
+  -webkit-user-drag: element;   /* OBLIGATOIRE dans Electron */
+  user-select:       none;
+  cursor:            grab;
+}
+.script-item[draggable='true']:active { cursor: grabbing; }
+
+/* Icône drag handle sur les scripts */
+.drag-handle {
+  cursor: grab;
+  color:  var(--text-dim);
+  transition: color 0.1s;
+}
+.script-item:hover .drag-handle { color: var(--accent); }
+.script-item.dragging .drag-handle { cursor: grabbing; }
+
+/* Hint dans le header de la sidebar */
+.panel-hint {
+  font-size:      9px;
+  color:          var(--text-dim);
+  font-weight:    400;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.7;
+}
+
+/* Slot survolé pendant un drag → highlight clair */
+.slot-item.drag-over .slot-btn {
+  background:   var(--bg-active);
+  border-color: var(--accent);
+  box-shadow:   0 0 0 1px var(--accent-dim);
+}
+.slot-item.drag-over .slot-number   { color: var(--accent); }
+.slot-item.drag-over .slot-name     { color: var(--accent); }
+.slot-item.drag-over .slot-indicator { color: var(--accent); }
