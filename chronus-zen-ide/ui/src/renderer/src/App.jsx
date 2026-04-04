@@ -134,10 +134,52 @@ export default function App() {
       const result = await window.api.parser.parse(selectedScript.content);
       setStructure(result);
       setShowStructure(true);
+      setShowFeatures(false);
+      setShowExplan(false);
     } catch (err) {
       flash(`Erreur structure : ${err.message}`);
     }
   }, [selectedScript, flash]);
+
+  // ── Détection de fonctionnalités (FeatureDetector) ───────────────────────
+
+  const handleDetectFeatures = useCallback(async () => {
+    if (!selectedScript) return;
+    try {
+      const parsed = structure?.ok ? structure : null;
+      const result = await window.api.features.detect(selectedScript.content, parsed);
+      setFeaturesResult(result);
+      setShowFeatures(true);
+      setShowStructure(false);
+      setShowExplan(false);
+    } catch (err) {
+      flash(`Erreur détection : ${err.message}`);
+    }
+  }, [selectedScript, structure, flash]);
+
+  // ── Explication IA (ScriptExplainer) ─────────────────────────────────────
+
+  const handleExplainScript = useCallback(async () => {
+    if (!selectedScript) return;
+    setShowExplan(true);
+    setShowStructure(false);
+    setShowFeatures(false);
+    setExplainLoading(true);
+    setExplanation(null);
+    try {
+      const parsed   = structure?.ok       ? structure       : null;
+      const detected = featuresResult?.features ? featuresResult : null;
+      const result   = await window.api.explainScript(
+        selectedScript.content, parsed, detected
+      );
+      setExplanation(result);
+    } catch (err) {
+      setExplanation({ ok: false, error: err.message });
+    } finally {
+      setExplainLoading(false);
+    }
+  }, [selectedScript, structure, featuresResult]);
+
   // ── Import via dialog Electron (bouton ⬆ dans ScriptList) ─────────────────
   const handleImportGpc = useCallback(async () => {
     try {

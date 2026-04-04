@@ -66,6 +66,9 @@ class GpcCompiler {
     let inEmptyCombo = false;
     let emptyComboLine = null;
     let comboBodyLines = 0;
+    // Tracker les tableaux const multi-lignes (const int16 x[] = { ... };)
+    // Dans ce contexte, les lignes n'ont pas forcément de ; ou , (dernier élément)
+    let inConstArray = false;
 
     lines.forEach((rawLine, index) => {
       const lineNum = index + 1;
@@ -77,10 +80,25 @@ class GpcCompiler {
         return;
       }
 
+      // ── Suivi des tableaux const multi-lignes ─────────────────────────────
+      // Entrée : "const int16 foo[] = {" ou "const string foo[] = {"
+      if (/^const\s+(int16|string|int)\s+\w+\s*\[\s*\]\s*=\s*\{/.test(line)) {
+        // inline complet "= { ... };" → pas de mode multi-ligne
+        if (!line.endsWith('};')) inConstArray = true;
+      }
+      // Sortie : ligne "};" referme le tableau
+      if (inConstArray && line === '};') {
+        inConstArray = false;
+        return; // la ligne "};" elle-même est valide
+      }
+      // Dans un tableau const, on ne vérifie pas le point-virgule
+      if (inConstArray) return;
+
       // ── Détection de blocs combo/init/main ─────────────────────────────────────────────────
       // Supporte : "combo foo {" | "init foo {" | "main {" | inline "combo foo {}"
-      const isInlineBlock  = /^(combo|init)\s+\w+\s*\{\s*\}$/.test(line);
-      const isBlockHeader  = /^(combo\s+\w+|init\s+\w+|main)\s*\{/.test(line);
+      // init n'a pas de nom dans GPC ("init {"), main non plus, combo si ("combo JumpShot {")
+      const isInlineBlock  = /^(combo\s+\w+|init|main)\s*\{\s*\}$/.test(line);
+      const isBlockHeader  = /^(combo\s+\w+|init|main)\s*\{/.test(line);
       if (isBlockHeader) {
         hasBlock = true;
         if (!isInlineBlock) {
@@ -121,19 +139,26 @@ class GpcCompiler {
       }
 
       // ── E002 : Point-virgule manquant ─────────────────────────────────────
-      // Exclure : ouvrants/fermants, inline {}, préprocesseur, else, return seul
-      const isBlockDelimiter = line.endsWith('{') || line === '}' || /\{\s*\}$/.test(line);
-      const isPreprocessor   = line.startsWith('#');
-      const isElseBranch     = /^(else|else\s+if\s*\()/.test(line);
-      const isReturnBreak    = /^(return|break|continue)$/.test(line);
-
-      if (!isBlockDelimiter && !isPreprocessor && !isElseBranch && !isReturnBreak && !line.endsWith(';')) {
-        issues.push({
-          line:     lineNum,
-          code:     'E002',
-          severity: 'error',
-          message:  `Ligne ${lineNum} : point-virgule manquant — "${this._truncate(line)}"`,
-        });
+      // Strip les commentaires inline avant le test.
+      // Une ligne GPC valide se termine TOUJOURS par l'un de ces caractères :
+      //   ;  → instruction terminée
+      //   {  → ouverture de bloc (if / for / combo / function / init / main…)
+      //   }  → fermeture de bloc OU bloc inline complet (ex: if(x){x=1;})
+      //   ,  → élément de tableau const multi-ligne (int16[], string[]…)
+      const codePart = line.replace(/\/\/.*$/, '').trim();
+      if (codePart !== '' && !codePart.startsWith('#')) {
+        const validEnding = codePart.endsWith(';') || codePart.endsWith('{') ||
+                            codePart.endsWith('}') || codePart.endsWith(',') ||
+                            // continuation de ligne : opérateurs en fin (expr multi-lignes GPC)
+                            /[|&+\-*/%^(]$/.test(codePart);
+        if (!validEnding) {
+          issues.push({
+            line:     lineNum,
+            code:     'E002',
+            severity: 'error',
+            message:  `Ligne ${lineNum} : point-virgule manquant — "${this._truncate(line)}"`,
+          });
+        }
       }
 
       // ── W001 : TODO ────────────────────────────────────────────────────────
