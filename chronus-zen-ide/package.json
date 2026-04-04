@@ -1,0 +1,15 @@
+{
+  "name": "chronus-zen-ide",
+  "version": "0.1.0",
+  "description": "IDE personnel pour scripts Chronus Zen (langage GPC) — fondation core",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test":  "node test.js",
+    "start": "node cli.js"
+  },
+  "keywords": ["gpc", "chronus-zen", "warzone", "ide"],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

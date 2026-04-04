@@ -1,0 +1,98 @@
+import { useState } from 'react';
+
+/**
+ * ScriptList
+ *
+ * Affiche la liste des scripts avec :
+ *  - sélection d'un script (→ Editor)
+ *  - création rapide (nom → backend)
+ *  - suppression avec confirmation visuelle (hover)
+ *
+ * Props :
+ *  - scripts   : Script[]
+ *  - selectedId: string | undefined
+ *  - onSelect  : (script) => void
+ *  - onCreate  : (name) => void
+ *  - onDelete  : (id) => void
+ */
+export default function ScriptList({ scripts, selectedId, onSelect, onCreate, onDelete }) {
+  const [creating, setCreating] = useState(false);
+  const [newName,  setNewName]  = useState('');
+
+  const handleCreate = () => {
+    const name = newName.trim();
+    if (!name) return;
+    onCreate(name);
+    setNewName('');
+    setCreating(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter')  handleCreate();
+    if (e.key === 'Escape') { setCreating(false); setNewName(''); }
+  };
+
+  return (
+    <section className="script-list">
+      <div className="panel-header">
+        Scripts
+        <button
+          className="btn-icon"
+          title="Nouveau script"
+          onClick={() => setCreating(c => !c)}
+        >
+          ＋
+        </button>
+      </div>
+
+      {creating && (
+        <div className="create-form">
+          <input
+            className="create-input"
+            placeholder="Nom du script…"
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoFocus
+          />
+          <div className="create-actions">
+            <button className="btn-primary" onClick={handleCreate}>Créer</button>
+            <button className="btn-ghost"   onClick={() => { setCreating(false); setNewName(''); }}>Annuler</button>
+          </div>
+        </div>
+      )}
+
+      <ul className="scripts-ul">
+        {scripts.length === 0 && (
+          <li className="scripts-empty">Aucun script — cliquez sur ＋</li>
+        )}
+
+        {scripts.map(s => (
+          <li
+            key={s.id}
+            className={`script-item ${selectedId === s.id ? 'selected' : ''}`}
+          >
+            <button
+              className="script-name-btn"
+              onClick={() => onSelect(s)}
+              title={s.name}
+            >
+              <span className="script-icon">⬡</span>
+              <span className="script-label">{s.name}</span>
+            </button>
+
+            <button
+              className="script-delete"
+              title="Supprimer ce script"
+              onClick={() => {
+                if (window.confirm(`Supprimer "${s.name}" ?`)) onDelete(s.id);
+              }}
+            >
+              ✕
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
