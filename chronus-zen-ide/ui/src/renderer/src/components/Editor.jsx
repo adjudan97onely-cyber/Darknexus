@@ -1,70 +1,135 @@
-import { useState, useEffect } from 'react';
-
 /**
- * Editor
- *
- * Zone d'édition du contenu d'un script GPC.
+ * Editor — CodeMirror 6
  *
  * Fonctionnalités :
- *  - Synchronisation avec le script sélectionné (prop)
- *  - Détection de modifications non sauvegardées (dirty state)
- *  - Sauvegarde via Ctrl+S ou bouton
- *  - Touche Tab → 2 espaces (comportement IDE)
+ *  - Coloration syntaxique GPC (StreamLanguage custom)
+ *  - Numérotation des lignes
+ *  - Highlight des erreurs / warnings du compiler (lintGutter + soulignement)
+ *  - Auto-sauvegarde avec debounce 800 ms → fetch analyse → lint refresh
+ *  - Sauvegarde manuelle Ctrl+S
+ *  - Export .gpc
  *
  * Props :
- *  - script : Script | null
- *  - onSave : (content: string) => void
+ *  - script           : Script | null
+ *  - onSave           : (content: string) => void
+ *  - onAnalysisUpdate : (analysis) => void  — remonte l'analyse à AnalysisPanel
  */
-export default function Editor({ script, onSave }) {
-  const [content,      setContent]      = useState('');
-  const [dirty,        setDirty]        = useState(false);
-  const [exportStatus, setExportStatus] = useState(null); // null | 'ok' | 'err'
 
-  // Réinitialiser quand le script sélectionné change
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import CodeMirror                                              from '@uiw/react-codemirror';
+import { syntaxHighlighting }                                 from '@codemirror/language';
+import { linter, lintGutter, forceLinting }                   from '@codemirror/lint';
+import { oneDark }                                            from '@codemirror/theme-one-dark';
+import { keymap }                                             from '@codemirror/view';
+import { defaultKeymap }                                      from '@codemirror/commands';
+import { gpcLanguage, gpcHighlightStyle }                     from '../lib/gpcLanguage';
+
+// ── Debounce ──────────────────────────────────────────────────────────────────
+
+function useDebounce(fn, delay) {
+  const timerRef = useRef(null);
+  return useCallback((...args) => {
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => fn(...args), delay);
+  }, [fn, delay]);
+}
+
+// ── Composant ─────────────────────────────────────────────────────────────────
+
+export default function Editor({ script, onSave, onAnalysisUpdate }) {
+  const [dirty,        setDirty]        = useState(false);
+  const [saveStatus,   setSaveStatus]   = useState('saved'); // 'saved' | 'dirty' | 'saving'
+  const [exportStatus, setExportStatus] = useState(null);    // null | 'ok' | 'err'
+
+  const contentRef  = useRef(script?.content ?? '');  // contenu courant (pas de re-render)
+  const viewRef     = useRef(null);                    // instance CodeMirror View
+  const analysisRef = useRef(null);                    // analyse courante (lue par linter)
+
+  // Réinitialiser quand le script change
   useEffect(() => {
-    setContent(script?.content ?? '');
+    contentRef.current  = script?.content ?? '';
+    analysisRef.current = null;
     setDirty(false);
+    setSaveStatus('saved');
   }, [script?.id]);
 
-  const handleChange = (e) => {
-    setContent(e.target.value);
+  // ── Auto-sauvegarde + analyse ─────────────────────────────────────────────
+
+  const doSaveAndAnalyze = useCallback(async (content) => {
+    if (!script) return;
+    setSaveStatus('saving');
+    try {
+      await window.api.scripts.update(script.id, content);
+      const analysis      = await window.api.analysis.get(script.id);
+      analysisRef.current = analysis;
+      onAnalysisUpdate?.(analysis);
+      if (viewRef.current) forceLinting(viewRef.current);
+    } catch {
+      /* silencieux */
+    } finally {
+      setSaveStatus('saved');
+      setDirty(false);
+    }
+  }, [script, onAnalysisUpdate]);
+
+  const debouncedSave = useDebounce(doSaveAndAnalyze, 800);
+
+  const handleChange = useCallback((value) => {
+    contentRef.current = value;
     setDirty(true);
-  };
+    setSaveStatus('dirty');
+    debouncedSave(value);
+  }, [debouncedSave]);
 
-  const handleSave = () => {
-    onSave(content);
-    setDirty(false);
-  };
+  const handleManualSave = useCallback(() => {
+    onSave(contentRef.current);
+    doSaveAndAnalyze(contentRef.current);
+  }, [onSave, doSaveAndAnalyze]);
 
-  const handleExport = async () => {
+  const handleExport = useCallback(async () => {
+    if (!script) return;
     const res = await window.api.scripts.exportGpc(script.id);
     setExportStatus(res.ok ? 'ok' : 'err');
     setTimeout(() => setExportStatus(null), 2500);
-  };
+  }, [script]);
 
-  const handleKeyDown = (e) => {
-    // Ctrl+S / Cmd+S → sauvegarde
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-      e.preventDefault();
-      if (dirty) handleSave();
-      return;
-    }
+  // ── Linter CodeMirror ─────────────────────────────────────────────────────
+  // Lit analysisRef.current (ref → pas de dépendance stale)
 
-    // Tab → 2 espaces (sans perdre le focus)
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const el    = e.target;
-      const start = el.selectionStart;
-      const end   = el.selectionEnd;
-      const next  = content.slice(0, start) + '  ' + content.slice(end);
-      setContent(next);
-      setDirty(true);
-      requestAnimationFrame(() => {
-        el.selectionStart = start + 2;
-        el.selectionEnd   = start + 2;
+  const gpcLinter = useMemo(() => linter((view) => {
+    const analysis = analysisRef.current;
+    if (!analysis?.issues) return [];
+
+    return analysis.issues
+      .filter(i => i.line != null && i.line > 0)
+      .map(i => {
+        const lineNum = Math.max(1, Math.min(i.line, view.state.doc.lines));
+        const line    = view.state.doc.line(lineNum);
+        return {
+          from:     line.from,
+          to:       line.to,
+          severity: i.severity === 'error' ? 'error' : 'warning',
+          message:  i.message,
+        };
       });
-    }
-  };
+  }, { delay: 0 }), []);
+
+  // Ctrl+S dans CodeMirror
+  const saveKeymap = useMemo(() => keymap.of([{
+    key: 'Mod-s',
+    run: () => { handleManualSave(); return true; },
+  }]), [handleManualSave]);
+
+  const extensions = useMemo(() => [
+    gpcLanguage,
+    syntaxHighlighting(gpcHighlightStyle),
+    lintGutter(),
+    gpcLinter,
+    saveKeymap,
+    keymap.of(defaultKeymap),
+  ], [gpcLinter, saveKeymap]);
+
+  // ── Rendu ─────────────────────────────────────────────────────────────────
 
   if (!script) {
     return (
@@ -74,21 +139,28 @@ export default function Editor({ script, onSave }) {
     );
   }
 
+  const saveLabel =
+    saveStatus === 'saving' ? '⟳ Sauvegarde…'
+    : dirty                 ? '● Sauvegarder'
+    :                         '✓ Sauvegardé';
+
   return (
     <div className="editor">
       <div className="editor-header">
         <span className="editor-filename">{script.name}</span>
         <span className="editor-meta">
-          Modifié le {new Date(script.updatedAt).toLocaleString('fr-FR')}
+          {new Date(script.updatedAt).toLocaleString('fr-FR')}
         </span>
+
         <button
           className={`btn-save ${dirty ? 'dirty' : ''}`}
-          onClick={handleSave}
-          disabled={!dirty}
+          onClick={handleManualSave}
+          disabled={!dirty && saveStatus !== 'dirty'}
           title="Ctrl+S"
         >
-          {dirty ? '● Sauvegarder' : '✓ Sauvegardé'}
+          {saveLabel}
         </button>
+
         <button
           className="btn-export"
           onClick={handleExport}
@@ -96,19 +168,29 @@ export default function Editor({ script, onSave }) {
         >
           {exportStatus === 'ok'  ? '✓ Exporté !'
          : exportStatus === 'err' ? '✗ Erreur'
-         : '⬇ Export .gpc'}
+         :                          '⬇ Export .gpc'}
         </button>
       </div>
 
-      <textarea
-        className="editor-textarea"
-        value={content}
+      <CodeMirror
+        key={script.id}
+        value={script.content}
+        extensions={extensions}
+        theme={oneDark}
         onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        spellCheck={false}
-        autoCorrect="off"
-        autoCapitalize="off"
-        placeholder="// Écrire le script GPC ici…"
+        onCreateEditor={(view) => { viewRef.current = view; }}
+        className="cm-editor-wrap"
+        basicSetup={{
+          lineNumbers:               true,
+          foldGutter:                true,
+          highlightActiveLine:       true,
+          highlightSelectionMatches: true,
+          autocompletion:            false,
+          bracketMatching:           true,
+          closeBrackets:             true,
+          indentOnInput:             true,
+          tabSize:                   2,
+        }}
       />
     </div>
   );

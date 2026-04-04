@@ -423,20 +423,80 @@ body {
 }
 .btn-export:hover   { background: #4a90d9; color: #fff; }
 
-.editor-textarea {
-  flex:        1;
-  background:  var(--bg);
-  color:       var(--text);
+/* ══ CodeMirror overrides ════════════════════════════════════════════════════ */
+
+/* Wrapper — remplace .editor-textarea, occupe tout l'espace disponible */
+.cm-editor-wrap {
+  flex:       1;
+  min-height: 0;
+  overflow:   hidden;
+}
+
+/* L'éditeur CodeMirror prend toute la hauteur du wrapper */
+.cm-editor-wrap .cm-editor {
+  height:      100%;
   font-family: var(--font-mono);
   font-size:   13px;
   line-height: 1.65;
-  border:      none;
-  outline:     none;
-  padding:     16px 18px;
-  resize:      none;
-  tab-size:    2;
-  min-height:  0;
 }
+
+/* Faire scroller le contenu (pas le composant entier) */
+.cm-editor-wrap .cm-scroller {
+  overflow:   auto;
+  height:     100%;
+  padding:    8px 0;
+}
+
+/* Fond assorti au thème de l'IDE */
+.cm-editor-wrap .cm-editor.cm-focused { outline: none; }
+
+/* Gouttière numéros de ligne : fond légèrement distinct */
+.cm-editor-wrap .cm-gutters {
+  background:   #0d1117;
+  border-right: 1px solid var(--border);
+  color:        #546e7a;
+  font-size:    12px;
+}
+
+/* Gouttière lint (icônes erreur/warning) */
+.cm-editor-wrap .cm-gutter-lint { width: 18px; }
+
+/* Soulignement erreur — rouge */
+.cm-editor-wrap .cm-lintRange-error {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='3'%3E%3Cpath d='M0 2.5 L1.5 1 L3 2.5 L4.5 1 L6 2.5' stroke='%23f07178' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+}
+
+/* Soulignement warning — jaune */
+.cm-editor-wrap .cm-lintRange-warning {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='3'%3E%3Cpath d='M0 2.5 L1.5 1 L3 2.5 L4.5 1 L6 2.5' stroke='%23ffcb6b' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+}
+
+/* Icônes dans la gouttière lint */
+.cm-editor-wrap .cm-lint-marker-error   { color: #f07178; }
+.cm-editor-wrap .cm-lint-marker-warning { color: #ffcb6b; }
+
+/* Tooltip lint (au survol d'une erreur) */
+.cm-tooltip-lint {
+  background:    #1a1a2e;
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  color:         var(--text);
+  font-family:   var(--font-ui);
+  font-size:     12px;
+  padding:       6px 10px;
+  max-width:     360px;
+}
+
+/* Ligne active légèrement illuminée */
+.cm-editor-wrap .cm-activeLine { background: rgba(255,255,255,0.03); }
+
+/* Sélection */
+.cm-editor-wrap .cm-selectionBackground { background: rgba(106,175,255,0.2) !important; }
+
 
 /* ══ Analysis Panel ══════════════════════════════════════════════════════════ */
 .analysis-panel {

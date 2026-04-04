@@ -172,6 +172,7 @@ export default function App() {
           <Editor
             script={selectedScript}
             onSave={handleSaveScript}
+            onAnalysisUpdate={setAnalysis}
           />
           <AnalysisPanel analysis={analysis} />
         </div>
