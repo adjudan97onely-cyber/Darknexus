@@ -44,6 +44,7 @@ let projectManager;
 let scriptParser;
 let featureDetector;
 let scriptExplainer;
+let compiler;
 
 async function loadBackend() {
   const ideRoot = path.join(__dirname, '../../..');
@@ -63,6 +64,10 @@ async function loadBackend() {
   const seEntry = path.join(ideRoot, 'src', 'compiler', 'ScriptExplainer.js');
   const seMod   = await import(pathToFileURL(seEntry).href);
   scriptExplainer = seMod.scriptExplainer;
+
+  const gcEntry = path.join(ideRoot, 'src', 'compiler', 'GpcCompiler.js');
+  const gcMod   = await import(pathToFileURL(gcEntry).href);
+  compiler = gcMod.compiler;
 }
 
 // ── IPC Handlers ──────────────────────────────────────────────────────────────
@@ -113,6 +118,11 @@ function registerIpc() {
   // ── Analyse GPC ──────────────────────────────────────────────────────────
   ipcMain.handle('analysis:get', (_, { scriptId }) =>
     projectManager.getScriptAnalysis(scriptId)
+  );
+
+  // ── Correction automatique E002 (GpcCompiler.fix) ─────────────────────────
+  ipcMain.handle('compiler:fix', (_, { content }) =>
+    compiler.fix(content)
   );
 
   // ── Analyse structurelle (ScriptParser) ──────────────────────────────────

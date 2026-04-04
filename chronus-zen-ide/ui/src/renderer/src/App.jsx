@@ -180,6 +180,25 @@ export default function App() {
     }
   }, [selectedScript, structure, featuresResult]);
 
+  // ── Correction automatique E002 (GpcCompiler.fix) ────────────────────────
+
+  const handleFixScript = useCallback(async () => {
+    if (!selectedScript) return;
+    try {
+      const { fixedContent, changes } = await window.api.compiler.fix(selectedScript.content);
+      if (changes.length === 0) { flash('✓ Aucune correction nécessaire.'); return; }
+      // Sauvegarder le contenu corrigé
+      const updated = await window.api.scripts.update(selectedScript.id, fixedContent);
+      setSelectedScript({ ...selectedScript, content: fixedContent });
+      // Re-analyser pour mettre à jour le panel
+      const newAnalysis = await window.api.analysis.get(selectedScript.id).catch(() => null);
+      setAnalysis(newAnalysis);
+      flash(`🔧 ${changes.length} correction${changes.length > 1 ? 's' : ''} appliquée${changes.length > 1 ? 's' : ''}.`);
+    } catch (err) {
+      flash(`Erreur correction : ${err.message}`);
+    }
+  }, [selectedScript, flash]);
+
   // ── Import via dialog Electron (bouton ⬆ dans ScriptList) ─────────────────
   const handleImportGpc = useCallback(async () => {
     try {
@@ -360,7 +379,7 @@ export default function App() {
                   onClose={() => setShowExplan(false)}
                 />
               ) : (
-                <AnalysisPanel analysis={analysis} />
+                <AnalysisPanel analysis={analysis} onFix={handleFixScript} />
               )}
             </>
           ) : (

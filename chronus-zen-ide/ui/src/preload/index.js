@@ -57,6 +57,16 @@ contextBridge.exposeInMainWorld('api', {
       ipcRenderer.invoke('analysis:get', { scriptId }),
   },
 
+  compiler: {
+    /**
+     * Corrige automatiquement les E002 (point-virgule manquant).
+     * @param {string} content
+     * @returns {Promise<{fixedContent: string, changes: Array<{line,before,after}>}>}
+     */
+    fix: (content) =>
+      ipcRenderer.invoke('compiler:fix', { content }),
+  },
+
   parser: {
     /**
      * Analyse structurelle d'un script GPC via ScriptParser.

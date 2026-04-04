@@ -233,6 +233,61 @@ class GpcCompiler {
   _truncate(str, max = 50) {
     return str.length > max ? str.slice(0, max) + '…' : str;
   }
+
+  /**
+   * Corrige automatiquement les erreurs E002 (point-virgule manquant).
+   * Insère `;` en fin de code, avant tout commentaire inline `//`.
+   * @param {string} content — contenu brut du script
+   * @returns {{ fixedContent: string, changes: Array<{line:number, before:string, after:string}> }}
+   */
+  fix(content) {
+    if (!content || content.trim() === '') return { fixedContent: content, changes: [] };
+
+    const lines        = content.split('\n');
+    const fixedLines   = [];
+    const changes      = [];
+    let inConstArray   = false;
+
+    lines.forEach((rawLine, index) => {
+      const lineNum = index + 1;
+      const line    = rawLine.trim();
+
+      // Suivi tableaux const multi-lignes (même logique qu'analyze)
+      if (/^const\s+(int16|string|int)\s+\w+\s*\[\s*\]\s*=\s*\{/.test(line)) {
+        if (!line.endsWith('};')) inConstArray = true;
+      }
+      if (inConstArray && line === '};') { inConstArray = false; }
+
+      // Si la ligne n'a pas besoin de correction ou est hors-scope → copie brute
+      if (inConstArray || line === '' ||
+          line.startsWith('//') || line.startsWith('/*') || line.startsWith('*') ||
+          line.startsWith('#')) {
+        fixedLines.push(rawLine);
+        return;
+      }
+
+      const codePart = line.replace(/\/\/.*$/, '').trim();
+      if (codePart === '') { fixedLines.push(rawLine); return; }
+
+      const validEnding = codePart.endsWith(';') || codePart.endsWith('{') ||
+                          codePart.endsWith('}') || codePart.endsWith(',') ||
+                          /[|&+\-*/%^(]$/.test(codePart);
+
+      if (!validEnding) {
+        // Insérer `;` juste après le code, avant le commentaire inline (si présent)
+        const commentMatch = rawLine.match(/(\/\/.*)?$/);
+        const comment      = commentMatch ? commentMatch[0] : '';
+        const codeSection  = comment ? rawLine.slice(0, rawLine.lastIndexOf(comment)) : rawLine;
+        const fixed        = codeSection.trimEnd() + ';' + (comment ? '  ' + comment.trim() : '');
+        fixedLines.push(fixed);
+        changes.push({ line: lineNum, before: rawLine, after: fixed });
+      } else {
+        fixedLines.push(rawLine);
+      }
+    });
+
+    return { fixedContent: fixedLines.join('\n'), changes };
+  }
 }
 
 /** Singleton partagé */

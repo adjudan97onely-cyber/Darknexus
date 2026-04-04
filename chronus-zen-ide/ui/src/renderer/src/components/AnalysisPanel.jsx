@@ -1,21 +1,11 @@
 /**
  * AnalysisPanel
  *
- * Affiche le résultat de l'analyse GPC d'un script.
- * Mis à jour automatiquement après :
- *  - assignation d'un script à un slot
- *  - sauvegarde du script
- *
  * Props :
  *  - analysis : AnalysisResult | null
- *    {
- *      scriptName: string,
- *      success:    boolean,
- *      errors:     string[],
- *      warnings:   string[]
- *    }
+ *  - onFix    : () => void  — appelé quand l'utilisateur clique "Corriger"
  */
-export default function AnalysisPanel({ analysis }) {
+export default function AnalysisPanel({ analysis, onFix }) {
   if (!analysis) {
     return (
       <div className="analysis-panel analysis-empty">
@@ -25,7 +15,9 @@ export default function AnalysisPanel({ analysis }) {
     );
   }
 
-  const noIssues = analysis.errors.length === 0 && analysis.warnings.length === 0;
+  const noIssues   = analysis.errors.length === 0 && analysis.warnings.length === 0;
+  // Seuls les E002 sont auto-corrigeables
+  const hasFixable = analysis.issues?.some(i => i.code === 'E002');
 
   return (
     <div className="analysis-panel">
@@ -34,6 +26,11 @@ export default function AnalysisPanel({ analysis }) {
         <span className={`analysis-badge ${analysis.success ? 'success' : 'failure'}`}>
           {analysis.success ? '✓ SUCCÈS' : '✗ ÉCHEC'}
         </span>
+        {hasFixable && onFix && (
+          <button className="btn-fix" onClick={onFix} title="Corriger automatiquement les point-virgules manquants">
+            🔧 Corriger
+          </button>
+        )}
       </div>
 
       {noIssues && (
