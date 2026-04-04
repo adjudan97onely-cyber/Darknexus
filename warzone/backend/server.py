@@ -496,11 +496,17 @@ Réponds toujours en français. Sois technique, précis, et À JOUR avec les don
 @api_router.post("/chat", response_model=ChatResponse)
 async def chat_with_ai(request: ChatRequest):
     try:
-        # Local standalone mode: use OpenAI-compatible key from env.
-        api_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
+        # Supporte OpenAI ET Groq (gratuit) via OPENAI_BASE_URL
+        api_key = os.environ.get('GROQ_API_KEY') or os.environ.get('OPENAI_API_KEY') or os.environ.get('EMERGENT_LLM_KEY')
         if not api_key:
             raise HTTPException(status_code=500, detail="AI service not configured")
-        llm_model = os.environ.get('LLM_MODEL', 'gpt-4o-mini')
+        # Groq si clé Groq présente, sinon OpenAI par défaut
+        if os.environ.get('GROQ_API_KEY'):
+            base_url = "https://api.groq.com/openai/v1"
+            llm_model = os.environ.get('LLM_MODEL', 'llama3-8b-8192')
+        else:
+            base_url = os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')
+            llm_model = os.environ.get('LLM_MODEL', 'gpt-4o-mini')
         
         # Get chat history for context
         history = await db.chat_messages.find(
@@ -523,7 +529,7 @@ async def chat_with_ai(request: ChatRequest):
             messages.append({"role": role, "content": msg.get("content", "")})
         messages.append({"role": "user", "content": request.message})
 
-        openai_client = AsyncOpenAI(api_key=api_key)
+        openai_client = AsyncOpenAI(api_key=api_key, base_url=base_url)
         completion = await openai_client.chat.completions.create(
             model=llm_model,
             messages=messages,
@@ -554,7 +560,6 @@ async def chat_with_ai(request: ChatRequest):
         logging.error(f"Chat error: {str(e)}")
         error_str = str(e)
         if "401" in error_str or "invalid_api_key" in error_str or "Incorrect API key" in error_str:
-            # Clé invalide : retourner un vrai 200 avec message lisible plutôt qu'un crash 500
             fallback_msg = (
                 "⚠️ Clé OpenAI invalide ou expirée.\n\n"
                 "Pour réactiver l'IA :\n"
@@ -563,12 +568,15 @@ async def chat_with_ai(request: ChatRequest):
                 "3. Mets-la dans warzone/backend/.env → OPENAI_API_KEY=sk-...\n"
                 "4. Redémarre le backend"
             )
-            await db.chat_messages.insert_one(ChatMessage(
-                session_id=request.session_id, role="user", content=request.message
-            ).model_dump())
-            await db.chat_messages.insert_one(ChatMessage(
-                session_id=request.session_id, role="assistant", content=fallback_msg
-            ).model_dump())
+            try:
+                await db.chat_messages.insert_one(ChatMessage(
+                    session_id=request.session_id, role="user", content=request.message
+                ).model_dump())
+                await db.chat_messages.insert_one(ChatMessage(
+                    session_id=request.session_id, role="assistant", content=fallback_msg
+                ).model_dump())
+            except Exception:
+                pass  # MongoDB down — pas bloquant pour retourner la réponse
             return ChatResponse(response=fallback_msg, session_id=request.session_id)
         raise HTTPException(status_code=500, detail=f"AI service error: {error_str}")
 
@@ -1235,7 +1243,19 @@ async def _meta_update_loop():
 
 @app.on_event("startup")
 async def startup_event():
-    """Au démarrage: lance le scheduler META + première sync si besoin."""
+    """Au démarrage: auto-seed armes si DB vide + lance le scheduler META."""
+    # --- Auto-seed armes si collection vide ---
+    try:
+        count = await db.weapons.count_documents({})
+        if count == 0:
+            logger.info("⚙️ DB vide → seed automatique des armes META...")
+            result = await seed_default_weapons()
+            logger.info(f"✅ Seed terminé : {result.get('count', '?')} armes ajoutées.")
+        else:
+            logger.info(f"✅ {count} armes déjà en base — pas de seed.")
+    except Exception as e:
+        logger.error(f"❌ Erreur auto-seed armes : {e}")
+
     cache = load_cache()
     if cache is None:
         # Première exécution : sync immédiate
