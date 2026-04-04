@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import SlotSidebar   from './components/SlotSidebar';
-import ScriptList    from './components/ScriptList';
-import Editor        from './components/Editor';
-import AnalysisPanel from './components/AnalysisPanel';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import SlotSidebar      from './components/SlotSidebar';
+import ScriptList       from './components/ScriptList';
+import Editor           from './components/Editor';
+import AnalysisPanel    from './components/AnalysisPanel';
+import DropZone         from './components/DropZone';
+import { useFileImport } from './hooks/useFileImport';
 
 /**
  * App — composant racine
@@ -22,6 +24,8 @@ export default function App() {
   const [selectedScript, setSelectedScript] = useState(null);
   const [analysis,       setAnalysis]       = useState(null);
   const [statusMsg,      setStatusMsg]      = useState('');
+  const [globalDrag,     setGlobalDrag]     = useState(false); // overlay drag toute la fenêtre
+  const globalDragCounter                   = useRef(0);
 
   // ── Chargement initial ───────────────────────────────────────────────────
 
@@ -113,6 +117,7 @@ export default function App() {
     }
   }, [selectedScript, loadScripts, flash]);
 
+  // ── Import via dialog Electron (bouton ⬆ dans ScriptList) ─────────────────
   const handleImportGpc = useCallback(async () => {
     try {
       const res = await window.api.scripts.importGpc();
@@ -120,10 +125,75 @@ export default function App() {
       await loadScripts();
       const count = res.scripts.length;
       flash(`${count} script${count > 1 ? 's' : ''} importé${count > 1 ? 's' : ''}.`);
+      // Sélectionner le dernier script importé
+      if (res.scripts.length > 0) {
+        const last     = res.scripts[res.scripts.length - 1];
+        const analysis = await window.api.analysis.get(last.id).catch(() => null);
+        setSelectedScript(last);
+        setAnalysis(analysis);
+      }
     } catch (err) {
       flash(`Erreur import : ${err.message}`);
     }
   }, [loadScripts, flash]);
+
+  // ── Callback partagé après import réussi (hook useFileImport) ───────────────
+  const handleImported = useCallback(async (script, analysis) => {
+    await loadScripts();
+    setSelectedScript(script);
+    setAnalysis(analysis);
+    flash(`✓ Script importé : "${script.name}"`);
+  }, [loadScripts, flash]);
+
+  const handleImportError = useCallback((msg) => {
+    flash(`✗ ${msg}`);
+  }, [flash]);
+
+  const { importFiles, importText } = useFileImport({
+    onImported: handleImported,
+    onError:    handleImportError,
+  });
+
+  // ── Ctrl+V global — coller un script depuis le presse-papiers ───────────
+  useEffect(() => {
+    const handlePaste = (e) => {
+      // Ne pas intercepter si l'utilisateur colle dans un champ texte / CodeMirror
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      const text = e.clipboardData?.getData('text/plain') ?? '';
+      if (text.trim().length >= 5) {
+        importText(text, 'Script collé');
+      }
+    };
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [importText]);
+
+  // ── Drag global sur toute la fenêtre — affiche l'overlay DropZone ────────
+  const handleGlobalDragEnter = useCallback((e) => {
+    if (!e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    globalDragCounter.current++;
+    setGlobalDrag(true);
+  }, []);
+
+  const handleGlobalDragLeave = useCallback((e) => {
+    globalDragCounter.current--;
+    if (globalDragCounter.current === 0) setGlobalDrag(false);
+  }, []);
+
+  const handleGlobalDragOver = useCallback((e) => {
+    if (e.dataTransfer.types.includes('Files')) e.preventDefault();
+  }, []);
+
+  const handleGlobalDrop = useCallback((e) => {
+    e.preventDefault();
+    globalDragCounter.current = 0;
+    setGlobalDrag(false);
+    if (e.dataTransfer.files.length > 0) {
+      importFiles(e.dataTransfer.files);
+    }
+  }, [importFiles]);
 
   // ── Actions slots ────────────────────────────────────────────────────────
 
@@ -145,7 +215,13 @@ export default function App() {
   // ── Rendu ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="app">
+    <div
+      className="app"
+      onDragEnter={handleGlobalDragEnter}
+      onDragLeave={handleGlobalDragLeave}
+      onDragOver={handleGlobalDragOver}
+      onDrop={handleGlobalDrop}
+    >
       <header className="app-header">
         <span className="app-logo">⬡ Chronus Zen IDE</span>
         {statusMsg && <span className="app-status">{statusMsg}</span>}
@@ -169,14 +245,33 @@ export default function App() {
         />
 
         <div className="main-panel">
-          <Editor
-            script={selectedScript}
-            onSave={handleSaveScript}
-            onAnalysisUpdate={setAnalysis}
-          />
-          <AnalysisPanel analysis={analysis} />
+          {selectedScript ? (
+            <>
+              <Editor
+                script={selectedScript}
+                onSave={handleSaveScript}
+                onAnalysisUpdate={setAnalysis}
+              />
+              <AnalysisPanel analysis={analysis} />
+            </>
+          ) : (
+            <DropZone
+              onDrop={importFiles}
+              onPicker={handleImportGpc}
+            />
+          )}
         </div>
       </div>
+
+      {/* Overlay plein écran quand un fichier est glissé sur la fenêtre */}
+      {globalDrag && (
+        <div className="global-drop-overlay">
+          <div className="global-drop-overlay__inner">
+            <div className="global-drop-overlay__icon">⬇</div>
+            <div className="global-drop-overlay__label">Déposer le fichier GPC</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
