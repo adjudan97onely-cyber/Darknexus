@@ -16,6 +16,26 @@ const path                                      = require('path');
 const { pathToFileURL }                         = require('url');
 const fs                                        = require('fs');
 
+// ── Chargement du .env (lecture manuelle, sans dépendance dotenv) ─────────────
+// Cherche .env dans la racine de l'IDE (3 niveaux au-dessus du main compilé)
+function loadEnvFile() {
+  try {
+    const envPath = path.join(__dirname, '../../../.env');
+    if (!fs.existsSync(envPath)) return;
+    const raw = fs.readFileSync(envPath, 'utf8');
+    for (const line of raw.split('\n')) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const eqIdx = trimmed.indexOf('=');
+      if (eqIdx < 1) continue;
+      const key = trimmed.slice(0, eqIdx).trim();
+      const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
+      if (key && !(key in process.env)) process.env[key] = val;
+    }
+  } catch { /* .env absent ou illisible — pas bloquant */ }
+}
+loadEnvFile();
+
 // ── Backend ───────────────────────────────────────────────────────────────────
 // __dirname en dev/build = ui/out/main/
 // 3 niveaux plus haut    = chronus-zen-ide/
@@ -23,6 +43,7 @@ const fs                                        = require('fs');
 let projectManager;
 let scriptParser;
 let featureDetector;
+let scriptExplainer;
 
 async function loadBackend() {
   const ideRoot = path.join(__dirname, '../../..');
@@ -38,6 +59,10 @@ async function loadBackend() {
   const fdEntry = path.join(ideRoot, 'src', 'compiler', 'FeatureDetector.js');
   const fdMod   = await import(pathToFileURL(fdEntry).href);
   featureDetector = fdMod.featureDetector;
+
+  const seEntry = path.join(ideRoot, 'src', 'compiler', 'ScriptExplainer.js');
+  const seMod   = await import(pathToFileURL(seEntry).href);
+  scriptExplainer = seMod.scriptExplainer;
 }
 
 // ── IPC Handlers ──────────────────────────────────────────────────────────────
@@ -98,6 +123,11 @@ function registerIpc() {
   // ── Détection de fonctionnalités (FeatureDetector) ─────────────────────────
   ipcMain.handle('features:detect', (_, { content, parsedData }) =>
     featureDetector.detectFeatures(content, parsedData ?? null)
+  );
+
+  // ── Explication IA (ScriptExplainer) ──────────────────────────────────
+  ipcMain.handle('explain:script', (_, { content, structure, features }) =>
+    scriptExplainer.explainScript({ content, structure, features })
   );
 
   // ── Export .gpc ───────────────────────────────────────────────────────────

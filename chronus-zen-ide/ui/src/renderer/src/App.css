@@ -896,6 +896,225 @@ body {
   font-style: italic;
 }
 
+/* ══ Bouton Expliquer (variante accentuée) ═══════════════════════════════════ */
+
+.btn-structure--explain {
+  border-color: var(--accent-dim);
+  color:        var(--accent);
+}
+.btn-structure--explain:hover {
+  border-color: var(--accent);
+  background:   rgba(0, 212, 255, 0.06);
+}
+.btn-structure--explain:disabled {
+  opacity: 0.5;
+  cursor:  not-allowed;
+}
+
+/* ══ Explanation Panel ═══════════════════════════════════════════════════════ */
+
+.explanation-panel {
+  flex-shrink:    0;
+  max-height:     340px;
+  overflow-y:     auto;
+  background:     var(--bg-panel);
+  border-top:     1px solid var(--border);
+  display:        flex;
+  flex-direction: column;
+}
+
+/* En-tête */
+.ep-header {
+  display:       flex;
+  align-items:   center;
+  gap:           8px;
+  padding:       7px 14px;
+  background:    #09091a;
+  border-bottom: 1px solid var(--border);
+  flex-shrink:   0;
+}
+
+.ep-title {
+  font-size:      11px;
+  font-weight:    700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--text-dim);
+}
+
+.ep-model {
+  font-size:     10px;
+  padding:       2px 7px;
+  border:        1px solid var(--border);
+  border-radius: 10px;
+  color:         var(--text-dim);
+  font-family:   var(--font-mono);
+}
+
+.ep-tokens {
+  font-size:  10px;
+  color:      var(--text-dim);
+  opacity:    0.6;
+  margin-left: auto;
+}
+
+/* Spinner */
+.ep-spinner {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             12px;
+  padding:         32px;
+  flex:            1;
+}
+
+.ep-spinner__ring {
+  width:        32px;
+  height:       32px;
+  border:       3px solid var(--border);
+  border-top:   3px solid var(--accent);
+  border-radius: 50%;
+  animation:    spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.ep-spinner__label {
+  font-size:  12px;
+  color:      var(--text-dim);
+  animation:  pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* Erreur */
+.ep-error {
+  display:        flex;
+  flex-direction: column;
+  gap:            6px;
+  padding:        16px 14px;
+  color:          var(--error);
+}
+
+.ep-error__icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.ep-error__msg {
+  font-size: 12px;
+}
+
+.ep-error__hint {
+  font-size:     11px;
+  color:         var(--text-dim);
+  background:    var(--bg-active);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  padding:       8px 10px;
+  line-height:   1.6;
+  margin-top:    4px;
+}
+
+.ep-error__hint code {
+  font-family:   var(--font-mono);
+  font-size:     11px;
+  color:         var(--accent);
+  background:    rgba(0, 212, 255, 0.08);
+  border-radius: 2px;
+  padding:       1px 4px;
+}
+
+/* Contenu principal */
+.ep-content {
+  display:        flex;
+  flex-direction: column;
+  gap:            0;
+}
+
+/* Résumé */
+.ep-summary {
+  padding:     10px 14px 8px;
+  font-size:   13px;
+  font-weight: 500;
+  color:       var(--text);
+  line-height: 1.5;
+  border-bottom: 1px solid var(--border);
+  background:  rgba(0, 212, 255, 0.03);
+}
+
+/* Tags jeu + complexité */
+.ep-tags {
+  display:       flex;
+  gap:           0;
+  border-bottom: 1px solid var(--border);
+  flex-shrink:   0;
+}
+
+.ep-tag {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+  padding:        7px 14px;
+  border-right:   1px solid var(--border);
+}
+
+.ep-tag:last-child { border-right: none; }
+
+.ep-tag__label {
+  font-size:      9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color:          var(--text-dim);
+  margin-bottom:  3px;
+}
+
+.ep-tag__value {
+  font-size:   11px;
+  font-weight: 600;
+  color:       var(--text);
+  line-height: 1.4;
+}
+
+.ep-tag--game      .ep-tag__value { color: var(--accent); }
+.ep-tag--complexity .ep-tag__value { color: var(--warning); }
+
+/* Sections explicatives */
+.ep-section {
+  padding:       8px 14px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ep-section:last-child { border-bottom: none; }
+
+.ep-section__header {
+  display:       flex;
+  align-items:   center;
+  gap:           6px;
+  margin-bottom: 5px;
+}
+
+.ep-section__icon {
+  font-size: 12px;
+  color:     var(--accent);
+}
+
+.ep-section__title {
+  font-size:      10px;
+  font-weight:    700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color:          var(--text-dim);
+}
+
+.ep-section__body {
+  font-size:   12px;
+  color:       var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
 .editor-header {

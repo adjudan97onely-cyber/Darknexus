@@ -77,4 +77,14 @@ contextBridge.exposeInMainWorld('api', {
     detect: (content, parsedData = null) =>
       ipcRenderer.invoke('features:detect', { content, parsedData }),
   },
+
+  /**
+   * Explication intelligente d'un script via IA (ScriptExplainer).
+   * @param {string}               content   — contenu brut
+   * @param {ParseResult|null}     structure — résultat ScriptParser
+   * @param {DetectionResult|null} features  — résultat FeatureDetector
+   * @returns {Promise<ExplanationResult>}
+   */
+  explainScript: (content, structure = null, features = null) =>
+    ipcRenderer.invoke('explain:script', { content, structure, features }),
 });

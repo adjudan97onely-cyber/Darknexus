@@ -5,6 +5,7 @@ import Editor           from './components/Editor';
 import AnalysisPanel    from './components/AnalysisPanel';
 import StructurePanel   from './components/StructurePanel';
 import FeaturesPanel    from './components/FeaturesPanel';
+import ExplanationPanel from './components/ExplanationPanel';
 import DropZone         from './components/DropZone';
 import { useFileImport } from './hooks/useFileImport';
 
@@ -31,6 +32,9 @@ export default function App() {
   const [showStructure,  setShowStructure]  = useState(false); // panneau structure visible
   const [featuresResult, setFeaturesResult] = useState(null);  // résultat FeatureDetector
   const [showFeatures,   setShowFeatures]   = useState(false); // panneau features visible
+  const [explanation,    setExplanation]    = useState(null);  // résultat ScriptExplainer
+  const [explainLoading, setExplainLoading] = useState(false); // loader appel IA
+  const [showExplan,     setShowExplan]     = useState(false); // panneau explication visible
   const globalDragCounter                   = useRef(0);
 
   // ── Chargement initial ───────────────────────────────────────────────────
@@ -258,6 +262,14 @@ export default function App() {
             >
               ⊕ Features
             </button>
+            <button
+              className={`btn-structure btn-structure--explain${showExplan ? ' btn-structure--active' : ''}`}
+              onClick={showExplan ? () => setShowExplan(false) : handleExplainScript}
+              title={showExplan ? 'Masquer l\'explication' : 'Expliquer le script via IA'}
+              disabled={explainLoading}
+            >
+              {explainLoading ? '⧙ IA...' : '⬡ Expliquer'}
+            </button>
           </div>
         )}
 
@@ -298,6 +310,12 @@ export default function App() {
                 <FeaturesPanel
                   result={featuresResult}
                   onClose={() => setShowFeatures(false)}
+                />
+              ) : showExplan ? (
+                <ExplanationPanel
+                  result={explanation}
+                  loading={explainLoading}
+                  onClose={() => setShowExplan(false)}
                 />
               ) : (
                 <AnalysisPanel analysis={analysis} />

@@ -9,6 +9,9 @@ ui/out/
 # Chaque installation a ses propres scripts locaux
 src/storage/data/
 
+# Clés API — NE JAMAIS VERSIONNER
+.env
+
 # Logs
 *.log
 npm-debug.log*
