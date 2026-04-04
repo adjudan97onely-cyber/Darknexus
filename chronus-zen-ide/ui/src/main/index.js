@@ -22,6 +22,7 @@ const fs                                        = require('fs');
 
 let projectManager;
 let scriptParser;
+let featureDetector;
 
 async function loadBackend() {
   const ideRoot = path.join(__dirname, '../../..');
@@ -33,6 +34,10 @@ async function loadBackend() {
   const spEntry = path.join(ideRoot, 'src', 'compiler', 'ScriptParser.js');
   const spMod   = await import(pathToFileURL(spEntry).href);
   scriptParser  = spMod.scriptParser;
+
+  const fdEntry = path.join(ideRoot, 'src', 'compiler', 'FeatureDetector.js');
+  const fdMod   = await import(pathToFileURL(fdEntry).href);
+  featureDetector = fdMod.featureDetector;
 }
 
 // ── IPC Handlers ──────────────────────────────────────────────────────────────
@@ -88,6 +93,11 @@ function registerIpc() {
   // ── Analyse structurelle (ScriptParser) ──────────────────────────────────
   ipcMain.handle('parser:parse', (_, { content }) =>
     scriptParser.parse(content)
+  );
+
+  // ── Détection de fonctionnalités (FeatureDetector) ─────────────────────────
+  ipcMain.handle('features:detect', (_, { content, parsedData }) =>
+    featureDetector.detectFeatures(content, parsedData ?? null)
   );
 
   // ── Export .gpc ───────────────────────────────────────────────────────────

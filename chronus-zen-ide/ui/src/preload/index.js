@@ -66,4 +66,15 @@ contextBridge.exposeInMainWorld('api', {
     parse: (content) =>
       ipcRenderer.invoke('parser:parse', { content }),
   },
+
+  features: {
+    /**
+     * Détection automatique des fonctionnalités via FeatureDetector.
+     * @param {string}          content     — contenu brut du script
+     * @param {ParseResult|null} parsedData — résultat ScriptParser (optionnel)
+     * @returns {Promise<DetectionResult>}
+     */
+    detect: (content, parsedData = null) =>
+      ipcRenderer.invoke('features:detect', { content, parsedData }),
+  },
 });

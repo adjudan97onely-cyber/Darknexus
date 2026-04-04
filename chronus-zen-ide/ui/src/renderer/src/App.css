@@ -703,6 +703,199 @@ body {
   font-style: italic;
 }
 
+/* ══ Boutons header groupés ══════════════════════════════════════════════════ */
+
+.app-header-actions {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  -webkit-app-region: no-drag;
+}
+
+/* ══ Features Panel ══════════════════════════════════════════════════════════ */
+
+.features-panel {
+  flex-shrink:    0;
+  max-height:     260px;
+  overflow-y:     auto;
+  background:     var(--bg-panel);
+  border-top:     1px solid var(--border);
+  display:        flex;
+  flex-direction: column;
+}
+
+/* En-tête */
+.fp-header {
+  display:       flex;
+  align-items:   center;
+  gap:           10px;
+  padding:       7px 14px;
+  background:    #09091a;
+  border-bottom: 1px solid var(--border);
+  flex-shrink:   0;
+}
+
+.fp-title {
+  font-size:      11px;
+  font-weight:    700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--text-dim);
+}
+
+.fp-header-stats {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+}
+
+.fp-stat {
+  font-size:     10px;
+  font-weight:   600;
+  padding:       2px 7px;
+  border-radius: 10px;
+  border:        1px solid transparent;
+}
+.fp-stat--high   { color: var(--success); border-color: rgba(68,255,136,0.3); background: rgba(68,255,136,0.07); }
+.fp-stat--medium { color: var(--warning); border-color: rgba(255,170,0,0.3);  background: rgba(255,170,0,0.07);  }
+.fp-stat--low    { color: var(--text-dim); }
+.fp-stat--none   { color: var(--text-dim); font-style: italic; font-weight: 400; }
+
+/* Métriques */
+.fp-metrics {
+  display:       flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink:   0;
+}
+
+.fp-metric {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  padding:         6px 18px;
+  border-right:    1px solid var(--border);
+  min-width:       70px;
+}
+.fp-metric:last-child { border-right: none; }
+
+.fp-metric__val {
+  font-size:   15px;
+  font-weight: 700;
+  color:       var(--accent);
+  line-height: 1.2;
+}
+
+.fp-metric__lbl {
+  font-size:   9px;
+  color:       var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top:  2px;
+}
+
+/* Liste des features */
+.fp-list {
+  padding:        6px 14px;
+  display:        flex;
+  flex-direction: column;
+  gap:            6px;
+}
+
+.fp-feature {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  padding:     5px 6px;
+  border-radius: var(--radius);
+  transition:  background 0.1s;
+}
+.fp-feature:hover { background: var(--bg-hover); }
+
+.fp-feature__icon {
+  font-size:   16px;
+  line-height: 1;
+  width:       20px;
+  text-align:  center;
+  flex-shrink: 0;
+  color:       var(--accent);
+}
+
+.fp-feature__info {
+  flex:           1;
+  display:        flex;
+  flex-direction: column;
+  gap:            4px;
+  min-width:      0;
+}
+
+.fp-feature__top {
+  display:     flex;
+  align-items: baseline;
+  gap:         6px;
+}
+
+.fp-feature__name {
+  font-size:   12px;
+  font-weight: 600;
+  color:       var(--text);
+  flex:        1;
+}
+
+.fp-feature__score {
+  font-size:   11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+/* Barre de confiance */
+.fp-bar-wrap {
+  height:        4px;
+  background:    var(--bg-active);
+  border-radius: 2px;
+  overflow:      hidden;
+}
+
+.fp-bar-fill {
+  height:        100%;
+  border-radius: 2px;
+  transition:    width 0.4s ease;
+}
+
+/* Niveau texte */
+.fp-feature__level {
+  font-size:   10px;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width:   44px;
+  text-align:  right;
+  text-transform: capitalize;
+}
+
+/* État vide */
+.fp-empty {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             6px;
+  padding:         24px 16px;
+  text-align:      center;
+  color:           var(--text-dim);
+  font-size:       12px;
+}
+
+.fp-empty__icon {
+  font-size: 24px;
+  opacity:   0.4;
+}
+
+.fp-empty__hint {
+  font-size:  11px;
+  color:      var(--text-dim);
+  opacity:    0.6;
+  font-style: italic;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
 .editor-header {

@@ -4,6 +4,7 @@ import ScriptList       from './components/ScriptList';
 import Editor           from './components/Editor';
 import AnalysisPanel    from './components/AnalysisPanel';
 import StructurePanel   from './components/StructurePanel';
+import FeaturesPanel    from './components/FeaturesPanel';
 import DropZone         from './components/DropZone';
 import { useFileImport } from './hooks/useFileImport';
 
@@ -28,6 +29,8 @@ export default function App() {
   const [globalDrag,     setGlobalDrag]     = useState(false); // overlay drag toute la fenêtre
   const [structure,      setStructure]      = useState(null);  // résultat ScriptParser
   const [showStructure,  setShowStructure]  = useState(false); // panneau structure visible
+  const [featuresResult, setFeaturesResult] = useState(null);  // résultat FeatureDetector
+  const [showFeatures,   setShowFeatures]   = useState(false); // panneau features visible
   const globalDragCounter                   = useRef(0);
 
   // ── Chargement initial ───────────────────────────────────────────────────
@@ -240,13 +243,22 @@ export default function App() {
         <span className="app-logo">⬡ Chronus Zen IDE</span>
 
         {selectedScript && (
-          <button
-            className={`btn-structure${showStructure ? ' btn-structure--active' : ''}`}
-            onClick={showStructure ? () => setShowStructure(false) : handleAnalyzeStructure}
-            title={showStructure ? 'Masquer la structure' : 'Analyser la structure du script'}
-          >
-            ⬡ Structure
-          </button>
+          <div className="app-header-actions">
+            <button
+              className={`btn-structure${showStructure ? ' btn-structure--active' : ''}`}
+              onClick={showStructure ? () => setShowStructure(false) : handleAnalyzeStructure}
+              title={showStructure ? 'Masquer la structure' : 'Analyser la structure du script'}
+            >
+              ⬡ Structure
+            </button>
+            <button
+              className={`btn-structure${showFeatures ? ' btn-structure--active' : ''}`}
+              onClick={showFeatures ? () => setShowFeatures(false) : handleDetectFeatures}
+              title={showFeatures ? 'Masquer les fonctionnalités' : 'Détecter les fonctionnalités'}
+            >
+              ⊕ Features
+            </button>
+          </div>
         )}
 
         {statusMsg && <span className="app-status">{statusMsg}</span>}
@@ -281,6 +293,11 @@ export default function App() {
                 <StructurePanel
                   result={structure}
                   onClose={() => setShowStructure(false)}
+                />
+              ) : showFeatures && featuresResult ? (
+                <FeaturesPanel
+                  result={featuresResult}
+                  onClose={() => setShowFeatures(false)}
                 />
               ) : (
                 <AnalysisPanel analysis={analysis} />
