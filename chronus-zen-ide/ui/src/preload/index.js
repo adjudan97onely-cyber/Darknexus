@@ -56,4 +56,14 @@ contextBridge.exposeInMainWorld('api', {
     get: (scriptId) =>
       ipcRenderer.invoke('analysis:get', { scriptId }),
   },
+
+  parser: {
+    /**
+     * Analyse structurelle d'un script GPC via ScriptParser.
+     * @param {string} content
+     * @returns {Promise<ParseResult>}
+     */
+    parse: (content) =>
+      ipcRenderer.invoke('parser:parse', { content }),
+  },
 });

@@ -21,12 +21,18 @@ const fs                                        = require('fs');
 // 3 niveaux plus haut    = chronus-zen-ide/
 
 let projectManager;
+let scriptParser;
 
 async function loadBackend() {
   const ideRoot = path.join(__dirname, '../../..');
-  const entry   = path.join(ideRoot, 'src', 'core', 'ProjectManager.js');
-  const mod     = await import(pathToFileURL(entry).href);
-  projectManager = mod.projectManager;
+
+  const pmEntry = path.join(ideRoot, 'src', 'core', 'ProjectManager.js');
+  const pmMod   = await import(pathToFileURL(pmEntry).href);
+  projectManager = pmMod.projectManager;
+
+  const spEntry = path.join(ideRoot, 'src', 'compiler', 'ScriptParser.js');
+  const spMod   = await import(pathToFileURL(spEntry).href);
+  scriptParser  = spMod.scriptParser;
 }
 
 // ── IPC Handlers ──────────────────────────────────────────────────────────────
@@ -74,9 +80,14 @@ function registerIpc() {
     };
   });
 
-  // ── Analyse ───────────────────────────────────────────────────────────────
+  // ── Analyse GPC ──────────────────────────────────────────────────────────
   ipcMain.handle('analysis:get', (_, { scriptId }) =>
     projectManager.getScriptAnalysis(scriptId)
+  );
+
+  // ── Analyse structurelle (ScriptParser) ──────────────────────────────────
+  ipcMain.handle('parser:parse', (_, { content }) =>
+    scriptParser.parse(content)
   );
 
   // ── Export .gpc ───────────────────────────────────────────────────────────

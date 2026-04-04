@@ -3,6 +3,7 @@ import SlotSidebar      from './components/SlotSidebar';
 import ScriptList       from './components/ScriptList';
 import Editor           from './components/Editor';
 import AnalysisPanel    from './components/AnalysisPanel';
+import StructurePanel   from './components/StructurePanel';
 import DropZone         from './components/DropZone';
 import { useFileImport } from './hooks/useFileImport';
 
@@ -25,6 +26,8 @@ export default function App() {
   const [analysis,       setAnalysis]       = useState(null);
   const [statusMsg,      setStatusMsg]      = useState('');
   const [globalDrag,     setGlobalDrag]     = useState(false); // overlay drag toute la fenêtre
+  const [structure,      setStructure]      = useState(null);  // résultat ScriptParser
+  const [showStructure,  setShowStructure]  = useState(false); // panneau structure visible
   const globalDragCounter                   = useRef(0);
 
   // ── Chargement initial ───────────────────────────────────────────────────
@@ -116,7 +119,18 @@ export default function App() {
       flash(`Erreur : ${err.message}`);
     }
   }, [selectedScript, loadScripts, flash]);
+  // ── Analyse structurelle (ScriptParser) ──────────────────────────────────
 
+  const handleAnalyzeStructure = useCallback(async () => {
+    if (!selectedScript) return;
+    try {
+      const result = await window.api.parser.parse(selectedScript.content);
+      setStructure(result);
+      setShowStructure(true);
+    } catch (err) {
+      flash(`Erreur structure : ${err.message}`);
+    }
+  }, [selectedScript, flash]);
   // ── Import via dialog Electron (bouton ⬆ dans ScriptList) ─────────────────
   const handleImportGpc = useCallback(async () => {
     try {
@@ -224,6 +238,17 @@ export default function App() {
     >
       <header className="app-header">
         <span className="app-logo">⬡ Chronus Zen IDE</span>
+
+        {selectedScript && (
+          <button
+            className={`btn-structure${showStructure ? ' btn-structure--active' : ''}`}
+            onClick={showStructure ? () => setShowStructure(false) : handleAnalyzeStructure}
+            title={showStructure ? 'Masquer la structure' : 'Analyser la structure du script'}
+          >
+            ⬡ Structure
+          </button>
+        )}
+
         {statusMsg && <span className="app-status">{statusMsg}</span>}
       </header>
 
@@ -252,7 +277,14 @@ export default function App() {
                 onSave={handleSaveScript}
                 onAnalysisUpdate={setAnalysis}
               />
-              <AnalysisPanel analysis={analysis} />
+              {showStructure && structure ? (
+                <StructurePanel
+                  result={structure}
+                  onClose={() => setShowStructure(false)}
+                />
+              ) : (
+                <AnalysisPanel analysis={analysis} />
+              )}
             </>
           ) : (
             <DropZone
