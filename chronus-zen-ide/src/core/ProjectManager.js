@@ -95,6 +95,7 @@ class ProjectManager {
     const script = this._findScriptOrThrow(id);
     script.content   = newContent;
     script.updatedAt = new Date().toISOString();
+    this._analysisCache.delete(id);   // invalider le cache pour forcer une ré-analyse
     this._saveScripts();
 
     return script;

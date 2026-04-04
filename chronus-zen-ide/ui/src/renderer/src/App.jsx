@@ -187,11 +187,11 @@ export default function App() {
     try {
       const { fixedContent, changes } = await window.api.compiler.fix(selectedScript.content);
       if (changes.length === 0) { flash('✓ Aucune correction nécessaire.'); return; }
-      // Sauvegarder le contenu corrigé
+      // Sauvegarder le contenu corrigé (invalide le cache d'analyse)
       const updated = await window.api.scripts.update(selectedScript.id, fixedContent);
-      setSelectedScript({ ...selectedScript, content: fixedContent });
-      // Re-analyser pour mettre à jour le panel
-      const newAnalysis = await window.api.analysis.get(selectedScript.id).catch(() => null);
+      setSelectedScript(updated); // déclenche la mise à jour de l'éditeur CodeMirror
+      // Re-analyser avec le nouveau contenu
+      const newAnalysis = await window.api.analysis.get(updated.id).catch(() => null);
       setAnalysis(newAnalysis);
       flash(`🔧 ${changes.length} correction${changes.length > 1 ? 's' : ''} appliquée${changes.length > 1 ? 's' : ''}.`);
     } catch (err) {

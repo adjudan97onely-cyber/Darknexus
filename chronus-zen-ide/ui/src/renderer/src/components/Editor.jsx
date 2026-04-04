@@ -45,13 +45,29 @@ export default function Editor({ script, onSave, onAnalysisUpdate }) {
   const viewRef     = useRef(null);                    // instance CodeMirror View
   const analysisRef = useRef(null);                    // analyse courante (lue par linter)
 
-  // Réinitialiser quand le script change
+  // Réinitialiser quand le script change (ID différent)
   useEffect(() => {
     contentRef.current  = script?.content ?? '';
     analysisRef.current = null;
     setDirty(false);
     setSaveStatus('saved');
   }, [script?.id]);
+
+  // Synchroniser un changement de contenu externe (ex: auto-fix) dans CodeMirror
+  // Ne s'applique que si le contenu du store diffère de ce qu'affiche l'éditeur
+  useEffect(() => {
+    if (!viewRef.current || !script) return;
+    const editorDoc = viewRef.current.state.doc.toString();
+    if (editorDoc !== script.content) {
+      viewRef.current.dispatch({
+        changes: { from: 0, to: editorDoc.length, insert: script.content },
+      });
+      contentRef.current = script.content;
+      setDirty(false);
+      setSaveStatus('saved');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [script?.content]);
 
   // ── Auto-sauvegarde + analyse ─────────────────────────────────────────────
 
