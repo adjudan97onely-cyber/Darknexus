@@ -4,6 +4,10 @@
 .env.*.local
 *.env
 
+# Export .env portable - NE PAS VERSIONNER (contient des cles!)
+env_export_PORTABLE.zip
+env_export_PORTABLE.txt
+
 # Logs
 logs
 *.log

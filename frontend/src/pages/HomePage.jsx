@@ -124,11 +124,11 @@ const HomePage = () => {
             <Button
               size="lg"
               onClick={() => navigate('/quick-create')}
-              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-8 py-6 transition-all duration-300 shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 animate-pulse relative overflow-hidden">
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-lg px-8 py-6 transition-all duration-300 shadow-2xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 relative overflow-hidden">
               <span className="relative z-10 flex items-center">
                 <Zap className="w-5 h-5 mr-2" />
                 Création Express ⚡
-                <span className="ml-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold animate-bounce">NOUVEAU</span>
+                <span className="ml-2 bg-yellow-400 text-black text-xs px-2 py-1 rounded-full font-bold">NOUVEAU</span>
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-emerald-500 to-teal-500 opacity-0 hover:opacity-20 transition-opacity duration-300"></span>
             </Button>
