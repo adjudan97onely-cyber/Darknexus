@@ -1,0 +1,1471 @@
+// ===================================================================
+// ZEN HUB PRO - MASTER SCRIPT V8 "PREDATOR"
+// Date: 04 AVRIL 2026 - Heure France
+// Total Weapons: 103
+// Platform: PlayStation 5
+// Author: DARKNEXUS AI TEAM
+// ===================================================================
+// BASE CONFIRMEE: V7_AUTO_DETECT (slot 4, prouve Device Monitor)
+// ARMES ACTIVES: MK35 ISR (FA longue portee, index 101) / VST (SMG, index 102)
+// META SAISON 3 - Source: wzstats.gg/fr - Mis a jour 04/04/2026
+//
+// AMELIORATIONS V8:
+//  [DETECT]  Buffer 5-intervalles, detect_lock_timer 400ms, last_valid_weapon
+//  [DETECT]  Seuil rumble 40% (plus sensible), cooldown 25ms, tol. RPM 140
+//  [RF]      weapon_rf_delay[] - delai RF specifique par arme (semi-autos)
+//  [AR]      Toggle AR global SHARE+R1 avec feedback OLED + vibration
+//  [AI]      aim_assist_paused auto sur SQUARE (plus de bug looting)
+//  [MENU]    nav_cd : navigation menu fluide sans defilement trop rapide
+//  [STICK]   correctStick() : deadzone propre avec clamp (BO7 method)
+//  [SNIPER]  QuickScope + Auto Hold Breath sur snipers
+//  [HUMAN]   Humanisation AR : micro-variations aleatoires (indetectable)
+//  [TOGGLE]  L2+SHARE : desactive tout le script sans debrancher
+//  [DEBUG]   TRACES actives (TRACE_1=RPM, TRACE_2=RumbleA, TRACE_3=Shots,
+//                            TRACE_4=Index, TRACE_5=RF, TRACE_6=AR)
+//  [MENU]    MOD+ menu (PAD+DOWN) : 5 features ON/OFF
+//
+// CONTROLES:
+//  PAD + R2      = Menu selection arme (101 armes)
+//  PAD + L2      = Menu reglage anti-recul manuel
+//  PAD + DOWN    = Menu MOD+ (Surprise/QuickScope/HoldBreath/Humanise/Script)
+//  PAD + UP      = Toggle Surprise Mode rapide
+//  SHARE + R1    = Toggle Anti-Recul global (feedback vibration)
+//  L2 + SHARE    = Toggle Script ON/OFF complet
+//  TRIANGLE      = Changer de profil (MK35 ISR / VST)
+// ===================================================================
+
+// === TOUCHES REMAPPABLES ===
+int vise = PS4_L2;
+int tire = PS4_R2;
+int accroupi = PS4_R3;
+int saut = PS4_CROSS;
+int recharge = PS4_SQUARE;
+int sprint = PS4_L3;
+int melee = PS4_CIRCLE;
+
+// === ETAT GLOBAL ===
+int script_enabled = TRUE;
+int current_profil = 0;
+int control_mode = 0;
+int update = TRUE;
+
+// === MODS COMBAT ===
+int jumpshot_actif = TRUE;
+int slidecancel_actif = TRUE;
+int autosprint_actif = TRUE;
+int anti_recul_actif = TRUE;
+int anti_recul_universel_v = 8;
+int anti_recul_universel_h = 0;
+int as_sprint_threshold = 80;
+int mode_ultra_aggro = FALSE;
+
+// === POLAR AIM (aim assist) ===
+int aim_assist_actif = TRUE;
+int aim_assist_paused = FALSE;
+int polar_step = 0;
+int polar_val = 1;
+int stick_rx = 0;
+int stick_ry = 0;
+int hip_fire_ar_v = 5;
+int hip_fire_ar_h = 0;
+int hip_rx = 0;
+int hip_ry = 0;
+
+// === RAMP-UP AR ===
+int ar_ramp = 0;
+
+// === AUTO-DETECT PAR RUMBLE (buffer 5-intervalles) ===
+int detect_active = TRUE;
+int rumble_now = 0;
+int rumble_prev = 0;
+int rumble_a = 0;
+int rumble_b = 0;
+int rumble_peak = 0;
+int rumble_threshold = 3;
+int detect_cooldown = 0;
+int fallback_rf_index = 0;
+int shot_interval = 0;
+int interval_timer = 0;
+int shot_count = 0;
+int interval_buffer[5];
+int interval_index = 0;
+int interval_filled = 0;
+int avg_interval = 0;
+int stable_hits = 0;
+int stability_tolerance = 15;
+int last_valid_weapon = -1;
+int detect_lock_timer = 0;
+int detect_reset_delay = 300;
+int detected_index = -1;
+int measured_rpm = 0;
+int best_match = 0;
+int best_diff = 9999;
+int ad_diff = 0;
+int detect_i = 0;
+int buffer_i = 0;
+int buffer_sum = 0;
+int effective_weapon_index = -1;
+
+// === HAIR TRIGGER ===
+int hair_trigger_actif = TRUE;
+int hair_trigger_threshold = 30;
+
+// === JUMP SHOT ===
+int jumpshot_hold_time = 120;
+
+// === RAPID FIRE ===
+int rapid_fire_actif = FALSE;
+int rapid_fire_delay = 25;
+
+// === SNIPER SUPPORT ===
+int quick_scope_actif = FALSE;
+int auto_hold_breath_actif = TRUE;
+int is_sniper_weapon = FALSE;
+
+// === HUMANISATION AR ===
+int humanisation_actif = FALSE;
+int rand_seed = 12345;
+int random_offset_v = 0;
+int random_offset_h = 0;
+
+// === SURPRISE MODE ===
+int surprise_mode = FALSE;
+int surprise_pattern = 0;
+int surprise_timer = 0;
+int surprise_cooldown = 0;
+int surprise_trigger_time = 650;
+int surprise_cooldown_time = 320;
+
+// === SETTINGS CALIBRATION ===
+int game_sensitivity = 2;    // Sensi jeu 2.10 (arrondi entier GPC)
+int game_deadzone = 4;       // Deadzone stick droit min = 4
+int game_fov = 120;          // FOV 120
+int game_response = 1;       // 0=Standard 1=Dynamique 2=Lineaire
+int vibration_on = TRUE;
+int ads_mult = 85;           // ADS multiplier x100 (0.85 → sensi effective = 1.785)
+int ar_scale = 100;          // Scale AR hip fire (calc auto par recalculer_ar_scale)
+int ar_scale_ads = 100;      // Scale AR ADS (plus fort que hip, car sensi reduite)
+int settings_page = 0;
+
+// === MENUS ===
+int arme_profil_prim = 101;
+int arme_profil_sec = 102;
+int index_selection = 0;
+int menu_selection_actif = FALSE;
+int menu_ar_actif = FALSE;
+int menu_settings_actif = FALSE;
+int mods_menu_actif = FALSE;
+int mode_ar = 0;
+int mods_index = 0;
+int index = 0;
+int nav_cd = 0;
+
+// === CORRECTSTICK (deadzone) ===
+int cs_val = 0;
+
+// === BOUCLE GLOBALE ===
+int loop_i = 0;
+
+// === SPVAR SYSTEME ===
+int spvar_current_bit = 0;
+int spvar_current_slot = 0;
+int spvar_current_value = 0;
+int spvar_tmp = 0;
+int spvar_bits = 0;
+
+// === UTILS PRINT ===
+int n_str_ = 0;
+int c_val = 0;
+int c_c_c = 0;
+
+// ===================================================================
+// BASE DE DONNEES ARMES (101 armes)
+// ===================================================================
+
+int arv[103];
+int arh[103];
+int WEAPON_COUNT = 103;
+
+const string noms_armes[] = {
+    "M8A1", "Carbon 57", "M15 MOD 0", "REV-46", "Maddox RFB",
+    "Kogot-7", "EGRT-17", "Razor 9mm", "AK-27", "Hawker HX",
+    "MK.78", "Ryden 45K", "VS Recon", "Sturmwolf 45", "Peacekeeper Mk1",
+    "Dravec 45", "DS20 Mirage", "MPC-25", "MXR-17", "X9 Maverick",
+    "HDR", "XM325", "Sokol 545", "XR-3 Ion", "Kilo 141",
+    "Merrick 556", "Akita", "AS VAL", "WSP Swarm", "TANTO .22",
+    "Pulemyot 762", "SVA 545", "ASG-89", "XM4", "KSV",
+    "JACKAL PDW", "PP-919", "C9", "MCW", "Holger 556",
+    "Striker", "HRM-9", "LW3A1 Frostline", "KATT-AMR", "MORS",
+    "Marine SP", "M10 Breacher", "GS45", "9mm PM", "Renetti",
+    "GPMG-7", "XMG", "PU-21", "Shadow SK", "M34 Novaline",
+    "Warden 308", "Velox 5.7", "RK-9", "SG-12", "Echo 12",
+    "CODA 9", "Jager 45", "TR2", "Dresden 9mm", "SWAT 5.56",
+    "GPR 91", "X52 Resonator", "CR-56 AMAX", "LADRA", "AMES 85",
+    "PPSh-41", "GREKHOVA", "Victus XMR", "FJX Imperium", "LR 7.62",
+    "Kar98k", "SAUG", "ABR A1", "LC10", "KOMPAKT 92",
+    "Cypher 091", "FFAR 1", "MODEL L", "KRIG C", "M13B",
+    "M4", "MX9", "BAS-P", "Vaznev-9k", "VEL 46",
+    "Sakin MG38", "STG44", "AK-74", "PDSW 528", "TAQ-56",
+    "LW3A1 FROSTLINE", "Reclaimer 18", "Feng 82", "GOBLIN MK2", "Voyak KT-3",
+    "Swordfish A1",
+    "MK35 ISR",
+    "VST"
+};
+
+const int16 noms_armesVALEUR[] = {
+    4, 9, 9, 6, 10, 7, 7, 9, 5, 9,
+    5, 9, 8, 12, 15, 9, 11, 6, 6, 11,
+    3, 5, 9, 8, 8, 11, 5, 6, 9, 9,
+    12, 7, 6, 3, 3, 10, 6, 2, 3, 10,
+    7, 5, 15, 8, 4, 9, 12, 4, 6, 7,
+    6, 3, 5, 9, 12, 10, 9, 4, 5, 7,
+    6, 8, 3, 11, 9, 6, 13, 10, 5, 7,
+    7, 8, 10, 12, 7, 6, 4, 6, 4, 10,
+    10, 6, 7, 6, 4, 2, 3, 5, 9, 6,
+    10, 5, 5, 8, 6, 15, 12, 7, 10, 10,
+    12,
+    8,
+    3
+};
+
+// RPM par arme (confirme Device Monitor : M8A1=545, Kogot-7=923 etc.)
+const int16 weapon_rpm[] = {
+    545, 900, 680, 857, 722, 923, 650, 880, 600, 42,
+    550, 870, 48, 800, 700, 850, 670, 900, 690, 720,
+    35, 580, 545, 45, 680, 700, 80, 900, 1150, 1091,
+    550, 800, 200, 722, 857, 923, 800, 750, 700, 690,
+    800, 880, 45, 38, 38, 68, 100, 450, 600, 484,
+    517, 600, 570, 44, 500, 480, 500, 830, 110, 125,
+    480, 460, 520, 870, 490, 650, 600, 640, 850, 680,
+    780, 440, 36, 37, 42, 450, 810, 630, 840, 800,
+    660, 800, 690, 710, 780, 750, 850, 870, 820, 860,
+    620, 680, 610, 880, 670, 41, 120, 630, 650, 700,
+    450,
+    480,
+    820
+};
+
+// Anti-recul vertical par defaut (valeurs calibrees V7_AUTO_DETECT confirme)
+const int16 def_arv[] = {
+    6, 6, 7, 6, 8, 5, 8, 6, 10, 30,
+    9, 5, 28, 7, 7, 6, 8, 6, 8, 7,
+    31, 8, 10, 29, 6, 6, 18, 12, 10, 5,
+    12, 11, 13, 7, 6, 6, 7, 8, 8, 6,
+    5, 6, 28, 30, 30, 16, 15, 9, 6, 7,
+    10, 8, 9, 28, 7, 7, 4, 6, 14, 13,
+    4, 4, 6, 5, 7, 9, 5, 8, 6, 8,
+    6, 5, 32, 31, 29, 8, 6, 9, 6, 6,
+    9, 8, 8, 7, 7, 7, 6, 5, 6, 6,
+    10, 8, 9, 5, 8, 29, 13, 10, 8, 0,
+    0,
+    8,
+    6
+};
+
+// Anti-recul horizontal par defaut
+const int16 def_arh[] = {
+    2, 3, 2, 4, 3, 2, 3, 3, 4, 1,
+    3, 3, 1, 4, 3, 3, 3, 3, 3, 2,
+    1, 3, 4, 1, 2, 2, 8, 6, 6, 2,
+    5, 5, 7, 2, 2, 4, 3, 4, 3, 2,
+    2, 3, 1, 1, 1, 10, 8, 2, 4, 3,
+    2, 3, 3, 2, 2, 2, 2, 3, 5, 5,
+    2, 2, 2, 3, 3, 3, 1, 3, 3, 3,
+    4, 2, 2, 2, 2, 1, 4, 4, 3, 4,
+    3, 4, 3, 2, 2, 2, 4, 3, 3, 3,
+    4, 3, 4, 3, 3, 2, 5, 4, 3, 0,
+    0,
+    2,
+    3
+};
+
+// Rapid Fire delay par arme en ms (0=pas de RF, >0=semi-auto RF)
+const int16 weapon_rf_delay[] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 25, 0, 20, 40,
+    0, 0, 25, 0, 0, 20, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 25, 25, 20, 20, 20,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0,
+    0,
+    0
+};
+
+// ===================================================================
+// LABELS OLED
+// ===================================================================
+const string label_primaire[]   = { "PRIMARY" };
+const string label_secondaire[] = { "SECONDARY" };
+const string label_choix_arme[] = { "LIST" };
+const string vertical[]         = { "VERTICAL" };
+const string horizontal[]       = { "HORIZONTAL" };
+const string label_save[]       = { "SAVED" };
+const string label_ok[]         = { "OK" };
+const string en[]               = { "EN:" };
+const string indic[]            = { "PAD+L2/R2" };
+const string settings_title[]   = { "SETTINGS" };
+const string val_on[]           = { "ON" };
+const string val_off[]          = { "OFF" };
+const string val_standard[]     = { "STANDARD" };
+const string val_linear[]       = { "LINEAR" };
+const string val_dynamic[]      = { "DYNAMIC" };
+const string page_indicator[]   = { "< >" };
+const string label_v8[]         = { "V8 PREDATOR" };
+const string label_ar[]         = { "ANTI-RECUL" };
+const string set_sensitivity[]  = { "SENSI" };
+const string set_deadzone[]     = { "DEADZONE" };
+const string set_fov[]          = { "FOV" };
+const string set_response[]     = { "RESPONSE" };
+const string set_vibration[]    = { "VIBRATION" };
+const string set_mode[]         = { "CTRL" };
+const string mods_title[]       = { "MOD+" };
+const string mod_surprise[]     = { "SURPRISE" };
+const string mod_qs[]           = { "QUICKSCOPE" };
+const string mod_breath[]       = { "HOLDBREATH" };
+const string mod_human[]        = { "HUMANIZE" };
+const string mod_script[]       = { "SCRIPT" };
+const string mode_tactique[]    = { "TACTIQUE" };
+const string label_aggro[]      = { "ULTRA AGGRO" };
+
+// ===================================================================
+// FONCTIONS UTILITAIRES
+// ===================================================================
+
+function centre_x(int nb_car, int larg_car) {
+    return (128 / 2) - ((nb_car * larg_car) / 2);
+}
+
+function recalculer_ar_scale() {
+    ar_scale = 700 / game_sensitivity;
+    ar_scale = ar_scale * 80 / game_fov;
+    ar_scale = ar_scale * (100 + game_deadzone) / 100;
+    if(game_response == 1) { ar_scale = ar_scale * 115 / 100; }  // Dynamique +15%
+    if(game_response == 2) { ar_scale = ar_scale * 90  / 100; }  // Lineaire  -10%
+    if(ar_scale < 50)  { ar_scale = 50; }
+    if(ar_scale > 200) { ar_scale = 200; }
+    // ADS scale : plus fort (sensi effective = game_sensitivity * ads_mult / 100)
+    ar_scale_ads = ar_scale * 100 / ads_mult;
+    if(ar_scale_ads < 50)  { ar_scale_ads = 50; }
+    if(ar_scale_ads > 250) { ar_scale_ads = 250; }
+}
+
+function rand_gpc() {
+    rand_seed = (rand_seed * 1103515245 + 12345) & 0x7FFFFFFF;
+    return abs(rand_seed);
+}
+
+function correctStick(int stick_id) {
+    cs_val = get_val(stick_id);
+    if(cs_val >= -game_deadzone && cs_val <= game_deadzone) {
+        set_val(stick_id, 0);
+    } else if(cs_val < -game_deadzone) {
+        set_val(stick_id, clamp((cs_val + game_deadzone) * 100 / (100 - game_deadzone), -100, 100));
+    } else {
+        set_val(stick_id, clamp((cs_val - game_deadzone) * 100 / (100 - game_deadzone), -100, 100));
+    }
+}
+
+// ===================================================================
+// FONCTIONS AFFICHAGE OLED
+// ===================================================================
+
+function afficher_profils() {
+    cls_oled(0);
+    rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+    rect_oled(0, 0, 124, 25, OLED_BLACK, OLED_WHITE);
+    rect_oled(0, 0, 124, 48, OLED_BLACK, OLED_WHITE);
+    if(current_profil == 0) {
+        print(23, 4, OLED_FONT_MEDIUM, OLED_WHITE, label_primaire[0]);
+        print(centre_x(noms_armesVALEUR[arme_profil_prim], OLED_FONT_SMALL_WIDTH), 32, 0, OLED_WHITE, noms_armes[arme_profil_prim]);
+    } else {
+        print(13, 4, OLED_FONT_MEDIUM, OLED_WHITE, label_secondaire[0]);
+        print(centre_x(noms_armesVALEUR[arme_profil_sec], OLED_FONT_SMALL_WIDTH), 32, 0, OLED_WHITE, noms_armes[arme_profil_sec]);
+    }
+    print(10, 52, 0, OLED_WHITE, indic[0]);
+}
+
+function afficher_menu_selection() {
+    cls_oled(0);
+    rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+    rect_oled(0, 0, 124, 25, OLED_BLACK, OLED_WHITE);
+    print(43, 4, OLED_FONT_MEDIUM, OLED_WHITE, label_choix_arme[0]);
+    print(2, 32, OLED_FONT_SMALL, OLED_WHITE, en[0]);
+    print(22, 32, OLED_FONT_SMALL, OLED_WHITE, noms_armes[index_selection]);
+}
+
+function afficher_menu_antirecul() {
+    cls_oled(0);
+    rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+    rect_oled(0, 0, 124, 25, OLED_BLACK, OLED_WHITE);
+    rect_oled(0, 0, 124, 43, OLED_BLACK, OLED_WHITE);
+    if(current_profil == 0) { index = arme_profil_prim; }
+    else { index = arme_profil_sec; }
+    print(centre_x(noms_armesVALEUR[index], OLED_FONT_SMALL_WIDTH), 30, 0, OLED_WHITE, noms_armes[index]);
+    if(mode_ar == 0) {
+        print(21, 4, OLED_FONT_MEDIUM, OLED_WHITE, vertical[0]);
+        print_number(arv[index], 2, centre_x(2, OLED_FONT_MEDIUM_WIDTH), 45, 1);
+    } else {
+        print(13, 4, OLED_FONT_MEDIUM, OLED_WHITE, horizontal[0]);
+        print_number(arh[index], 2, centre_x(2, OLED_FONT_MEDIUM_WIDTH), 45, 1);
+    }
+}
+
+function afficher_menu_settings() {
+    cls_oled(0);
+    rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+    rect_oled(0, 0, 124, 20, OLED_BLACK, OLED_WHITE);
+    print(10, 2, OLED_FONT_MEDIUM, OLED_WHITE, settings_title[0]);
+    print(95, 52, OLED_FONT_SMALL, OLED_WHITE, page_indicator[0]);
+    if(settings_page == 0) {
+        print(10, 25, OLED_FONT_SMALL, OLED_WHITE, set_sensitivity[0]);
+        print_number(game_sensitivity, 2, 70, 42, 1);
+    }
+    if(settings_page == 1) {
+        print(20, 25, OLED_FONT_SMALL, OLED_WHITE, set_deadzone[0]);
+        print_number(game_deadzone, 2, 70, 42, 1);
+    }
+    if(settings_page == 2) {
+        print(42, 25, OLED_FONT_SMALL, OLED_WHITE, set_fov[0]);
+        print_number(game_fov, 3, 60, 42, 1);
+    }
+    if(settings_page == 3) {
+        print(18, 25, OLED_FONT_SMALL, OLED_WHITE, set_response[0]);
+        if(game_response == 0) { print(25, 45, OLED_FONT_SMALL, OLED_WHITE, val_standard[0]); }
+        if(game_response == 1) { print(35, 45, OLED_FONT_SMALL, OLED_WHITE, val_linear[0]); }
+        if(game_response == 2) { print(30, 45, OLED_FONT_SMALL, OLED_WHITE, val_dynamic[0]); }
+    }
+    if(settings_page == 4) {
+        print(18, 25, OLED_FONT_SMALL, OLED_WHITE, set_vibration[0]);
+        if(vibration_on) { print(50, 45, OLED_FONT_SMALL, OLED_WHITE, val_on[0]); }
+        else { print(48, 45, OLED_FONT_SMALL, OLED_WHITE, val_off[0]); }
+    }
+    if(settings_page == 5) {
+        print(15, 25, OLED_FONT_SMALL, OLED_WHITE, set_mode[0]);
+        if(control_mode == 0) { print(25, 45, OLED_FONT_SMALL, OLED_WHITE, val_standard[0]); }
+        else { print(22, 45, OLED_FONT_SMALL, OLED_WHITE, mode_tactique[0]); }
+    }
+}
+
+function afficher_menu_mods() {
+    cls_oled(0);
+    rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+    rect_oled(0, 0, 124, 20, OLED_BLACK, OLED_WHITE);
+    print(25, 2, OLED_FONT_MEDIUM, OLED_WHITE, mods_title[0]);
+    if(mods_index == 0) {
+        print(10, 25, OLED_FONT_SMALL, OLED_WHITE, mod_surprise[0]);
+        if(surprise_mode) { print(80, 42, OLED_FONT_SMALL, OLED_WHITE, val_on[0]); }
+        else { print(73, 42, OLED_FONT_SMALL, OLED_WHITE, val_off[0]); }
+    } else if(mods_index == 1) {
+        print(10, 25, OLED_FONT_SMALL, OLED_WHITE, mod_qs[0]);
+        if(quick_scope_actif) { print(80, 42, OLED_FONT_SMALL, OLED_WHITE, val_on[0]); }
+        else { print(73, 42, OLED_FONT_SMALL, OLED_WHITE, val_off[0]); }
+    } else if(mods_index == 2) {
+        print(10, 25, OLED_FONT_SMALL, OLED_WHITE, mod_breath[0]);
+        if(auto_hold_breath_actif) { print(80, 42, OLED_FONT_SMALL, OLED_WHITE, val_on[0]); }
+        else { print(73, 42, OLED_FONT_SMALL, OLED_WHITE, val_off[0]); }
+    } else if(mods_index == 3) {
+        print(10, 25, OLED_FONT_SMALL, OLED_WHITE, mod_human[0]);
+        if(humanisation_actif) { print(80, 42, OLED_FONT_SMALL, OLED_WHITE, val_on[0]); }
+        else { print(73, 42, OLED_FONT_SMALL, OLED_WHITE, val_off[0]); }
+    } else {
+        print(10, 25, OLED_FONT_SMALL, OLED_WHITE, mod_script[0]);
+        if(script_enabled) { print(80, 42, OLED_FONT_SMALL, OLED_WHITE, val_on[0]); }
+        else { print(73, 42, OLED_FONT_SMALL, OLED_WHITE, val_off[0]); }
+    }
+}
+
+// ===================================================================
+// INIT
+// ===================================================================
+
+init {
+    Load();
+
+    if(arme_profil_prim == 0 && arme_profil_sec == 0) {
+        arme_profil_prim = 101;
+        arme_profil_sec = 102;
+    }
+
+    if(current_profil == 0) { set_led(LED_1, 1); }
+    else { set_led(LED_1, 3); }
+
+    if(control_mode == 1) {
+        accroupi = PS4_R3;
+        saut     = PS4_CROSS;
+        melee    = PS4_CIRCLE;
+    } else {
+        accroupi = PS4_CIRCLE;
+        saut     = PS4_CROSS;
+        melee    = PS4_R3;
+    }
+
+    recalculer_ar_scale();
+    detect_active = vibration_on;
+    update = TRUE;
+}
+
+// ===================================================================
+// BOUCLE PRINCIPALE
+// ===================================================================
+
+main {
+
+    // --- TRACES DEBUG (Device Monitor) ---
+    set_val(TRACE_1, measured_rpm);
+    set_val(TRACE_2, rumble_a);
+    set_val(TRACE_3, shot_count);
+    set_val(TRACE_4, detected_index);
+    set_val(TRACE_5, rapid_fire_actif);
+    set_val(TRACE_6, anti_recul_actif);
+
+    // --- AFFICHAGE OLED PROFIL ---
+    if(update) {
+        afficher_profils();
+        update = FALSE;
+    }
+
+    // --- TOGGLE SCRIPT COMPLET (L2 + SHARE) ---
+    if(get_val(PS4_L2) && event_press(PS4_SHARE)) {
+        script_enabled = !script_enabled;
+        set_val(PS4_SHARE, 0);
+        cls_oled(0);
+        rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+        print(10, 18, OLED_FONT_SMALL, OLED_WHITE, mod_script[0]);
+        if(script_enabled) { print(46, 38, OLED_FONT_MEDIUM, OLED_WHITE, val_on[0]); }
+        else { print(40, 38, OLED_FONT_MEDIUM, OLED_WHITE, val_off[0]); }
+        combo_run(FeedbackToggle);
+    }
+
+    // --- BLOCAGE SI SCRIPT DESACTIVE ---
+    if(!script_enabled) {
+        if(mods_menu_actif || menu_selection_actif || menu_ar_actif || menu_settings_actif) {
+            block_all_inputs();
+        }
+    }
+
+    if(script_enabled) {
+
+    // --- CHANGER DE PROFIL (TRIANGLE) ---
+    if(event_press(PS4_TRIANGLE) && !mods_menu_actif && !menu_selection_actif && !menu_ar_actif && !menu_settings_actif) {
+        if(current_profil == 0) {
+            current_profil = 1;
+            set_led(LED_1, 3);
+        } else {
+            current_profil = 0;
+            set_led(LED_1, 1);
+        }
+        ar_ramp = 0;
+        detected_index = -1;
+        update = TRUE;
+    }
+
+    // --- TOGGLE ANTI-RECUL GLOBAL (SHARE + R1) ---
+    if(get_val(PS4_SHARE) && event_press(PS4_R1)) {
+        anti_recul_actif = !anti_recul_actif;
+        set_val(PS4_R1, 0);
+        cls_oled(0);
+        rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+        print(10, 10, OLED_FONT_SMALL, OLED_WHITE, label_ar[0]);
+        if(anti_recul_actif) { print(46, 32, OLED_FONT_MEDIUM, OLED_WHITE, val_on[0]); }
+        else { print(40, 32, OLED_FONT_MEDIUM, OLED_WHITE, val_off[0]); }
+        combo_run(FeedbackToggle);
+    }
+
+    // --- BLOCAGE TOUCHES DANS MENUS ---
+    if(menu_selection_actif || menu_ar_actif || menu_settings_actif || mods_menu_actif) {
+        block_all_inputs();
+    }
+
+    // --- AUTO SPRINT ---
+    if(autosprint_actif && !menu_selection_actif && !menu_ar_actif && !menu_settings_actif && !mods_menu_actif) {
+        if(abs(get_val(PS4_LY)) > as_sprint_threshold && get_val(PS4_LY) < 0) {
+            set_val(sprint, 100);
+        }
+    }
+
+    // --- JUMP SHOT ---
+    if(jumpshot_actif && !menu_selection_actif && !menu_ar_actif && !menu_settings_actif && !mods_menu_actif) {
+        if(get_val(tire) && !get_val(vise)) {
+            combo_run(JumpShot);
+        }
+    }
+
+    // --- SLIDE CANCEL ---
+    if(slidecancel_actif && !menu_selection_actif && !menu_ar_actif && !menu_settings_actif && !mods_menu_actif) {
+        if(get_val(sprint) && event_press(accroupi)) {
+            combo_run(SlideCancel);
+        }
+    }
+
+    // --- PAD + DOWN = MENU MOD+ ---
+    if(get_val(PS4_TOUCH) && event_press(PS4_DOWN) && !menu_selection_actif && !menu_ar_actif && !menu_settings_actif) {
+        mods_menu_actif = TRUE;
+        mods_index = 0;
+        afficher_menu_mods();
+    }
+
+    // --- PAD + RIGHT = TOGGLE ULTRA AGGRO ---
+    if(get_val(PS4_TOUCH) && event_press(PS4_RIGHT) && !menu_selection_actif && !menu_ar_actif && !menu_settings_actif && !mods_menu_actif) {
+        mode_ultra_aggro = !mode_ultra_aggro;
+        cls_oled(0);
+        rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+        print(5, 10, OLED_FONT_SMALL, OLED_WHITE, label_aggro[0]);
+        if(mode_ultra_aggro) { print(46, 36, OLED_FONT_MEDIUM, OLED_WHITE, val_on[0]); }
+        else { print(40, 36, OLED_FONT_MEDIUM, OLED_WHITE, val_off[0]); }
+        combo_run(FeedbackToggle);
+    }
+
+    // --- PAD + UP = TOGGLE SURPRISE RAPIDE ---
+    if(get_val(PS4_TOUCH) && event_press(PS4_UP) && !menu_selection_actif && !menu_ar_actif && !menu_settings_actif && !mods_menu_actif) {
+        if(surprise_mode) { surprise_mode = FALSE; }
+        else { surprise_mode = TRUE; }
+        cls_oled(0);
+        rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+        print(15, 18, OLED_FONT_MEDIUM, OLED_WHITE, mod_surprise[0]);
+        if(surprise_mode) { print(46, 40, OLED_FONT_SMALL, OLED_WHITE, val_on[0]); }
+        else { print(44, 40, OLED_FONT_SMALL, OLED_WHITE, val_off[0]); }
+        combo_run(FeedbackToggle);
+    }
+
+    // --- MENU MOD+ ---
+    if(mods_menu_actif) {
+        if(nav_cd > 0) { nav_cd = nav_cd - get_rtime(); }
+        if(nav_cd < 0) { nav_cd = 0; }
+        if(nav_cd == 0 && event_press(PS4_UP)) {
+            if(mods_index > 0) { mods_index = mods_index - 1; }
+            else { mods_index = 4; }
+            nav_cd = 150;
+            afficher_menu_mods();
+        }
+        if(nav_cd == 0 && event_press(PS4_DOWN)) {
+            if(mods_index < 4) { mods_index = mods_index + 1; }
+            else { mods_index = 0; }
+            nav_cd = 150;
+            afficher_menu_mods();
+        }
+        if(event_press(PS4_LEFT) || event_press(PS4_RIGHT)) {
+            if(mods_index == 0) { surprise_mode = !surprise_mode; }
+            if(mods_index == 1) { quick_scope_actif = !quick_scope_actif; }
+            if(mods_index == 2) { auto_hold_breath_actif = !auto_hold_breath_actif; }
+            if(mods_index == 3) { humanisation_actif = !humanisation_actif; }
+            if(mods_index == 4) { script_enabled = !script_enabled; }
+            afficher_menu_mods();
+            combo_run(FeedbackToggle);
+        }
+        if(event_press(PS4_CROSS)) {
+            mods_menu_actif = FALSE;
+            update = TRUE;
+            Save();
+            combo_run(ScreenSave);
+        }
+        if(event_press(PS4_CIRCLE)) {
+            mods_menu_actif = FALSE;
+            update = TRUE;
+        }
+    }
+
+    // --- PAD + DOWN depuis settings (deja gere) / PAD + R2 = MENU ARME ---
+    if(get_val(PS4_TOUCH) && event_press(PS4_R2) && !mods_menu_actif && !menu_ar_actif && !menu_settings_actif) {
+        menu_selection_actif = TRUE;
+        if(current_profil == 0) { index_selection = arme_profil_prim; }
+        else { index_selection = arme_profil_sec; }
+        nav_cd = 0;
+        afficher_menu_selection();
+    }
+
+    if(menu_selection_actif) {
+        if(nav_cd > 0) { nav_cd = nav_cd - get_rtime(); }
+        if(nav_cd < 0) { nav_cd = 0; }
+        if(nav_cd == 0 && event_press(PS4_RIGHT)) {
+            if(index_selection < 100) { index_selection = index_selection + 1; }
+            nav_cd = 120;
+            afficher_menu_selection();
+        }
+        if(nav_cd == 0 && event_press(PS4_LEFT)) {
+            if(index_selection > 0) { index_selection = index_selection - 1; }
+            nav_cd = 120;
+            afficher_menu_selection();
+        }
+        if(event_press(PS4_CROSS)) {
+            if(current_profil == 0) { arme_profil_prim = index_selection; }
+            else { arme_profil_sec = index_selection; }
+            menu_selection_actif = FALSE;
+            detected_index = -1;
+            last_valid_weapon = -1;
+            ar_ramp = 0;
+            update = TRUE;
+            Save();
+            combo_run(ScreenSave);
+        }
+        if(event_press(PS4_CIRCLE)) {
+            menu_selection_actif = FALSE;
+            update = TRUE;
+        }
+    }
+
+    // --- PAD + L2 = MENU ANTI-RECUL ---
+    if(get_val(PS4_TOUCH) && event_press(PS4_L2) && !mods_menu_actif && !menu_selection_actif && !menu_settings_actif) {
+        menu_ar_actif = TRUE;
+        mode_ar = 0;
+        afficher_menu_antirecul();
+    }
+
+    if(menu_ar_actif) {
+        if(event_press(PS4_CROSS)) {
+            if(mode_ar == 0) { mode_ar = 1; }
+            else { mode_ar = 0; }
+            afficher_menu_antirecul();
+        }
+        if(event_press(PS4_UP)) {
+            if(current_profil == 0) { index = arme_profil_prim; }
+            else { index = arme_profil_sec; }
+            if(mode_ar == 0) {
+                if(arv[index] < 30) { arv[index] = arv[index] + 1; }
+            } else {
+                if(arh[index] < 30) { arh[index] = arh[index] + 1; }
+            }
+            afficher_menu_antirecul();
+        }
+        if(event_press(PS4_DOWN)) {
+            if(current_profil == 0) { index = arme_profil_prim; }
+            else { index = arme_profil_sec; }
+            if(mode_ar == 0) {
+                if(arv[index] > -10) { arv[index] = arv[index] - 1; }
+            } else {
+                if(arh[index] > -10) { arh[index] = arh[index] - 1; }
+            }
+            afficher_menu_antirecul();
+        }
+        if(event_press(PS4_CIRCLE)) {
+            menu_ar_actif = FALSE;
+            update = TRUE;
+            Save();
+            combo_run(ScreenSave);
+        }
+    }
+
+    // --- PAD + LEFT (TOUCH + LEFT) = MENU SETTINGS ---
+    if(get_val(PS4_TOUCH) && event_press(PS4_LEFT) && !mods_menu_actif && !menu_selection_actif && !menu_ar_actif) {
+        menu_settings_actif = TRUE;
+        settings_page = 0;
+        afficher_menu_settings();
+    }
+
+    if(menu_settings_actif) {
+        if(event_press(PS4_RIGHT)) {
+            if(settings_page < 5) { settings_page = settings_page + 1; }
+            else { settings_page = 0; }
+            afficher_menu_settings();
+        }
+        if(event_press(PS4_LEFT)) {
+            if(settings_page > 0) { settings_page = settings_page - 1; }
+            else { settings_page = 5; }
+            afficher_menu_settings();
+        }
+        if(event_press(PS4_UP)) {
+            if(settings_page == 0 && game_sensitivity < 20) { game_sensitivity = game_sensitivity + 1; }
+            if(settings_page == 1 && game_deadzone < 20)    { game_deadzone = game_deadzone + 1; }
+            if(settings_page == 2 && game_fov < 120)        { game_fov = game_fov + 5; }
+            if(settings_page == 3) { game_response = game_response + 1; if(game_response > 2) { game_response = 0; } }
+            if(settings_page == 4) { if(vibration_on) { vibration_on = FALSE; } else { vibration_on = TRUE; } }
+            if(settings_page == 5) {
+                if(control_mode == 0) { control_mode = 1; accroupi = PS4_R3; melee = PS4_CIRCLE; }
+                else { control_mode = 0; accroupi = PS4_CIRCLE; melee = PS4_R3; }
+            }
+            afficher_menu_settings();
+        }
+        if(event_press(PS4_DOWN)) {
+            if(settings_page == 0 && game_sensitivity > 1)  { game_sensitivity = game_sensitivity - 1; }
+            if(settings_page == 1 && game_deadzone > 0)     { game_deadzone = game_deadzone - 1; }
+            if(settings_page == 2 && game_fov > 60)         { game_fov = game_fov - 5; }
+            if(settings_page == 3) { if(game_response > 0) { game_response = game_response - 1; } else { game_response = 2; } }
+            if(settings_page == 4) { if(vibration_on) { vibration_on = FALSE; } else { vibration_on = TRUE; } }
+            if(settings_page == 5) {
+                if(control_mode == 0) { control_mode = 1; accroupi = PS4_R3; melee = PS4_CIRCLE; }
+                else { control_mode = 0; accroupi = PS4_CIRCLE; melee = PS4_R3; }
+            }
+            afficher_menu_settings();
+        }
+        if(event_press(PS4_CROSS)) {
+            recalculer_ar_scale();
+            detect_active = vibration_on;
+            menu_settings_actif = FALSE;
+            update = TRUE;
+            Save();
+            combo_run(ScreenSave);
+        }
+        if(event_press(PS4_CIRCLE)) {
+            menu_settings_actif = FALSE;
+            update = TRUE;
+        }
+    }
+
+    // --- SURPRISE MODE ---
+    if(surprise_mode && !menu_selection_actif && !menu_ar_actif && !menu_settings_actif && !mods_menu_actif) {
+        if(get_val(tire)) {
+            if(surprise_timer == 0 && surprise_cooldown == 0) {
+                surprise_pattern = (surprise_pattern + 1) % 4;
+                surprise_timer = surprise_trigger_time;
+            }
+            if(surprise_timer > 0) {
+                surprise_timer = surprise_timer - get_rtime();
+                if(surprise_timer < 0) {
+                    surprise_timer = 0;
+                    surprise_cooldown = surprise_cooldown_time;
+                    if(get_val(vise)) {
+                        if(surprise_pattern == 0) { combo_run(SurpriseAdsLeft); }
+                        if(surprise_pattern == 1) { combo_run(SurpriseAdsRight); }
+                        if(surprise_pattern == 2) { combo_run(SurpriseDropOnly); }
+                        if(surprise_pattern == 3) { combo_run(SurpriseStrafeOnly); }
+                    }
+                }
+            }
+            if(surprise_cooldown > 0) {
+                surprise_cooldown = surprise_cooldown - get_rtime();
+                if(surprise_cooldown < 0) { surprise_cooldown = 0; }
+            }
+        } else {
+            surprise_timer = 0;
+            surprise_cooldown = 0;
+        }
+    }
+
+    // --- HAIR TRIGGER ---
+    if(hair_trigger_actif && !menu_selection_actif && !menu_ar_actif && !mods_menu_actif) {
+        if(get_val(vise) > hair_trigger_threshold && get_val(vise) < 100) {
+            set_val(vise, 100);
+        }
+    }
+
+    // --- AIM ASSIST PAUSED (Luna V6) : coupe pendant SQUARE ---
+    aim_assist_paused = get_val(recharge);
+
+    // --- AUTO-DETECT V8 (buffer 5 intervalles, lock_timer, last_valid) ---
+    if(detect_active && get_val(tire) && !menu_selection_actif && !menu_ar_actif && !mods_menu_actif) {
+
+        rumble_a = get_rumble(RUMBLE_A);
+        rumble_b = get_rumble(RUMBLE_B);
+        if(rumble_a > rumble_b) { rumble_now = rumble_a; }
+        else { rumble_now = rumble_b; }
+
+        if(rumble_now > rumble_peak) { rumble_peak = rumble_now; }
+        rumble_threshold = rumble_peak * 40 / 100;
+        if(rumble_threshold < 3) { rumble_threshold = 3; }
+
+        if(detect_cooldown > 0) { detect_cooldown = detect_cooldown - get_rtime(); }
+        if(detect_cooldown < 0) { detect_cooldown = 0; }
+        if(detect_lock_timer > 0) { detect_lock_timer = detect_lock_timer - get_rtime(); }
+        if(detect_lock_timer < 0) { detect_lock_timer = 0; }
+
+        if(interval_timer > detect_reset_delay) {
+            shot_count = 0;
+            interval_index = 0;
+            interval_filled = 0;
+            avg_interval = 0;
+            stable_hits = 0;
+        }
+
+        if(rumble_now >= rumble_threshold && rumble_prev < rumble_threshold && detect_cooldown == 0) {
+            detect_cooldown = 25;
+
+            if(shot_count > 0 && interval_timer > 15) {
+                shot_interval = interval_timer;
+                interval_buffer[interval_index] = shot_interval;
+                if(interval_filled < 5) { interval_filled = interval_filled + 1; }
+                interval_index = (interval_index + 1) % 5;
+
+                buffer_sum = 0;
+                for(buffer_i = 0; buffer_i < interval_filled; buffer_i = buffer_i + 1) {
+                    buffer_sum = buffer_sum + interval_buffer[buffer_i];
+                }
+                if(interval_filled > 0) { avg_interval = buffer_sum / interval_filled; }
+            }
+
+            interval_timer = 0;
+            shot_count = shot_count + 1;
+
+            // === PRE-DETECTION RAPIDE ===
+            // Objectif : reduire le delai initial sans remplacer la logique existante
+            if(shot_count >= 2 && interval_filled >= 1 && avg_interval > 15 && avg_interval < 300 && detect_lock_timer == 0) {
+                measured_rpm = 60000 / avg_interval;
+                best_match = 0;
+                best_diff = 9999;
+                for(detect_i = 0; detect_i < WEAPON_COUNT; detect_i = detect_i + 1) {
+                    ad_diff = abs(measured_rpm - weapon_rpm[detect_i]);
+                    if(ad_diff < best_diff) {
+                        best_diff = ad_diff;
+                        best_match = detect_i;
+                    }
+                }
+                // Seuil strict pour eviter mauvaises detections rapides
+                if(best_diff < 100 && detected_index == -1) {
+                    detected_index = best_match;
+                    last_valid_weapon = best_match;
+                    detect_lock_timer = 200;
+                }
+            }
+
+            if(shot_count >= 3 && interval_filled >= 2 && avg_interval > 15) {
+                stable_hits = 0;
+                for(buffer_i = 0; buffer_i < interval_filled; buffer_i = buffer_i + 1) {
+                    ad_diff = abs(interval_buffer[buffer_i] - avg_interval);
+                    if(ad_diff <= stability_tolerance) {
+                        stable_hits = stable_hits + 1;
+                    }
+                }
+
+                if(stable_hits >= 2) {
+                    measured_rpm = 60000 / avg_interval;
+
+                    best_match = 0;
+                    best_diff = 9999;
+                    for(detect_i = 0; detect_i < WEAPON_COUNT; detect_i = detect_i + 1) {
+                        ad_diff = abs(measured_rpm - weapon_rpm[detect_i]);
+                        if(ad_diff < best_diff) {
+                            best_diff = ad_diff;
+                            best_match = detect_i;
+                        }
+                    }
+
+                    if(best_diff < 140) {
+                        if(detected_index == -1 || best_match == detected_index || detect_lock_timer == 0) {
+                            detected_index = best_match;
+                            last_valid_weapon = best_match;
+                            detect_lock_timer = 400;
+                            ar_ramp = 0;
+
+                            cls_oled(0);
+                            rect_oled(0, 0, 124, 64, OLED_BLACK, OLED_WHITE);
+                            print(5, 4, OLED_FONT_SMALL, OLED_WHITE, noms_armes[detected_index]);
+                            print_number(measured_rpm, 4, 30, 25, 1);
+                        }
+                    } else if(last_valid_weapon >= 0) {
+                        detected_index = last_valid_weapon;
+                    }
+                }
+            }
+        }
+
+        interval_timer = interval_timer + get_rtime();
+        rumble_prev = rumble_now;
+    }
+
+    if(!get_val(tire)) {
+        shot_count = 0;
+        interval_timer = 0;
+        rumble_prev = 0;
+        rumble_peak = 0;
+        rumble_threshold = 3;
+        detect_cooldown = 0;
+        interval_index = 0;
+        interval_filled = 0;
+        avg_interval = 0;
+        stable_hits = 0;
+        if(detected_index < 0 && last_valid_weapon >= 0) {
+            detected_index = last_valid_weapon;
+        }
+        if(detected_index >= 0) { update = TRUE; }
+    }
+
+    // --- DETERMINER ARME EFFECTIVE ---
+    if(detect_active && detected_index >= 0) {
+        effective_weapon_index = detected_index;
+    } else {
+        if(current_profil == 0) { fallback_rf_index = arme_profil_prim; }
+        else { fallback_rf_index = arme_profil_sec; }
+        effective_weapon_index = fallback_rf_index;
+    }
+
+    // --- RAPID FIRE INTELLIGENT (delai par arme) ---
+    if(effective_weapon_index >= 0 && weapon_rf_delay[effective_weapon_index] > 0) {
+        rapid_fire_actif = TRUE;
+        rapid_fire_delay = weapon_rf_delay[effective_weapon_index];
+    } else {
+        rapid_fire_actif = FALSE;
+        rapid_fire_delay = 25;
+    }
+
+    if(rapid_fire_actif && get_val(tire) && !menu_selection_actif && !menu_ar_actif && !mods_menu_actif) {
+        combo_run(RapidFire);
+    }
+
+    // --- SNIPER : QUICKSCOPE & HOLD BREATH ---
+    is_sniper_weapon = FALSE;
+    if(effective_weapon_index >= 0) {
+        if(weapon_rpm[effective_weapon_index] < 80) {
+            is_sniper_weapon = TRUE;
+        }
+    }
+
+    if(quick_scope_actif && is_sniper_weapon && !menu_selection_actif && !menu_ar_actif && !mods_menu_actif) {
+        if(get_val(vise) && event_press(tire)) {
+            combo_run(QuickScope);
+        }
+    }
+
+    if(auto_hold_breath_actif && is_sniper_weapon && get_val(vise) && !menu_selection_actif && !menu_ar_actif && !mods_menu_actif) {
+        set_val(saut, 100);
+    }
+
+    // --- APPLICATION ULTRA AGGRO ---
+    if(mode_ultra_aggro) {
+        hair_trigger_threshold = 10;
+        as_sprint_threshold    = 60;
+        polar_val              = 3;
+    } else {
+        hair_trigger_threshold = 30;
+        as_sprint_threshold    = 80;
+        polar_val              = 2;  // Courbe Dynamique
+    }
+
+    // --- POLAR AIM V8 (aim assist re-trigger) ---
+    if(!menu_selection_actif && !menu_ar_actif && !mods_menu_actif && !aim_assist_paused) {
+        if(aim_assist_actif && get_val(vise)) {
+            polar_step = polar_step + 1;
+            if(polar_step == 1) { set_val(PS4_RX, get_val(PS4_RX) + polar_val); }
+            if(polar_step == 2) { set_val(PS4_RY, get_val(PS4_RY) + polar_val); }
+            if(polar_step == 3) { set_val(PS4_RX, get_val(PS4_RX) - polar_val); }
+            if(polar_step == 4) { set_val(PS4_RY, get_val(PS4_RY) - polar_val); }
+            if(polar_step >= 4) { polar_step = 0; }
+        }
+
+        // Hip fire : stabilisation + polar aim + AR dedie
+        if(get_val(tire) && !get_val(vise)) {
+            hip_rx = abs(get_val(PS4_RX));
+            hip_ry = abs(get_val(PS4_RY));
+            // Stabilisation RS : damping fort si le stick bouge peu (micro-vibrations)
+            if(hip_rx < 30 && hip_ry < 30) {
+                set_val(PS4_RX, get_val(PS4_RX) * 45 / 100);
+                set_val(PS4_RY, get_val(PS4_RY) * 45 / 100);
+            } else {
+                // Mouvement voulu : damping leger pour garder le controle
+                set_val(PS4_RX, get_val(PS4_RX) * 75 / 100);
+                set_val(PS4_RY, get_val(PS4_RY) * 75 / 100);
+            }
+            // Polar aim hip fire (aim assist en hip)
+            polar_step = polar_step + 1;
+            if(polar_step == 1) { set_val(PS4_RX, get_val(PS4_RX) + polar_val); }
+            if(polar_step == 2) { set_val(PS4_RY, get_val(PS4_RY) + polar_val); }
+            if(polar_step == 3) { set_val(PS4_RX, get_val(PS4_RX) - polar_val); }
+            if(polar_step == 4) { set_val(PS4_RY, get_val(PS4_RY) - polar_val); }
+            if(polar_step >= 4) { polar_step = 0; }
+            // Anti-recul dedie hip fire
+            if(ar_ramp < 80) { ar_ramp = ar_ramp + 2; }
+            set_val(PS4_RY, get_val(PS4_RY) + (hip_fire_ar_v * ar_ramp * ar_scale / 10000));
+            set_val(PS4_RX, get_val(PS4_RX) + (hip_fire_ar_h * ar_ramp * ar_scale / 10000));
+        }
+    }
+
+    // --- DEADZONE PROPRE (correctStick) : actif uniquement pendant le tir (stick reste vif hors combat) ---
+    if(!menu_selection_actif && !menu_ar_actif && !mods_menu_actif && get_val(tire)) {
+        correctStick(PS4_RX);
+        correctStick(PS4_RY);
+    }
+
+    // --- ANTI-RECOIL V8 (ramp-up + humanisation) ---
+    if(anti_recul_actif && !menu_selection_actif && !menu_ar_actif && !mods_menu_actif) {
+        if(get_val(vise) && get_val(tire)) {
+
+            if(ar_ramp < 80) { ar_ramp = ar_ramp + 2; }
+
+            // Humanisation : micro-variation aleatoire
+            random_offset_v = 0;
+            random_offset_h = 0;
+            if(humanisation_actif) {
+                random_offset_v = (rand_gpc() % 5) - 2;
+                random_offset_h = (rand_gpc() % 3) - 1;
+            }
+
+            // Priorite : reglage manuel > valeurs DB > universel (fonctionne meme sans arme detectee)
+            // ar_scale_ads : tient compte du ADS multiplier 0.85 (sensi effective plus basse → AR plus fort)
+            if(effective_weapon_index >= 0 && (arv[effective_weapon_index] != 0 || arh[effective_weapon_index] != 0)) {
+                set_val(PS4_RY, get_val(PS4_RY) + ((arv[effective_weapon_index] + random_offset_v) * ar_ramp * ar_scale_ads / 10000));
+                set_val(PS4_RX, get_val(PS4_RX) + ((arh[effective_weapon_index] + random_offset_h) * ar_ramp * ar_scale_ads / 10000));
+            } else if(effective_weapon_index >= 0 && def_arv[effective_weapon_index] != 0) {
+                set_val(PS4_RY, get_val(PS4_RY) + ((def_arv[effective_weapon_index] + random_offset_v) * ar_ramp * ar_scale_ads / 10000));
+                set_val(PS4_RX, get_val(PS4_RX) + ((def_arh[effective_weapon_index] + random_offset_h) * ar_ramp * ar_scale_ads / 10000));
+            } else {
+                // Universel : s'applique TOUJOURS (largage, arme inconnue, etc.)
+                set_val(PS4_RY, get_val(PS4_RY) + ((anti_recul_universel_v + random_offset_v) * ar_ramp * ar_scale_ads / 10000));
+                set_val(PS4_RX, get_val(PS4_RX) + ((anti_recul_universel_h + random_offset_h) * ar_ramp * ar_scale_ads / 10000));
+            }
+        } else {
+            ar_ramp = 0;
+        }
+    }
+
+    } // fin if(script_enabled)
+}
+
+// ===================================================================
+// COMBOS
+// ===================================================================
+
+combo JumpShot {
+    set_val(saut, 100);
+    wait(50);
+    set_val(saut, 0);
+}
+
+combo SlideCancel {
+    set_val(accroupi, 100);
+    wait(55);
+    set_val(accroupi, 0);
+}
+
+combo RapidFire {
+    set_val(tire, 100);
+    wait(rapid_fire_delay);
+    set_val(tire, 0);
+    wait(rapid_fire_delay);
+}
+
+combo QuickScope {
+    set_val(vise, 100);
+    wait(80);
+    set_val(tire, 100);
+    wait(30);
+    set_val(vise, 0);
+    wait(20);
+}
+
+combo SurpriseAdsLeft {
+    set_val(PS4_LX, -18);
+    wait(55);
+}
+
+combo SurpriseAdsRight {
+    set_val(PS4_LX, 18);
+    wait(55);
+}
+
+combo SurpriseDropOnly {
+    set_val(accroupi, 100);
+    wait(65);
+    set_val(accroupi, 0);
+    wait(40);
+}
+
+combo SurpriseStrafeOnly {
+    set_val(PS4_LX, 30);
+    wait(45);
+    set_val(PS4_LX, -30);
+    wait(45);
+}
+
+combo FeedbackToggle {
+    set_rumble(RUMBLE_A, 80);
+    wait(100);
+    reset_rumble();
+    wait(60);
+    set_rumble(RUMBLE_A, 80);
+    wait(100);
+    reset_rumble();
+}
+
+combo ScreenSave {
+    cls_oled(0);
+    print(10, 20, OLED_FONT_MEDIUM, OLED_WHITE, label_save[0]);
+    print(52, 40, OLED_FONT_MEDIUM, OLED_WHITE, label_ok[0]);
+    wait(600);
+    cls_oled(0);
+    update = TRUE;
+}
+
+// ===================================================================
+// PRINT NUMBER (utilitaire OLED)
+// ===================================================================
+
+const int16 ASCII_NUM[] = { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57 };
+
+function print_number(int f_val, int f_digits, int print_s_x, int print_s_y, int f_font) {
+    n_str_ = 1;
+    c_val = 10000;
+    if(f_val < 0) {
+        putc_oled(n_str_, 45);
+        n_str_ = n_str_ + 1;
+        f_val = abs(f_val);
+    }
+    for(c_c_c = 5; c_c_c >= 1; c_c_c = c_c_c - 1) {
+        if(f_digits >= c_c_c) {
+            putc_oled(n_str_, ASCII_NUM[f_val / c_val]);
+            f_val = f_val % c_val;
+            n_str_ = n_str_ + 1;
+        }
+        c_val = c_val / 10;
+    }
+    puts_oled(print_s_x, print_s_y, f_font, n_str_ - 1, OLED_WHITE);
+}
+
+// ===================================================================
+// SAVE / LOAD (persistance SPVAR)
+// ===================================================================
+
+function Save() {
+    reset_spvar();
+    save_spvar(1, 0, 1);
+    save_spvar(arme_profil_prim, 0, 100);
+    save_spvar(arme_profil_sec, 0, 100);
+    save_spvar(control_mode, 0, 1);
+    save_spvar(game_sensitivity, 1, 20);
+    save_spvar(game_deadzone, 0, 20);
+    save_spvar(game_fov, 60, 120);
+    save_spvar(game_response, 0, 2);
+    save_spvar(vibration_on, 0, 1);
+    save_spvar(surprise_mode, 0, 1);
+    save_spvar(quick_scope_actif, 0, 1);
+    save_spvar(auto_hold_breath_actif, 0, 1);
+    save_spvar(humanisation_actif, 0, 1);
+    save_spvar(arv[0], -99, 99); save_spvar(arv[1], -99, 99); save_spvar(arv[2], -99, 99);
+    save_spvar(arv[3], -99, 99); save_spvar(arv[4], -99, 99); save_spvar(arv[5], -99, 99);
+    save_spvar(arv[6], -99, 99); save_spvar(arv[7], -99, 99); save_spvar(arv[8], -99, 99);
+    save_spvar(arv[9], -99, 99); save_spvar(arv[10], -99, 99); save_spvar(arv[11], -99, 99);
+    save_spvar(arv[12], -99, 99); save_spvar(arv[13], -99, 99); save_spvar(arv[14], -99, 99);
+    save_spvar(arv[15], -99, 99); save_spvar(arv[16], -99, 99); save_spvar(arv[17], -99, 99);
+    save_spvar(arv[18], -99, 99); save_spvar(arv[19], -99, 99); save_spvar(arv[20], -99, 99);
+    save_spvar(arv[21], -99, 99); save_spvar(arv[22], -99, 99); save_spvar(arv[23], -99, 99);
+    save_spvar(arv[24], -99, 99); save_spvar(arv[25], -99, 99); save_spvar(arv[26], -99, 99);
+    save_spvar(arv[27], -99, 99); save_spvar(arv[28], -99, 99); save_spvar(arv[29], -99, 99);
+    save_spvar(arv[30], -99, 99); save_spvar(arv[31], -99, 99); save_spvar(arv[32], -99, 99);
+    save_spvar(arv[33], -99, 99); save_spvar(arv[34], -99, 99); save_spvar(arv[35], -99, 99);
+    save_spvar(arv[36], -99, 99); save_spvar(arv[37], -99, 99); save_spvar(arv[38], -99, 99);
+    save_spvar(arv[39], -99, 99); save_spvar(arv[40], -99, 99); save_spvar(arv[41], -99, 99);
+    save_spvar(arv[42], -99, 99); save_spvar(arv[43], -99, 99); save_spvar(arv[44], -99, 99);
+    save_spvar(arv[45], -99, 99); save_spvar(arv[46], -99, 99); save_spvar(arv[47], -99, 99);
+    save_spvar(arv[48], -99, 99); save_spvar(arv[49], -99, 99); save_spvar(arv[50], -99, 99);
+    save_spvar(arv[51], -99, 99); save_spvar(arv[52], -99, 99); save_spvar(arv[53], -99, 99);
+    save_spvar(arv[54], -99, 99); save_spvar(arv[55], -99, 99); save_spvar(arv[56], -99, 99);
+    save_spvar(arv[57], -99, 99); save_spvar(arv[58], -99, 99); save_spvar(arv[59], -99, 99);
+    save_spvar(arv[60], -99, 99); save_spvar(arv[61], -99, 99); save_spvar(arv[62], -99, 99);
+    save_spvar(arv[63], -99, 99); save_spvar(arv[64], -99, 99); save_spvar(arv[65], -99, 99);
+    save_spvar(arv[66], -99, 99); save_spvar(arv[67], -99, 99); save_spvar(arv[68], -99, 99);
+    save_spvar(arv[69], -99, 99); save_spvar(arv[70], -99, 99); save_spvar(arv[71], -99, 99);
+    save_spvar(arv[72], -99, 99); save_spvar(arv[73], -99, 99); save_spvar(arv[74], -99, 99);
+    save_spvar(arv[75], -99, 99); save_spvar(arv[76], -99, 99); save_spvar(arv[77], -99, 99);
+    save_spvar(arv[78], -99, 99); save_spvar(arv[79], -99, 99); save_spvar(arv[80], -99, 99);
+    save_spvar(arv[81], -99, 99); save_spvar(arv[82], -99, 99); save_spvar(arv[83], -99, 99);
+    save_spvar(arv[84], -99, 99); save_spvar(arv[85], -99, 99); save_spvar(arv[86], -99, 99);
+    save_spvar(arv[87], -99, 99); save_spvar(arv[88], -99, 99); save_spvar(arv[89], -99, 99);
+    save_spvar(arv[90], -99, 99); save_spvar(arv[91], -99, 99); save_spvar(arv[92], -99, 99);
+    save_spvar(arv[93], -99, 99); save_spvar(arv[94], -99, 99); save_spvar(arv[95], -99, 99);
+    save_spvar(arv[96], -99, 99); save_spvar(arv[97], -99, 99); save_spvar(arv[98], -99, 99);
+    save_spvar(arv[99], -99, 99); save_spvar(arv[100], -99, 99);
+    save_spvar(arv[101], -99, 99); save_spvar(arv[102], -99, 99);
+    save_spvar(arh[0], -99, 99); save_spvar(arh[1], -99, 99); save_spvar(arh[2], -99, 99);
+    save_spvar(arh[3], -99, 99); save_spvar(arh[4], -99, 99); save_spvar(arh[5], -99, 99);
+    save_spvar(arh[6], -99, 99); save_spvar(arh[7], -99, 99); save_spvar(arh[8], -99, 99);
+    save_spvar(arh[9], -99, 99); save_spvar(arh[10], -99, 99); save_spvar(arh[11], -99, 99);
+    save_spvar(arh[12], -99, 99); save_spvar(arh[13], -99, 99); save_spvar(arh[14], -99, 99);
+    save_spvar(arh[15], -99, 99); save_spvar(arh[16], -99, 99); save_spvar(arh[17], -99, 99);
+    save_spvar(arh[18], -99, 99); save_spvar(arh[19], -99, 99); save_spvar(arh[20], -99, 99);
+    save_spvar(arh[21], -99, 99); save_spvar(arh[22], -99, 99); save_spvar(arh[23], -99, 99);
+    save_spvar(arh[24], -99, 99); save_spvar(arh[25], -99, 99); save_spvar(arh[26], -99, 99);
+    save_spvar(arh[27], -99, 99); save_spvar(arh[28], -99, 99); save_spvar(arh[29], -99, 99);
+    save_spvar(arh[30], -99, 99); save_spvar(arh[31], -99, 99); save_spvar(arh[32], -99, 99);
+    save_spvar(arh[33], -99, 99); save_spvar(arh[34], -99, 99); save_spvar(arh[35], -99, 99);
+    save_spvar(arh[36], -99, 99); save_spvar(arh[37], -99, 99); save_spvar(arh[38], -99, 99);
+    save_spvar(arh[39], -99, 99); save_spvar(arh[40], -99, 99); save_spvar(arh[41], -99, 99);
+    save_spvar(arh[42], -99, 99); save_spvar(arh[43], -99, 99); save_spvar(arh[44], -99, 99);
+    save_spvar(arh[45], -99, 99); save_spvar(arh[46], -99, 99); save_spvar(arh[47], -99, 99);
+    save_spvar(arh[48], -99, 99); save_spvar(arh[49], -99, 99); save_spvar(arh[50], -99, 99);
+    save_spvar(arh[51], -99, 99); save_spvar(arh[52], -99, 99); save_spvar(arh[53], -99, 99);
+    save_spvar(arh[54], -99, 99); save_spvar(arh[55], -99, 99); save_spvar(arh[56], -99, 99);
+    save_spvar(arh[57], -99, 99); save_spvar(arh[58], -99, 99); save_spvar(arh[59], -99, 99);
+    save_spvar(arh[60], -99, 99); save_spvar(arh[61], -99, 99); save_spvar(arh[62], -99, 99);
+    save_spvar(arh[63], -99, 99); save_spvar(arh[64], -99, 99); save_spvar(arh[65], -99, 99);
+    save_spvar(arh[66], -99, 99); save_spvar(arh[67], -99, 99); save_spvar(arh[68], -99, 99);
+    save_spvar(arh[69], -99, 99); save_spvar(arh[70], -99, 99); save_spvar(arh[71], -99, 99);
+    save_spvar(arh[72], -99, 99); save_spvar(arh[73], -99, 99); save_spvar(arh[74], -99, 99);
+    save_spvar(arh[75], -99, 99); save_spvar(arh[76], -99, 99); save_spvar(arh[77], -99, 99);
+    save_spvar(arh[78], -99, 99); save_spvar(arh[79], -99, 99); save_spvar(arh[80], -99, 99);
+    save_spvar(arh[81], -99, 99); save_spvar(arh[82], -99, 99); save_spvar(arh[83], -99, 99);
+    save_spvar(arh[84], -99, 99); save_spvar(arh[85], -99, 99); save_spvar(arh[86], -99, 99);
+    save_spvar(arh[87], -99, 99); save_spvar(arh[88], -99, 99); save_spvar(arh[89], -99, 99);
+    save_spvar(arh[90], -99, 99); save_spvar(arh[91], -99, 99); save_spvar(arh[92], -99, 99);
+    save_spvar(arh[93], -99, 99); save_spvar(arh[94], -99, 99); save_spvar(arh[95], -99, 99);
+    save_spvar(arh[96], -99, 99); save_spvar(arh[97], -99, 99); save_spvar(arh[98], -99, 99);
+    save_spvar(arh[99], -99, 99); save_spvar(arh[100], -99, 99);
+    save_spvar(arh[101], -99, 99); save_spvar(arh[102], -99, 99);
+}
+
+function Load() {
+    reset_spvar();
+    if(read_spvar(0, 1, 1)) {
+        arme_profil_prim         = read_spvar(0, 102, 101);
+        arme_profil_sec          = read_spvar(0, 102, 102);
+        control_mode             = read_spvar(0, 1, 0);
+        game_sensitivity         = read_spvar(1, 20, 7);
+        game_deadzone            = read_spvar(0, 20, 5);
+        game_fov                 = read_spvar(60, 120, 80);
+        game_response            = read_spvar(0, 2, 0);
+        vibration_on             = read_spvar(0, 1, 1);
+        surprise_mode            = read_spvar(0, 1, 0);
+        quick_scope_actif        = read_spvar(0, 1, 0);
+        auto_hold_breath_actif   = read_spvar(0, 1, 1);
+        humanisation_actif       = read_spvar(0, 1, 0);
+        arv[0]  = read_spvar(-99, 99, 0); arv[1]  = read_spvar(-99, 99, 0); arv[2]  = read_spvar(-99, 99, 0);
+        arv[3]  = read_spvar(-99, 99, 0); arv[4]  = read_spvar(-99, 99, 0); arv[5]  = read_spvar(-99, 99, 0);
+        arv[6]  = read_spvar(-99, 99, 0); arv[7]  = read_spvar(-99, 99, 0); arv[8]  = read_spvar(-99, 99, 0);
+        arv[9]  = read_spvar(-99, 99, 0); arv[10] = read_spvar(-99, 99, 0); arv[11] = read_spvar(-99, 99, 0);
+        arv[12] = read_spvar(-99, 99, 0); arv[13] = read_spvar(-99, 99, 0); arv[14] = read_spvar(-99, 99, 0);
+        arv[15] = read_spvar(-99, 99, 0); arv[16] = read_spvar(-99, 99, 0); arv[17] = read_spvar(-99, 99, 0);
+        arv[18] = read_spvar(-99, 99, 0); arv[19] = read_spvar(-99, 99, 0); arv[20] = read_spvar(-99, 99, 0);
+        arv[21] = read_spvar(-99, 99, 0); arv[22] = read_spvar(-99, 99, 0); arv[23] = read_spvar(-99, 99, 0);
+        arv[24] = read_spvar(-99, 99, 0); arv[25] = read_spvar(-99, 99, 0); arv[26] = read_spvar(-99, 99, 0);
+        arv[27] = read_spvar(-99, 99, 0); arv[28] = read_spvar(-99, 99, 0); arv[29] = read_spvar(-99, 99, 0);
+        arv[30] = read_spvar(-99, 99, 0); arv[31] = read_spvar(-99, 99, 0); arv[32] = read_spvar(-99, 99, 0);
+        arv[33] = read_spvar(-99, 99, 0); arv[34] = read_spvar(-99, 99, 0); arv[35] = read_spvar(-99, 99, 0);
+        arv[36] = read_spvar(-99, 99, 0); arv[37] = read_spvar(-99, 99, 0); arv[38] = read_spvar(-99, 99, 0);
+        arv[39] = read_spvar(-99, 99, 0); arv[40] = read_spvar(-99, 99, 0); arv[41] = read_spvar(-99, 99, 0);
+        arv[42] = read_spvar(-99, 99, 0); arv[43] = read_spvar(-99, 99, 0); arv[44] = read_spvar(-99, 99, 0);
+        arv[45] = read_spvar(-99, 99, 0); arv[46] = read_spvar(-99, 99, 0); arv[47] = read_spvar(-99, 99, 0);
+        arv[48] = read_spvar(-99, 99, 0); arv[49] = read_spvar(-99, 99, 0); arv[50] = read_spvar(-99, 99, 0);
+        arv[51] = read_spvar(-99, 99, 0); arv[52] = read_spvar(-99, 99, 0); arv[53] = read_spvar(-99, 99, 0);
+        arv[54] = read_spvar(-99, 99, 0); arv[55] = read_spvar(-99, 99, 0); arv[56] = read_spvar(-99, 99, 0);
+        arv[57] = read_spvar(-99, 99, 0); arv[58] = read_spvar(-99, 99, 0); arv[59] = read_spvar(-99, 99, 0);
+        arv[60] = read_spvar(-99, 99, 0); arv[61] = read_spvar(-99, 99, 0); arv[62] = read_spvar(-99, 99, 0);
+        arv[63] = read_spvar(-99, 99, 0); arv[64] = read_spvar(-99, 99, 0); arv[65] = read_spvar(-99, 99, 0);
+        arv[66] = read_spvar(-99, 99, 0); arv[67] = read_spvar(-99, 99, 0); arv[68] = read_spvar(-99, 99, 0);
+        arv[69] = read_spvar(-99, 99, 0); arv[70] = read_spvar(-99, 99, 0); arv[71] = read_spvar(-99, 99, 0);
+        arv[72] = read_spvar(-99, 99, 0); arv[73] = read_spvar(-99, 99, 0); arv[74] = read_spvar(-99, 99, 0);
+        arv[75] = read_spvar(-99, 99, 0); arv[76] = read_spvar(-99, 99, 0); arv[77] = read_spvar(-99, 99, 0);
+        arv[78] = read_spvar(-99, 99, 0); arv[79] = read_spvar(-99, 99, 0); arv[80] = read_spvar(-99, 99, 0);
+        arv[81] = read_spvar(-99, 99, 0); arv[82] = read_spvar(-99, 99, 0); arv[83] = read_spvar(-99, 99, 0);
+        arv[84] = read_spvar(-99, 99, 0); arv[85] = read_spvar(-99, 99, 0); arv[86] = read_spvar(-99, 99, 0);
+        arv[87] = read_spvar(-99, 99, 0); arv[88] = read_spvar(-99, 99, 0); arv[89] = read_spvar(-99, 99, 0);
+        arv[90] = read_spvar(-99, 99, 0); arv[91] = read_spvar(-99, 99, 0); arv[92] = read_spvar(-99, 99, 0);
+        arv[93] = read_spvar(-99, 99, 0); arv[94] = read_spvar(-99, 99, 0); arv[95] = read_spvar(-99, 99, 0);
+        arv[96] = read_spvar(-99, 99, 0); arv[97] = read_spvar(-99, 99, 0); arv[98] = read_spvar(-99, 99, 0);
+        arv[99] = read_spvar(-99, 99, 0); arv[100] = read_spvar(-99, 99, 0);
+        arv[101] = read_spvar(-99, 99, 0); arv[102] = read_spvar(-99, 99, 0);
+        arh[0]  = read_spvar(-99, 99, 0); arh[1]  = read_spvar(-99, 99, 0); arh[2]  = read_spvar(-99, 99, 0);
+        arh[3]  = read_spvar(-99, 99, 0); arh[4]  = read_spvar(-99, 99, 0); arh[5]  = read_spvar(-99, 99, 0);
+        arh[6]  = read_spvar(-99, 99, 0); arh[7]  = read_spvar(-99, 99, 0); arh[8]  = read_spvar(-99, 99, 0);
+        arh[9]  = read_spvar(-99, 99, 0); arh[10] = read_spvar(-99, 99, 0); arh[11] = read_spvar(-99, 99, 0);
+        arh[12] = read_spvar(-99, 99, 0); arh[13] = read_spvar(-99, 99, 0); arh[14] = read_spvar(-99, 99, 0);
+        arh[15] = read_spvar(-99, 99, 0); arh[16] = read_spvar(-99, 99, 0); arh[17] = read_spvar(-99, 99, 0);
+        arh[18] = read_spvar(-99, 99, 0); arh[19] = read_spvar(-99, 99, 0); arh[20] = read_spvar(-99, 99, 0);
+        arh[21] = read_spvar(-99, 99, 0); arh[22] = read_spvar(-99, 99, 0); arh[23] = read_spvar(-99, 99, 0);
+        arh[24] = read_spvar(-99, 99, 0); arh[25] = read_spvar(-99, 99, 0); arh[26] = read_spvar(-99, 99, 0);
+        arh[27] = read_spvar(-99, 99, 0); arh[28] = read_spvar(-99, 99, 0); arh[29] = read_spvar(-99, 99, 0);
+        arh[30] = read_spvar(-99, 99, 0); arh[31] = read_spvar(-99, 99, 0); arh[32] = read_spvar(-99, 99, 0);
+        arh[33] = read_spvar(-99, 99, 0); arh[34] = read_spvar(-99, 99, 0); arh[35] = read_spvar(-99, 99, 0);
+        arh[36] = read_spvar(-99, 99, 0); arh[37] = read_spvar(-99, 99, 0); arh[38] = read_spvar(-99, 99, 0);
+        arh[39] = read_spvar(-99, 99, 0); arh[40] = read_spvar(-99, 99, 0); arh[41] = read_spvar(-99, 99, 0);
+        arh[42] = read_spvar(-99, 99, 0); arh[43] = read_spvar(-99, 99, 0); arh[44] = read_spvar(-99, 99, 0);
+        arh[45] = read_spvar(-99, 99, 0); arh[46] = read_spvar(-99, 99, 0); arh[47] = read_spvar(-99, 99, 0);
+        arh[48] = read_spvar(-99, 99, 0); arh[49] = read_spvar(-99, 99, 0); arh[50] = read_spvar(-99, 99, 0);
+        arh[51] = read_spvar(-99, 99, 0); arh[52] = read_spvar(-99, 99, 0); arh[53] = read_spvar(-99, 99, 0);
+        arh[54] = read_spvar(-99, 99, 0); arh[55] = read_spvar(-99, 99, 0); arh[56] = read_spvar(-99, 99, 0);
+        arh[57] = read_spvar(-99, 99, 0); arh[58] = read_spvar(-99, 99, 0); arh[59] = read_spvar(-99, 99, 0);
+        arh[60] = read_spvar(-99, 99, 0); arh[61] = read_spvar(-99, 99, 0); arh[62] = read_spvar(-99, 99, 0);
+        arh[63] = read_spvar(-99, 99, 0); arh[64] = read_spvar(-99, 99, 0); arh[65] = read_spvar(-99, 99, 0);
+        arh[66] = read_spvar(-99, 99, 0); arh[67] = read_spvar(-99, 99, 0); arh[68] = read_spvar(-99, 99, 0);
+        arh[69] = read_spvar(-99, 99, 0); arh[70] = read_spvar(-99, 99, 0); arh[71] = read_spvar(-99, 99, 0);
+        arh[72] = read_spvar(-99, 99, 0); arh[73] = read_spvar(-99, 99, 0); arh[74] = read_spvar(-99, 99, 0);
+        arh[75] = read_spvar(-99, 99, 0); arh[76] = read_spvar(-99, 99, 0); arh[77] = read_spvar(-99, 99, 0);
+        arh[78] = read_spvar(-99, 99, 0); arh[79] = read_spvar(-99, 99, 0); arh[80] = read_spvar(-99, 99, 0);
+        arh[81] = read_spvar(-99, 99, 0); arh[82] = read_spvar(-99, 99, 0); arh[83] = read_spvar(-99, 99, 0);
+        arh[84] = read_spvar(-99, 99, 0); arh[85] = read_spvar(-99, 99, 0); arh[86] = read_spvar(-99, 99, 0);
+        arh[87] = read_spvar(-99, 99, 0); arh[88] = read_spvar(-99, 99, 0); arh[89] = read_spvar(-99, 99, 0);
+        arh[90] = read_spvar(-99, 99, 0); arh[91] = read_spvar(-99, 99, 0); arh[92] = read_spvar(-99, 99, 0);
+        arh[93] = read_spvar(-99, 99, 0); arh[94] = read_spvar(-99, 99, 0); arh[95] = read_spvar(-99, 99, 0);
+        arh[96] = read_spvar(-99, 99, 0); arh[97] = read_spvar(-99, 99, 0); arh[98] = read_spvar(-99, 99, 0);
+        arh[99] = read_spvar(-99, 99, 0); arh[100] = read_spvar(-99, 99, 0);
+        arh[101] = read_spvar(-99, 99, 0); arh[102] = read_spvar(-99, 99, 0);
+    } else {
+        arme_profil_prim = 101;
+        arme_profil_sec  = 102;
+        control_mode     = 0;
+        game_sensitivity = 7;
+        game_deadzone    = 5;
+        game_fov         = 80;
+        game_response    = 0;
+        vibration_on     = TRUE;
+    }
+}
+
+// ===================================================================
+// SYSTEME SPVAR (NE PAS MODIFIER)
+// ===================================================================
+
+function reset_spvar() {
+    spvar_current_slot  = SPVAR_1;
+    spvar_current_bit   = 0;
+    spvar_current_value = 0;
+}
+
+function get_bit_count(val) {
+    spvar_tmp = 0;
+    while(val) {
+        spvar_tmp = spvar_tmp + 1;
+        val = abs(val >> 1);
+    }
+    return spvar_tmp;
+}
+
+function get_bit_count2(val1, val2) {
+    spvar_tmp = max(get_bit_count(val1), get_bit_count(val2));
+    if(val1 < 0 || val2 < 0) { spvar_tmp = spvar_tmp + 1; }
+    return spvar_tmp;
+}
+
+function is_signed2(val1, val2) { return val1 < 0 || val2 < 0; }
+function make_sign(bits) { return 1 << clamp(bits - 1, 0, 31); }
+function make_full_mask(bits) { if(bits == 32) { return -1; } return 0x7FFFFFFF >> (31 - bits); }
+function make_sign_mask(bits) { return make_full_mask(bits - 1); }
+
+function pack_i(val, bits) {
+    if(val < 0) { return (abs(val) & make_sign_mask(bits)) | make_sign(bits); }
+    return val & make_sign_mask(bits);
+}
+
+function unpack_i(val, bits) {
+    if(val & make_sign(bits)) { return 0 - (val & make_sign_mask(bits)); }
+    return val & make_sign_mask(bits);
+}
+
+function read_spvar_slot(slot) { return get_pvar(slot, 0x80000000, 0x7FFFFFFF, 0); }
+
+function save_spvar(val, min, max) {
+    spvar_bits = get_bit_count2(min, max);
+    val = clamp(val, min, max);
+    if(is_signed2(min, max)) { val = pack_i(val, spvar_bits); }
+    val = val & make_full_mask(spvar_bits);
+    if(spvar_bits >= 32 - spvar_current_bit) {
+        spvar_current_value = spvar_current_value | (val << spvar_current_bit);
+        set_pvar(spvar_current_slot, spvar_current_value);
+        spvar_current_slot = spvar_current_slot + 1;
+        spvar_bits = spvar_bits - (32 - spvar_current_bit);
+        val = val >> (32 - spvar_current_bit);
+        spvar_current_bit = 0;
+        spvar_current_value = 0;
+    }
+    spvar_current_value = spvar_current_value | (val << spvar_current_bit);
+    spvar_current_bit = spvar_current_bit + spvar_bits;
+    if(!spvar_current_bit) { spvar_current_value = 0; }
+    set_pvar(spvar_current_slot, spvar_current_value);
+}
+
+function read_spvar(min, max, def) {
+    spvar_bits = get_bit_count2(min, max);
+    spvar_current_value = (read_spvar_slot(spvar_current_slot) >> spvar_current_bit) & make_full_mask(spvar_bits);
+    if(spvar_bits >= 32 - spvar_current_bit) {
+        spvar_current_value = (spvar_current_value & make_full_mask(32 - spvar_current_bit)) |
+                              ((read_spvar_slot(spvar_current_slot + 1) & make_full_mask(spvar_bits - (32 - spvar_current_bit))) << (32 - spvar_current_bit));
+    }
+    spvar_current_bit = spvar_current_bit + spvar_bits;
+    spvar_current_value = spvar_current_value & make_full_mask(spvar_bits);
+    if(spvar_current_bit >= 32) {
+        spvar_current_slot = spvar_current_slot + 1;
+        spvar_current_bit = spvar_current_bit - 32;
+    }
+    if(is_signed2(min, max)) { spvar_current_value = unpack_i(spvar_current_value, spvar_bits); }
+    if(spvar_current_value < min || spvar_current_value > max) { return def; }
+    return spvar_current_value;
+}

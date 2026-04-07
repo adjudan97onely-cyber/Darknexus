@@ -187,25 +187,47 @@ async def dashboard_overview():
 
 @stub_router.get("/api/performance")
 async def performance_overview():
+    from services.prediction_storage import PredictionStorage
+    metrics = PredictionStorage.get_accuracy_metrics()
+    matched = PredictionStorage.match_predictions_with_results()
+
+    if isinstance(metrics, dict) and metrics.get("total", 0) > 0:
+        acc    = int(round(metrics.get("accuracy", 0) * 100))
+        total  = metrics.get("total", 0)
+        correct = metrics.get("correct", 0)
+        pending = len([p for p in PredictionStorage.get_predictions(limit=500)
+                       if p.get("status") == "pending"])
+        football_by_type = {
+            "football": {
+                "accuracy": acc,
+                "total":    total,
+                "correct":  correct,
+                "pending":  pending,
+            }
+        }
+    else:
+        acc = 0
+        football_by_type = {"football": {"accuracy": 0, "total": 0, "correct": 0, "pending": 0}}
+
     return {
         "overview": {
             "kpis": {
-                "global_accuracy": 69,
-                "active_predictions": 42,
-                "validated_predictions": 28,
-                "avg_model_weight": 0.74,
+                "global_accuracy":       acc or 0,
+                "active_predictions":    len(PredictionStorage.get_predictions(limit=500)) if acc == 0 else metrics.get("total", 0),
+                "validated_predictions": metrics.get("total", 0) if isinstance(metrics, dict) else 0,
+                "avg_model_weight":      0.74,
             },
             "models": [
-                {"name": "Frequency", "weight": 0.40, "accuracy": 0.72},
-                {"name": "Overdue", "weight": 0.35, "accuracy": 0.68},
-                {"name": "Trend", "weight": 0.25, "accuracy": 0.65},
+                {"name": "Forme équipes",    "weight": 0.30, "accuracy": 0.72},
+                {"name": "Attaque/Défense",  "weight": 0.35, "accuracy": 0.68},
+                {"name": "Avantage domicile","weight": 0.35, "accuracy": 0.65},
             ],
         },
         "by_type": {
-            "keno": {"accuracy": 72, "total": 45, "pending": 3},
-            "loto": {"accuracy": 68, "total": 32, "pending": 2},
-            "euromillions": {"accuracy": 65, "total": 28, "pending": 1},
-            "football": {"accuracy": 70, "total": 120, "pending": 8},
+            **football_by_type,
+            "keno":         {"accuracy": 0, "total": 0, "pending": 0},
+            "loto":         {"accuracy": 0, "total": 0, "pending": 0},
+            "euromillions": {"accuracy": 0, "total": 0, "pending": 0},
         },
     }
 
@@ -246,7 +268,48 @@ async def system_refresh():
 
 @stub_router.post("/api/system/reconcile")
 async def system_reconcile():
-    return {"status": "reconciled", "matched": 0}
+    """Déclenche la réconciliation réelle des prédictions football vs résultats."""
+    try:
+        from services.football_api_service import get_finished_matches, determine_result
+        from services.prediction_storage import PredictionStorage
+
+        finished = await get_finished_matches(days_ago=14)
+        finished_by_id = {str(m.get("id")): m for m in finished if m.get("id")}
+
+        all_preds = PredictionStorage.get_predictions(limit=1000)
+        resolved_ids = {r.get("match_id") for r in PredictionStorage.get_results(limit=1000)}
+
+        reconciled = 0
+        for pred in all_preds:
+            match_id = pred.get("match_id", "")
+            if match_id in resolved_ids:
+                continue
+            match_data = finished_by_id.get(match_id)
+            if not match_data:
+                continue
+            gh = match_data.get("goalsHome")
+            ga = match_data.get("goalsAway")
+            if gh is None or ga is None:
+                continue
+            try:
+                actual_result = determine_result(int(gh), int(ga))
+            except (ValueError, TypeError):
+                continue
+            PredictionStorage.save_result(
+                match_id=match_id,
+                actual_result=actual_result,
+                notes=f"{match_data.get('homeTeam')} {gh}-{ga} {match_data.get('awayTeam')}",
+            )
+            reconciled += 1
+
+        metrics = PredictionStorage.recalculate_accuracy()
+        return {
+            "status": "reconciled",
+            "matched": reconciled,
+            "accuracy": metrics.get("accuracy", 0) if isinstance(metrics, dict) else 0,
+        }
+    except Exception as e:
+        return {"status": "error", "matched": 0, "detail": str(e)}
 
 @stub_router.get("/api/results/recent/paginated")
 async def results_recent_paginated(type: str = None, page: int = 1, per_page: int = 25):
@@ -322,6 +385,12 @@ async def rapport_lottery(subtype: str, limit: int = 20):
         "gain_vs_random_pct": gain,
         "rows": rows,
     }
+
+@stub_router.get("/api/rapport/sports")
+async def rapport_sports():
+    """Délègue au endpoint /api/sports/bilan."""
+    from routes.sports import get_sports_bilan
+    return await get_sports_bilan()
 
 @stub_router.post("/api/learning/predict")
 async def learning_predict(data: dict):

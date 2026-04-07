@@ -32,7 +32,9 @@
       "Bash(pkill -f \"analytics/backend/server.py\")",
       "Bash(echo \"exit: $?\")",
       "Bash(grep:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "WebFetch(domain:guide.cronus.support)",
+      "WebFetch(domain:cronusmax.com)"
     ]
   }
 }

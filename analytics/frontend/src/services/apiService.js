@@ -179,6 +179,11 @@ export const sportsAPI = {
     _sportsAPI.footballAnalysis,
     sportMock.statistics
   ),
+
+  reconcile: withFallback(
+    _sportsAPI.reconcile,
+    { status: 'ok', reconciled: 0, message: 'Mode hors ligne' }
+  ),
 };
 
 // ── dashboardAPI (avec fallback) ──────────────────────────────────────────────
@@ -243,6 +248,21 @@ export const dashboardAPI = {
 // ── bilanAPI (avec fallback) ───────────────────────────────────────────────────
 
 export const bilanAPI = {
+  getSportsBilan: withFallback(
+    _bilanAPI.getSportsBilan,
+    {
+      subtype: 'football',
+      verdict: "Aucune prédiction validée pour l'instant. Les prédictions sont sauvegardées automatiquement — reviens après que des matchs se terminent.",
+      total_evaluated: 0,
+      total_correct: 0,
+      avg_score_pct: 0,
+      random_baseline_pct: 33,
+      ai_better_than_random: false,
+      gain_vs_random_pct: 0,
+      rows: [],
+    }
+  ),
+
   getLotteryBilan: withFallback(
     _bilanAPI.getLotteryBilan,
     (subtype) => {

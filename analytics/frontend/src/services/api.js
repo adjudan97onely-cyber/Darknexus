@@ -133,8 +133,10 @@ export const sportsAPI = {
     api.get('/api/sports/recommendations', { params }),
   autoSelectSports: (league, take = 5, minConfidence = 80) =>
     api.get('/api/auto-select/sports', { params: { league, take, min_confidence: minConfidence } }),
-  footballAnalysis: () => 
+  footballAnalysis: () =>
     api.get('/api/sports/football/analysis'),
+  reconcile: () =>
+    api.post('/api/sports/reconcile'),
 };
 
 export const dashboardAPI = {
@@ -157,6 +159,8 @@ export const dashboardAPI = {
 export const bilanAPI = {
   getLotteryBilan: (subtype, limit = 20) =>
     api.get(`/api/rapport/lottery/${subtype}`, { params: { limit } }),
+  getSportsBilan: () =>
+    api.get('/api/rapport/sports'),
 };
 
 export const authAPI = {

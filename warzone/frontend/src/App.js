@@ -10,7 +10,7 @@ import {
   Loader2, AlertCircle, Check, Star, Eye
 } from "lucide-react";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = 'http://localhost:5003';
 const API = `${BACKEND_URL}/api`;
 
 // ============== API FUNCTIONS ==============
@@ -29,7 +29,7 @@ const api = {
   generateMasterScript: () => axios.post(`${API}/generate-master-script`),
   
   // Chat
-  sendMessage: (sessionId, message) => axios.post(`${API}/chat`, { session_id: sessionId, message }),
+  sendMessage: (sessionId, message) => axios.post(`${API}/chat`, { session_id: sessionId, message }, { timeout: 300000 }),
   getChatHistory: (sessionId) => axios.get(`${API}/chat/${sessionId}`),
   clearChat: (sessionId) => axios.delete(`${API}/chat/${sessionId}`),
   
@@ -290,14 +290,17 @@ function StatCard({ icon: Icon, label, value, color, onClick }) {
 }
 
 // ============== META CENTER COMPONENT ==============
+const META_CATEGORIES = ['AR', 'SMG', 'LMG', 'SNIPER', 'SHOTGUN', 'PISTOL', 'LAUNCHER'];
+const META_GAMES = ['BO6', 'MW3'];
+
 function MetaCenter({ weapons, onRefresh, onWeaponCreate, onWeaponUpdate, onWeaponDelete, onSeedWeapons }) {
   const [filter, setFilter] = useState({ category: '', game: '', metaType: '' });
   const [showForm, setShowForm] = useState(false);
   const [editingWeapon, setEditingWeapon] = useState(null);
   const [seeding, setSeeding] = useState(false);
 
-  const categories = ['AR', 'SMG', 'LMG', 'SNIPER', 'SHOTGUN', 'PISTOL', 'LAUNCHER'];
-  const games = ['BO6', 'MW3'];
+  const categories = META_CATEGORIES;
+  const games = META_GAMES;
 
   const filteredWeapons = weapons.filter(w => {
     if (filter.category && w.category !== filter.category) return false;
@@ -876,8 +879,22 @@ function AIExpert({ weapons }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
-  const [sessionId] = useState(() => `session_${Date.now()}`);
+  const [sessionId] = useState(() => {
+    const stored = localStorage.getItem('warzone_session_id');
+    if (stored) return stored;
+    const newId = `session_${Date.now()}`;
+    localStorage.setItem('warzone_session_id', newId);
+    return newId;
+  });
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    api.getChatHistory(sessionId).then(res => {
+      if (Array.isArray(res.data) && res.data.length > 0) {
+        setMessages(res.data.map(m => ({ role: m.role, content: m.content })));
+      }
+    }).catch(() => {});
+  }, [sessionId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -910,6 +927,16 @@ function AIExpert({ weapons }) {
     }
   };
 
+  const clearConversation = async () => {
+    try {
+      await api.clearChat(sessionId);
+      setMessages([]);
+      toast.success("Conversation effacée");
+    } catch {
+      toast.error("Erreur lors de l'effacement");
+    }
+  };
+
   const quickPrompts = [
     "Génère un script anti-recoil pour le XM4 avec support OLED",
     "Quelle est l'arme méta cachée avec le meilleur TTK?",
@@ -925,8 +952,17 @@ function AIExpert({ weapons }) {
           <h2 className="font-heading text-3xl font-bold text-accent text-glow tracking-wider">IA EXPERTE</h2>
           <p className="text-sm text-muted-foreground font-mono mt-1">ARCHITECTE BALISTIQUE WARZONE</p>
         </div>
-        <div className="text-[10px] font-mono text-muted-foreground">
-          {weapons.length} armes en contexte
+        <div className="flex items-center gap-3">
+          <button
+            onClick={clearConversation}
+            className="text-[10px] font-mono text-muted-foreground hover:text-red-400 border border-border hover:border-red-400 px-2 py-1 transition-colors"
+            title="Effacer la conversation"
+          >
+            EFFACER
+          </button>
+          <div className="text-[10px] font-mono text-muted-foreground">
+            {weapons.length} armes en contexte
+          </div>
         </div>
       </div>
 
