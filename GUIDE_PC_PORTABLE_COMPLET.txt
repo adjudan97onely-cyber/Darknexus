@@ -1,0 +1,313 @@
+████████████████████████████████████████████████████████████████████████
+  DARKNEXUS - GUIDE COMPLET PC PORTABLE
+  Branche de travail : dev-portable
+  Snapshot stable   : tag v-stable-2026-04-08
+  Date de création  : 8 avril 2026
+████████████████████████████████████████████████████████████████████████
+
+═══════════════════════════════════════════════════════════════════════
+  PRINCIPE DE TRAVAIL
+═══════════════════════════════════════════════════════════════════════
+
+  PC BUREAU   → branche : main        (production stable)
+  PC PORTABLE → branche : dev-portable (tes développements)
+
+  Tu travailles librement sur dev-portable.
+  Quand ton travail est prêt et validé, on merge dans main.
+  La branche main n'est JAMAIS touchée depuis le portable.
+
+  Revenir à l'état stable du bureau à tout moment :
+    git checkout v-stable-2026-04-08
+
+
+═══════════════════════════════════════════════════════════════════════
+  ÉTAPE 1 — PRÉREQUIS (logiciels à installer sur le portable)
+═══════════════════════════════════════════════════════════════════════
+
+  Télécharge et installe dans cet ordre :
+
+  1. Git
+     → https://git-scm.com/download/win
+     Version : peu importe, prends la dernière
+
+  2. Python 3.11 ou 3.12 (PAS 3.13+ ni 3.14)
+     → https://www.python.org/downloads/
+     IMPORTANT : coche "Add Python to PATH" pendant l'install
+
+  3. Node.js v18 ou v20
+     → https://nodejs.org/  (bouton "LTS")
+
+  4. MongoDB Community Server 8.x
+     → https://www.mongodb.com/try/download/community
+     Sélectionne : Version 8.x | Windows | msi
+     Pendant l'install : coche "Install MongoDB as a Service"
+     (ça le lance automatiquement au démarrage)
+
+  5. VS Code
+     → https://code.visualstudio.com/ (tu l'as déjà)
+
+  Vérifie dans PowerShell que tout est bien installé :
+    git --version
+    python --version
+    node --version
+    npm --version
+
+
+═══════════════════════════════════════════════════════════════════════
+  ÉTAPE 2 — CLONER LE REPO ET SE METTRE SUR dev-portable
+═══════════════════════════════════════════════════════════════════════
+
+  Ouvre PowerShell et exécute ces commandes :
+
+    # Choisis où installer (ex: C:\ ou D:\)
+    cd C:\
+
+    # Clone le repo
+    git clone https://github.com/adjudan97onely-cyber/Darknexus.git Darknexus-main
+
+    # Entre dans le dossier
+    cd Darknexus-main
+
+    # IMPORTANT : bascule sur la branche dev-portable, pas main
+    git checkout dev-portable
+
+    # Vérifie que tu es bien sur dev-portable
+    git branch
+    # → tu dois voir : * dev-portable
+
+
+═══════════════════════════════════════════════════════════════════════
+  ÉTAPE 3 — SETUP PYTHON (venv)
+═══════════════════════════════════════════════════════════════════════
+
+  Dans le même PowerShell (depuis C:\Darknexus-main) :
+
+  --- Backend principal ---
+    cd backend
+    python -m venv venv
+    .\venv\Scripts\Activate.ps1
+    pip install --upgrade pip
+    pip install -r requirements.txt
+    deactivate
+    cd ..
+
+  --- Analytics backend ---
+    cd analytics\backend
+    python -m venv venv
+    .\venv\Scripts\Activate.ps1
+    pip install --upgrade pip
+    pip install -r requirements.txt
+    deactivate
+    cd ..\..
+
+  --- Warzone backend ---
+    cd warzone\backend
+    python -m venv venv
+    .\venv\Scripts\Activate.ps1
+    pip install fastapi uvicorn motor python-dotenv openai aiohttp
+    deactivate
+    cd ..\..
+
+  Si tu as une erreur d'exécution de script PowerShell :
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+
+═══════════════════════════════════════════════════════════════════════
+  ÉTAPE 4 — SETUP NODE.JS (npm install)
+═══════════════════════════════════════════════════════════════════════
+
+  Depuis C:\Darknexus-main :
+
+    cd frontend
+    npm install
+    cd ..
+
+    cd analytics\frontend
+    npm install
+    cd ..\..
+
+    cd killagain-food
+    npm install
+    cd ..
+
+    cd warzone\frontend
+    npm install
+    cd ..
+
+
+═══════════════════════════════════════════════════════════════════════
+  ÉTAPE 5 — COPIER LES FICHIERS .ENV
+═══════════════════════════════════════════════════════════════════════
+
+  Sur le PC BUREAU : lance EXPORT_ENV_POUR_PORTABLE.bat
+    → génère : env_export_PORTABLE.zip
+
+  Copie env_export_PORTABLE.zip vers le portable
+  (USB / Google Drive / OneDrive / mail)
+
+  Sur le PC PORTABLE : mets env_export_PORTABLE.zip dans C:\Darknexus-main\
+    → double-clic sur : IMPORT_ENV_DEPUIS_BUREAU.bat
+
+  Ça crée automatiquement tous les .env dans les bons dossiers.
+  ✓ Tes clés API seront les mêmes qu'au bureau
+  ✓ Tes connexions MongoDB seront identiques (localhost:27017)
+
+
+═══════════════════════════════════════════════════════════════════════
+  ÉTAPE 6 — VÉRIFIER MONGODB
+═══════════════════════════════════════════════════════════════════════
+
+  MongoDB doit tourner sur le portable (installé à l'étape 1).
+  Si "Install as a Service" était coché, il tourne déjà.
+
+  Pour vérifier :
+    Get-Service -Name "MongoDB" | Select-Object Name, Status
+
+  Si Status = "Stopped" :
+    Start-Service -Name "MongoDB"
+
+  Les bases de données utilisées dans Darknexus :
+    - dark_nexus_local    (backend principal)
+    - analytics_lottery   (analytics)
+    - adj_killagain_db    (killagain-food)
+    - warzone_dev         (warzone)
+
+  Elles seront créées automatiquement par les backends au 1er lancement.
+  Pas besoin de les importer manuellement.
+
+
+═══════════════════════════════════════════════════════════════════════
+  ÉTAPE 7 — LANCER LES APPS
+═══════════════════════════════════════════════════════════════════════
+
+  IMPORTANT : les scripts de lancement utilisent le venv de la racine.
+  Tu dois d'abord créer ce venv au bon endroit :
+
+    # Depuis C:\Darknexus-main
+    cd _publish\Darknexus-full\analytics-lottery\backend
+    python -m venv venv
+    .\venv\Scripts\Activate.ps1
+    pip install --upgrade pip
+    pip install -r ..\..\..\..\..\backend\requirements.txt
+    deactivate
+    cd ..\..\..\..\..
+
+  Ensuite tu peux lancer les apps avec les scripts habituels :
+
+    ✓ Darknexus main  → double-clic START_DARKNEXUS.bat
+    ✓ Analytics       → double-clic LANCER_ANALYTICS.bat
+    ✓ Killagain-Food  → double-clic LANCER_KILLAGAIN_FOOD.bat
+    ✓ Warzone         → double-clic LANCER_WARZONE.bat
+
+  Ou tout en une fois :
+    START_ALL.bat
+
+  URLs une fois lancé :
+    Darknexus :     http://localhost:3000
+    API Darknexus : http://localhost:5000/docs
+    Analytics :     http://localhost:5173
+    API Analytics : http://localhost:5001/docs
+    Killagain-Food: http://localhost:5180
+
+
+═══════════════════════════════════════════════════════════════════════
+  WORKFLOW GIT SUR LE PORTABLE
+═══════════════════════════════════════════════════════════════════════
+
+  ──────────────────────────────────────────────────────────────────
+  Tu es toujours sur la branche dev-portable
+  ──────────────────────────────────────────────────────────────────
+
+  1. VÉRIFIER ta branche courante
+       git branch
+       → doit afficher : * dev-portable
+
+  2. TRAVAILLER normalement (modifier des fichiers, tester, etc.)
+
+  3. SAUVEGARDER ton travail (commit)
+       git add .
+       git commit -m "feat: description de ce que tu as fait"
+
+  4. ENVOYER sur GitHub (branche dev-portable)
+       git push origin dev-portable
+
+  5. VOIR l'historique de tes commits
+       git log --oneline -10
+
+  ──────────────────────────────────────────────────────────────────
+  Récupérer les mises à jour du bureau (si tu as travaillé au bureau)
+  ──────────────────────────────────────────────────────────────────
+
+       git fetch origin
+       git pull origin dev-portable
+
+  ──────────────────────────────────────────────────────────────────
+  Quand tu veux merger ton travail vers main (UNIQUEMENT si validé)
+  ──────────────────────────────────────────────────────────────────
+  Dis-le moi dans le chat, je m'en occupe depuis le bureau.
+
+  ──────────────────────────────────────────────────────────────────
+  Revenir à l'état stable en cas de problème
+  ──────────────────────────────────────────────────────────────────
+       git stash           (met de côté tes modifs en cours)
+       git checkout v-stable-2026-04-08   (revient au snapshot bureau)
+       git checkout dev-portable          (pour reprendre le dev)
+       git stash pop       (récupère tes modifs)
+
+
+═══════════════════════════════════════════════════════════════════════
+  WORKFLOW VS CODE
+═══════════════════════════════════════════════════════════════════════
+
+  1. Ouvre VS Code
+  2. File → Open Folder → C:\Darknexus-main
+  3. En bas à gauche tu vois la branche courante : "dev-portable"
+  4. Pour commiter depuis VS Code :
+     - Icône "Source Control" (Ctrl+Shift+G)
+     - Stage changes (bouton +)
+     - Écris un message de commit
+     - Clique sur ✓ Commit
+     - Puis "Sync" pour pusher
+
+  Extensions VS Code recommandées (si pas déjà installées) :
+    - Python
+    - ESLint
+    - Tailwind CSS IntelliSense
+    - GitLens
+    - MongoDB for VS Code
+
+
+═══════════════════════════════════════════════════════════════════════
+  RÉSUMÉ RAPIDE (si tu as déjà tout installé)
+═══════════════════════════════════════════════════════════════════════
+
+  1. git clone https://github.com/adjudan97onely-cyber/Darknexus.git Darknexus-main
+  2. cd Darknexus-main
+  3. git checkout dev-portable
+  4. Setup venv : backend, analytics/backend, _publish/.../backend
+  5. npm install : frontend, analytics/frontend, killagain-food, warzone/frontend
+  6. Copie env_export_PORTABLE.zip → lance IMPORT_ENV_DEPUIS_BUREAU.bat
+  7. Lance les apps → tout doit fonctionner identiquement au bureau
+
+
+═══════════════════════════════════════════════════════════════════════
+  EN CAS DE PROBLÈME
+═══════════════════════════════════════════════════════════════════════
+
+  App ne démarre pas :
+    → Vérifie MongoDB : Get-Service MongoDB
+    → Vérifie que les .env sont présents : ls backend\.env
+    → Vérifie le venv : ls _publish\Darknexus-full\analytics-lottery\backend\venv
+
+  Erreur insertBefore / page blanche sur Darknexus (port 3000) :
+    → Désactive la traduction automatique du navigateur
+    → Ou ouvre en navigation privée
+    → Cette erreur a été corrigée dans le code mais Chrome peut quand même proposer
+
+  Conflit git au pull :
+    → git stash
+    → git pull origin dev-portable
+    → git stash pop
+    → Résous les conflits dans VS Code (marqueurs <<<<)
+
+████████████████████████████████████████████████████████████████████████
