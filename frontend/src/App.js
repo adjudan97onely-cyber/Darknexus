@@ -9,6 +9,7 @@ import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import VoiceAssistantPage from "./pages/VoiceAssistantPage";
 import AIAssistantPage from "./pages/AIAssistantPage";
+import AssistantV2Page from "./pages/AssistantV2Page";
 import WebScraperPage from "./pages/WebScraperPage";
 import LoginPage from "./pages/LoginPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
@@ -37,6 +38,7 @@ function AppContent() {
         <Route path="/project/:projectId" element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>} />
         <Route path="/voice-assistant" element={<ProtectedRoute><VoiceAssistantPage /></ProtectedRoute>} />
         <Route path="/assistant" element={<ProtectedRoute><AIAssistantPage /></ProtectedRoute>} />
+        <Route path="/assistant-v2" element={<ProtectedRoute><AssistantV2Page /></ProtectedRoute>} />
         <Route path="/scraper" element={<ProtectedRoute><WebScraperPage /></ProtectedRoute>} />
         <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
       </Routes>
